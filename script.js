@@ -525,3 +525,17 @@ window.addEventListener("load", () => {
     });
   });
 })();
+
+
+/* ============================================================
+   NO LIVE DEMO POPUP HANDLER
+============================================================ */
+document.querySelectorAll(".no-demo").forEach(btn => {
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();  // Prevents page reload / no action
+    
+    const message = btn.getAttribute("data-message") || "No live demo available for this project.";
+    showPopup(message, false);  // Uses your existing popup system
+  });
+});
+
