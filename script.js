@@ -511,3 +511,16 @@ window.addEventListener("load", () => {
     loader.style.display = "none";
   }, 600);
 });
+
+// ============================================================
+// LIVE DEMO POPUP (For projects without a live demo)
+// ============================================================
+(function () {
+  const buttons = document.querySelectorAll(".no-demo-btn");
+
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      showPopup("⚠ No Live Demo available for this project.", false);
+    });
+  });
+})();
