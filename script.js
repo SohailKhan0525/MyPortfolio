@@ -120,11 +120,14 @@ function showPopup(msg, ok = true) {
 })();
 
 /* ============================================================
-   NAVBAR — SMOOTH SCROLL + ACTIVE HIGHLIGHT
+   NAVBAR — SMOOTH SCROLL + ACTIVE HIGHLIGHT + MOBILE TOGGLE
 ============================================================ */
 (function () {
+  const nav = document.querySelector(".navbar nav");
   const navLinks = document.querySelectorAll(".navbar nav a");
+  const toggle = document.getElementById("nav-toggle");
 
+  // Smooth scroll
   navLinks.forEach((a) => {
     a.addEventListener("click", (e) => {
       const target = document.querySelector(a.getAttribute("href"));
@@ -137,11 +140,13 @@ function showPopup(msg, ok = true) {
         top: offset,
         behavior: "smooth",
       });
+
+      if (nav.classList.contains("open")) closeNav();
     });
   });
 
+  // Active highlight
   const sections = document.querySelectorAll("section[id]");
-
   window.addEventListener("scroll", () => {
     const top = window.scrollY + 120;
     let current = "";
@@ -154,6 +159,22 @@ function showPopup(msg, ok = true) {
       a.classList.toggle("active", a.getAttribute("href") === `#${current}`);
     });
   });
+
+  // Toggle handlers
+  function openNav() {
+    nav.classList.add("open");
+    toggle.setAttribute("aria-expanded", "true");
+  }
+  function closeNav() {
+    nav.classList.remove("open");
+    toggle.setAttribute("aria-expanded", "false");
+  }
+
+  if (toggle) {
+    toggle.addEventListener("click", () => {
+      nav.classList.contains("open") ? closeNav() : openNav();
+    });
+  }
 })();
 
 /* ============================================================
@@ -310,7 +331,6 @@ class ParticleSystem {
   const parts = [];
   for (let i = 0; i < 28; i++) {
     const a = Math.random() * Math.PI * 2;
-    const r = 40 + Math.random() * 80;
 
     parts.push({
       a,
@@ -319,10 +339,7 @@ class ParticleSystem {
     });
   }
 
-  let last = performance.now();
-
   function draw() {
-    const now = performance.now();
     ctx.clearRect(0, 0, W, H);
 
     parts.forEach((p) => {
@@ -512,30 +529,13 @@ window.addEventListener("load", () => {
   }, 600);
 });
 
-
 // ============================================================
-// LIVE DEMO POPUP (For projects without a live demo)
+// NO LIVE DEMO POPUP HANDLER
 // ============================================================
-(function () {
-  const buttons = document.querySelectorAll(".no-demo-btn");
-
-  buttons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      showPopup("⚠ No Live Demo available for this project.", false);
-    });
-  });
-})();
-
-
-/* ============================================================
-   NO LIVE DEMO POPUP HANDLER
-============================================================ */
 document.querySelectorAll(".no-demo").forEach(btn => {
   btn.addEventListener("click", (e) => {
-    e.preventDefault();  // Prevents page reload / no action
-    
+    e.preventDefault();
     const message = btn.getAttribute("data-message") || "No live demo available for this project.";
-    showPopup(message, false);  // Uses your existing popup system
+    showPopup(message, false);
   });
 });
-
