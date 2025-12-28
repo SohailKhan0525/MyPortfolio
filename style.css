@@ -56,9 +56,15 @@ a {
 }
 .logo:hover { transform: scale(1.1); }
 
+.navbar nav {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
 .navbar nav a {
-  margin-left: 26px;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   color: #d7e2ff;
   transition: .18s;
 }
@@ -67,6 +73,26 @@ a {
 .navbar nav a.active {
   color: #4bb8ff;
   border-bottom: 3px solid #5d16ec;
+}
+
+/* Mobile toggle */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  border: 2px solid #4bb8ff;
+  background: rgba(255,255,255,0.05);
+  padding: 10px;
+}
+.nav-toggle span {
+  display: block;
+  height: 2px;
+  background: #4bb8ff;
+  border-radius: 999px;
 }
 
 /* ===================================================================
@@ -192,10 +218,14 @@ a {
   display: grid;
   place-items: center;
   border: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
 }
 
 .hero-logo {
   width: 70%;
+  max-width: 280px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 24px rgba(58,203,255,0.35));
   animation: float 5s ease-in-out infinite;
 }
 
@@ -479,6 +509,11 @@ a {
 /* ===================================================================
    RESPONSIVE
 =================================================================== */
+@media (max-width: 1100px) {
+  .navbar { padding: 16px 5%; }
+  .section { padding: 100px 5%; }
+}
+
 @media (max-width: 900px) {
   .hero {
     flex-direction: column;
@@ -486,7 +521,40 @@ a {
   }
   .hero-right { order: -1; }
   .logo-frame { width: 260px; height: 260px; }
-  .name { font-size: 34px; }
+  .name { font-size: 38px; }
+
+  /* Mobile nav */
+  .nav-toggle { display: flex; }
+  .navbar nav {
+    position: absolute;
+    top: 76px;
+    right: 5%;
+    left: 5%;
+    padding: 14px;
+    border-radius: 14px;
+    background: rgba(5,8,15,0.9);
+    border: 1px solid rgba(255,255,255,0.06);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    transform: translateY(-16px);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .navbar nav.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .navbar nav a { width: 100%; }
+  #theme-toggle { top: 16px; right: 72px; }
+}
+
+@media (max-width: 600px) {
+  .section { padding: 90px 1.5rem; }
+  .navbar { padding: 14px 1.5rem; }
+  .navbar nav { right: 1.5rem; left: 1.5rem; }
+  .hero-logo { width: 74%; max-width: 240px; }
 }
 
 @media (max-width: 500px) {
