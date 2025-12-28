@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>TriAI Labs • Mohd Zaheer Uddin</title>
+  <title>Qofeno Labs • Mohd Zaheer Uddin</title>
 
   <!-- Font Awesome -->
   <link rel="stylesheet"
@@ -18,7 +18,7 @@
   <!-- PRELOADER -->
   <div id="preloader" aria-hidden="true">
     <div class="loader-ring" role="img" aria-label="Loading"></div>
-    <p class="loader-text">TriAI Labs</p>
+    <p class="loader-text">Qofeno Labs</p>
   </div>
 
   <!-- THEME TOGGLE -->
@@ -32,7 +32,10 @@
 
   <!-- NAVBAR -->
   <header class="navbar" id="navbar">
-    <div class="logo"><a href="#">TriAI Labs</a></div>
+    <div class="logo"><a href="#">Qofeno Labs</a></div>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
     <nav>
       <a href="#home">Home</a>
       <a href="#projects">Projects</a>
@@ -79,8 +82,8 @@
       <div class="hero-right reveal-on-scroll">
         <canvas id="logo-canvas" class="logo-canvas" aria-hidden="true"></canvas>
 
-        <div class="logo-frame" role="img" aria-label="TriAI Labs logo">
-          <img src="main.png" class="hero-logo" alt="TriAI Labs logo" />
+        <div class="logo-frame" role="img" aria-label="Qofeno Labs logo">
+          <img src="main.png" class="hero-logo" alt="Qofeno Labs logo" />
         </div>
       </div>
     </section>
@@ -92,12 +95,12 @@
 
       <div class="projects-grid">
 
-                <!-- PROJECT 1 -->
+        <!-- PROJECT 1 -->
         <article class="project-card-3d reveal-on-scroll" data-tilt>
           <canvas class="project-glow-canvas" aria-hidden="true"></canvas>
 
           <div class="project-content">
-            <div class="project-icon" aria-hidden="true"><i class="fa-solid fa-heart"></i></i></div>
+            <div class="project-icon" aria-hidden="true"><i class="fa-solid fa-heart"></i></div>
 
             <h3>House Price Prediction</h3>
             <p>
@@ -112,7 +115,7 @@
         </article>
 
         <!-- PROJECT 2 -->
-         <article class="project-card-3d reveal-on-scroll" data-tilt>
+        <article class="project-card-3d reveal-on-scroll" data-tilt>
           <canvas class="project-glow-canvas" aria-hidden="true"></canvas>
 
           <div class="project-content">
@@ -124,23 +127,21 @@
             </p>
 
             <div class="project-buttons">
-              <!-- <button class="project-btn no-demo-btn" type="button">Live Demo</button> -->
-               <!-- <a class="project-btn no-demo-btn" href="">Live Demo</a> -->
-              <a class="project-btn no-demo" 
-   data-message="This project is a pure ML model, so no live demo is available.">
-   Live Demo
-</a>
+              <a class="project-btn no-demo"
+                 data-message="This project is a pure ML model, so no live demo is available.">
+                 Live Demo
+              </a>
               <a class="project-btn" href="https://github.com/SohailKhan0525/Global-Earthquake-Prediction" target="_blank" rel="noopener">GitHub</a>
             </div>
           </div>
         </article>
 
-        <!-- Project 2-->
+        <!-- Project 3 -->
         <article class="project-card-3d reveal-on-scroll" data-tilt>
           <canvas class="project-glow-canvas" aria-hidden="true"></canvas>
 
           <div class="project-content">
-            <div class="project-icon" aria-hidden="true"><i class="fa-solid fa-heart"></i></i></div>
+            <div class="project-icon" aria-hidden="true"><i class="fa-solid fa-heart"></i></div>
 
             <h3>Heart Disease Prediction</h3>
             <p>
@@ -155,7 +156,7 @@
           </div>
         </article>
 
-        <!-- PROJECT 3 -->
+        <!-- PROJECT 4 -->
         <article class="project-card-3d reveal-on-scroll" data-tilt>
           <canvas class="project-glow-canvas" aria-hidden="true"></canvas>
 
@@ -175,7 +176,7 @@
           </div>
         </article>
 
-        <!-- PROJECT 4 -->
+        <!-- PROJECT 5 -->
         <article class="project-card-3d reveal-on-scroll" data-tilt>
           <canvas class="project-glow-canvas" aria-hidden="true"></canvas>
 
@@ -196,12 +197,12 @@
           </div>
         </article>
 
-        <!-- PROJECT 5 -->
+        <!-- PROJECT 6 -->
         <article class="project-card-3d reveal-on-scroll" data-tilt>
           <canvas class="project-glow-canvas" aria-hidden="true"></canvas>
 
           <div class="project-content">
-            <div class="project-icon" aria-hidden="true"><i class="fa-solid fa-file"></i></i></div>
+            <div class="project-icon" aria-hidden="true"><i class="fa-solid fa-file"></i></div>
 
             <h3>File Handling</h3>
             <p>
@@ -446,7 +447,7 @@
 
     <!-- FOOTER -->
     <footer class="footer">
-      <h3>TriAI Labs</h3>
+      <h3>Qofeno Labs</h3>
       <p>Mohd Zaheer Uddin</p>
       <div class="footer-socials">
         <a href="https://www.linkedin.com/in/mohd-zaheer-uddin-166b3b356/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-linkedin" aria-hidden="true"></i></a>
@@ -454,7 +455,7 @@
         <a href="https://www.youtube.com/@OfficialSohailKhan5" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>
         <a href="https://www.instagram.com/sohailkhan0525/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
       </div>
-      <p class="copyright">© 2025 TriAI Labs. Made with ❤️ by TriAI Labs.</p>
+      <p class="copyright">© 2025 Qofeno Labs. Made with ❤️ by Qofeno Labs.</p>
     </footer>
 
   </main>
@@ -465,4 +466,4 @@
   <!-- Your main JS (deferred) -->
   <script src="script.js" defer></script>
 </body>
-</html>
+            </html>
