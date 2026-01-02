@@ -100,6 +100,7 @@ function showPopup(msg, ok = true) {
    SKILL TILE 3D TILT
 ============================================================ */
 (function () {
+  if (!("ontouchstart" in window)) {
   document.querySelectorAll("[data-tilt]").forEach((el) => {
     el.addEventListener("mousemove", (e) => {
       const r = el.getBoundingClientRect();
@@ -189,7 +190,7 @@ class ParticleSystem {
 
     this.opts = Object.assign(
       {
-        count: 90,
+        count: window.innerWidth < 900 ? 45 : 90,
         speed: 0.35,
         size: 1.6,
         linkDist: 120,
@@ -318,6 +319,7 @@ class ParticleSystem {
    LOGO PARTICLE RING
 ============================================================ */
 (function () {
+  if (window.innerWidth < 900) return;
   const canvas = document.getElementById("logo-canvas");
   if (!canvas) return;
 
@@ -409,6 +411,7 @@ class ParticleSystem {
   const cards = document.querySelectorAll(".project-card-3d");
 
   cards.forEach((card) => {
+if (window.innerWidth < 900) return;
     /* Spark Canvas */
     const canvas = document.createElement("canvas");
     canvas.className = "project-glow-canvas";
