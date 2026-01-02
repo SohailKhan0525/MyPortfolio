@@ -2,52 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Qofeno Labs • Mohd Zaheer Uddin</title>
 
-  <!-- Font Awesome -->
-  <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
+  
   <meta name="theme-color" content="#02040a" />
 </head>
 <body>
 
-  <!-- PRELOADER -->
   <div id="preloader" aria-hidden="true">
     <div class="loader-ring" role="img" aria-label="Loading"></div>
     <p class="loader-text">Qofeno Labs</p>
   </div>
 
-  <!-- THEME TOGGLE -->
   <button id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
     <i class="fa-solid fa-sun" aria-hidden="true"></i>
     <i class="fa-solid fa-moon" aria-hidden="true"></i>
   </button>
 
-  <!-- PAGE PARTICLES -->
   <canvas id="bg-canvas" class="bg-canvas" aria-hidden="true"></canvas>
 
-  <!-- NAVBAR -->
   <header class="navbar" id="navbar">
     <div class="logo"><a href="#">Qofeno Labs</a></div>
     <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
     <nav>
-      <a href="#home">Home</a>
+      <a href="#home" class="active">Home</a>
       <a href="#projects">Projects</a>
       <a href="#skills">Skills</a>
       <a href="#contact">Contact</a>
     </nav>
   </header>
 
-  <!-- MAIN CONTENT -->
   <main>
 
-    <!-- HERO -->
     <section id="home" class="hero section">
       <div class="hero-left reveal-on-scroll">
         <h2 class="hello">Hello, I'm</h2>
@@ -61,7 +53,6 @@
           solving real-world problems and improving my skills daily.
         </p>
 
-        <!-- Social icons -->
         <div class="social-icons">
           <a href="https://www.linkedin.com/in/mohd-zaheer-uddin-166b3b356/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
             <i class="fa-brands fa-linkedin" aria-hidden="true"></i>
@@ -69,11 +60,14 @@
           <a href="https://github.com/SohailKhan0525" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
             <i class="fa-brands fa-github" aria-hidden="true"></i>
           </a>
-          <a href="https://www.youtube.com/@OfficialSohailKhan5" target="_blank" rel="noopener noreferrer" aria-label="Youtube"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>
-          <a href="https://www.instagram.com/sohailkhan0525/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+          <a href="https://www.youtube.com/@SohailKhan0525" target="_blank" rel="noopener noreferrer" aria-label="Youtube">
+            <i class="fa-brands fa-youtube" aria-hidden="true"></i>
+          </a>
+          <a href="https://www.instagram.com/sohailkhan0525/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+          </a>
         </div>
 
-        <!-- Hire me -->
         <div class="hire-wrapper">
           <a href="#contact" class="hire-btn">Hire Me</a>
         </div>
@@ -88,25 +82,17 @@
       </div>
     </section>
 
-    <!-- PROJECTS -->
     <section id="projects" class="projects section">
       <h2 class="section-title">Projects</h2>
       <p class="section-subtext">Some of my featured work with Python, AI, automation, and engineering.</p>
 
       <div class="projects-grid">
 
-        <!-- PROJECT 1 -->
         <article class="project-card-3d reveal-on-scroll" data-tilt>
-          <canvas class="project-glow-canvas" aria-hidden="true"></canvas>
-
           <div class="project-content">
             <div class="project-icon" aria-hidden="true"><i class="fa-solid fa-heart"></i></div>
-
             <h3>House Price Prediction</h3>
-            <p>
-              An AI model that predicts the house price.
-            </p>
-
+            <p>An AI model that predicts the house price.</p>
             <div class="project-buttons">
               <a class="project-btn" href="https://housepriceprediction-rqo8ykwgldxbpemwl6kvok.streamlit.app/" target="_blank" rel="noopener">Live Demo</a>
               <a class="project-btn" href="https://github.com/SohailKhan0525/HousePricePrediction" target="_blank" rel="noopener">GitHub</a>
@@ -114,41 +100,23 @@
           </div>
         </article>
 
-        <!-- PROJECT 2 -->
         <article class="project-card-3d reveal-on-scroll" data-tilt>
-          <canvas class="project-glow-canvas" aria-hidden="true"></canvas>
-
           <div class="project-content">
             <div class="project-icon" aria-hidden="true"><i class="fa-solid fa-house-chimney-crack"></i></div>
-
             <h3>Global Earthquake Prediction</h3>
-            <p>
-              An AI model that predicts the global earthquake risks.
-            </p>
-
+            <p>An AI model that predicts the global earthquake risks.</p>
             <div class="project-buttons">
-              <a class="project-btn no-demo"
-                 data-message="This project is a pure ML model, so no live demo is available.">
-                 Live Demo
-              </a>
+              <a class="project-btn no-demo" href="#" data-message="This project is a pure ML model, so no live demo is available.">Live Demo</a>
               <a class="project-btn" href="https://github.com/SohailKhan0525/Global-Earthquake-Prediction" target="_blank" rel="noopener">GitHub</a>
             </div>
           </div>
         </article>
 
-        <!-- Project 3 -->
         <article class="project-card-3d reveal-on-scroll" data-tilt>
-          <canvas class="project-glow-canvas" aria-hidden="true"></canvas>
-
           <div class="project-content">
-            <div class="project-icon" aria-hidden="true"><i class="fa-solid fa-heart"></i></div>
-
+            <div class="project-icon" aria-hidden="true"><i class="fa-solid fa-heart-pulse"></i></div>
             <h3>Heart Disease Prediction</h3>
-            <p>
-              An AI model that predicts the likelihood of heart disease
-              based on patient health metrics and lifestyle factors.
-            </p>
-
+            <p>An AI model that predicts the likelihood of heart disease based on patient health metrics.</p>
             <div class="project-buttons">
               <a class="project-btn" href="https://heartdiseaseml-4zrcurmudxpfxbwygcuyyt.streamlit.app/" target="_blank" rel="noopener">Live Demo</a>
               <a class="project-btn" href="https://github.com/SohailKhan0525/HeartDiseaseML" target="_blank" rel="noopener">GitHub</a>
@@ -156,19 +124,11 @@
           </div>
         </article>
 
-        <!-- PROJECT 4 -->
         <article class="project-card-3d reveal-on-scroll" data-tilt>
-          <canvas class="project-glow-canvas" aria-hidden="true"></canvas>
-
           <div class="project-content">
             <div class="project-icon" aria-hidden="true"><i class="fa-solid fa-graduation-cap"></i></div>
-
             <h3>Student Management</h3>
-            <p>
-              A lightweight student record management system built using Python,
-              designed to help manage student information efficiently.
-            </p>
-
+            <p>A lightweight student record management system built using Python.</p>
             <div class="project-buttons">
               <a class="project-btn" href="https://studentmanagementproject-ulj54ytmcyj55upzakbzhn.streamlit.app/" target="_blank" rel="noopener">Live Demo</a>
               <a class="project-btn" href="https://github.com/SohailKhan0525/StudentManagementProject" target="_blank" rel="noopener">GitHub</a>
@@ -176,20 +136,11 @@
           </div>
         </article>
 
-        <!-- PROJECT 5 -->
         <article class="project-card-3d reveal-on-scroll" data-tilt>
-          <canvas class="project-glow-canvas" aria-hidden="true"></canvas>
-
           <div class="project-content">
             <div class="project-icon" aria-hidden="true"><i class="fa-solid fa-building-columns"></i></div>
-
             <h3>Bank Management System</h3>
-            <p>
-              A Python-based bank management system that allows users to
-              perform banking operations like account creation, deposits,
-              withdrawals, and balance inquiries.
-            </p>
-
+            <p>A Python-based bank system for account creation, deposits, withdrawals, and inquiries.</p>
             <div class="project-buttons">
               <a class="project-btn" href="https://bankmanagementproject-brt9pt282uavy8ddzzy7ql.streamlit.app/" target="_blank" rel="noopener">Live Demo</a>
               <a class="project-btn" href="https://github.com/SohailKhan0525/BankManagementProject" target="_blank" rel="noopener">GitHub</a>
@@ -197,19 +148,11 @@
           </div>
         </article>
 
-        <!-- PROJECT 6 -->
         <article class="project-card-3d reveal-on-scroll" data-tilt>
-          <canvas class="project-glow-canvas" aria-hidden="true"></canvas>
-
           <div class="project-content">
-            <div class="project-icon" aria-hidden="true"><i class="fa-solid fa-file"></i></div>
-
+            <div class="project-icon" aria-hidden="true"><i class="fa-solid fa-folder-open"></i></div>
             <h3>File Handling</h3>
-            <p>
-              A Python-based file handling system that allows users to
-              create, read, update, and delete files efficiently.
-            </p>
-
+            <p>A Python-based file handling system to create, read, update, and delete files.</p>
             <div class="project-buttons">
               <a class="project-btn" href="https://filehandlingproject-mbevgff23iqepxbioy4hx5.streamlit.app/" target="_blank" rel="noopener">Live Demo</a>
               <a class="project-btn" href="https://github.com/SohailKhan0525/File_Handling_Project" target="_blank" rel="noopener">GitHub</a>
@@ -220,20 +163,16 @@
       </div>
     </section>
 
-    <!-- SKILLS -->
     <section id="skills" class="skills section">
       <h2 class="section-title">My Skills</h2>
       <p class="section-subtext">Technologies I use and topics I'm learning.</p>
 
       <div class="skills-container">
 
-        <!-- PROGRAMMING -->
         <div class="skill-category reveal-on-scroll">
           <h3 class="cat-title"><i class="fa-solid fa-code" aria-hidden="true"></i> Programming</h3>
           <p class="cat-sub">Core foundations for AI engineering.</p>
-
           <div class="skill-box">
-
             <div class="skill-item" data-tilt>
               <div class="skill-head">
                 <span><i class="fa-brands fa-python" aria-hidden="true"></i> Python</span>
@@ -241,7 +180,6 @@
               </div>
               <div class="bar"><div class="fill" data-level="100" aria-hidden="true"></div></div>
             </div>
-
             <div class="skill-item" data-tilt>
               <div class="skill-head">
                 <span><i class="fa-brands fa-git-alt" aria-hidden="true"></i> Git</span>
@@ -249,7 +187,6 @@
               </div>
               <div class="bar"><div class="fill" data-level="40" aria-hidden="true"></div></div>
             </div>
-
             <div class="skill-item" data-tilt>
               <div class="skill-head">
                 <span><i class="fa-solid fa-terminal" aria-hidden="true"></i> Linux</span>
@@ -257,7 +194,6 @@
               </div>
               <div class="bar"><div class="fill" data-level="40" aria-hidden="true"></div></div>
             </div>
-
             <div class="skill-item" data-tilt>
               <div class="skill-head">
                 <span><i class="fa-solid fa-database" aria-hidden="true"></i> Data Structures</span>
@@ -265,17 +201,13 @@
               </div>
               <div class="bar"><div class="fill" data-level="50" aria-hidden="true"></div></div>
             </div>
-
           </div>
         </div>
 
-        <!-- MATH -->
         <div class="skill-category reveal-on-scroll">
           <h3 class="cat-title"><i class="fa-solid fa-square-root-variable" aria-hidden="true"></i> Math</h3>
           <p class="cat-sub">Mathematical backbone for ML & DL.</p>
-
           <div class="skill-box">
-
             <div class="skill-item" data-tilt>
               <div class="skill-head">
                 <span><i class="fa-solid fa-superscript" aria-hidden="true"></i> Linear Algebra</span>
@@ -283,7 +215,6 @@
               </div>
               <div class="bar"><div class="fill" data-level="50" aria-hidden="true"></div></div>
             </div>
-
             <div class="skill-item" data-tilt>
               <div class="skill-head">
                 <span><i class="fa-solid fa-infinity" aria-hidden="true"></i> Calculus</span>
@@ -291,7 +222,6 @@
               </div>
               <div class="bar"><div class="fill" data-level="50" aria-hidden="true"></div></div>
             </div>
-
             <div class="skill-item" data-tilt>
               <div class="skill-head">
                 <span><i class="fa-solid fa-percent" aria-hidden="true"></i> Probability</span>
@@ -299,7 +229,6 @@
               </div>
               <div class="bar"><div class="fill" data-level="50" aria-hidden="true"></div></div>
             </div>
-
             <div class="skill-item" data-tilt>
               <div class="skill-head">
                 <span><i class="fa-solid fa-chart-simple" aria-hidden="true"></i> Statistics</span>
@@ -307,17 +236,13 @@
               </div>
               <div class="bar"><div class="fill" data-level="50" aria-hidden="true"></div></div>
             </div>
-
           </div>
         </div>
 
-        <!-- MACHINE LEARNING -->
         <div class="skill-category reveal-on-scroll">
           <h3 class="cat-title"><i class="fa-solid fa-robot" aria-hidden="true"></i> Machine Learning</h3>
           <p class="cat-sub">Modeling fundamentals for AI systems.</p>
-
           <div class="skill-box">
-
             <div class="skill-item" data-tilt>
               <div class="skill-head">
                 <span><i class="fa-solid fa-check-double" aria-hidden="true"></i> Supervised Learning</span>
@@ -325,7 +250,6 @@
               </div>
               <div class="bar"><div class="fill" data-level="80" aria-hidden="true"></div></div>
             </div>
-
             <div class="skill-item" data-tilt>
               <div class="skill-head">
                 <span><i class="fa-solid fa-expand" aria-hidden="true"></i> Unsupervised Learning</span>
@@ -333,7 +257,6 @@
               </div>
               <div class="bar"><div class="fill" data-level="50" aria-hidden="true"></div></div>
             </div>
-
             <div class="skill-item" data-tilt>
               <div class="skill-head">
                 <span><i class="fa-solid fa-chart-line" aria-hidden="true"></i> Model Evaluation</span>
@@ -341,17 +264,13 @@
               </div>
               <div class="bar"><div class="fill" data-level="50" aria-hidden="true"></div></div>
             </div>
-
           </div>
         </div>
 
-        <!-- DEEP LEARNING -->
         <div class="skill-category reveal-on-scroll">
           <h3 class="cat-title"><i class="fa-solid fa-brain" aria-hidden="true"></i> Deep Learning</h3>
           <p class="cat-sub">Neural network families to learn.</p>
-
           <div class="skill-box">
-
             <div class="skill-item" data-tilt>
               <div class="skill-head">
                 <span><i class="fa-solid fa-network-wired" aria-hidden="true"></i> Neural Networks</span>
@@ -359,7 +278,6 @@
               </div>
               <div class="bar"><div class="fill" data-level="5" aria-hidden="true"></div></div>
             </div>
-
             <div class="skill-item" data-tilt>
               <div class="skill-head">
                 <span><i class="fa-solid fa-image" aria-hidden="true"></i> CNNs</span>
@@ -367,7 +285,6 @@
               </div>
               <div class="bar"><div class="fill" data-level="5" aria-hidden="true"></div></div>
             </div>
-
             <div class="skill-item" data-tilt>
               <div class="skill-head">
                 <span><i class="fa-solid fa-wave-square" aria-hidden="true"></i> RNNs</span>
@@ -375,7 +292,6 @@
               </div>
               <div class="bar"><div class="fill" data-level="5" aria-hidden="true"></div></div>
             </div>
-
             <div class="skill-item" data-tilt>
               <div class="skill-head">
                 <span><i class="fa-solid fa-shapes" aria-hidden="true"></i> Transformers</span>
@@ -383,17 +299,13 @@
               </div>
               <div class="bar"><div class="fill" data-level="5" aria-hidden="true"></div></div>
             </div>
-
           </div>
         </div>
 
-        <!-- MODERN AI -->
         <div class="skill-category reveal-on-scroll">
           <h3 class="cat-title"><i class="fa-solid fa-rocket" aria-hidden="true"></i> Modern AI</h3>
           <p class="cat-sub">LLMs, RAG, agent systems & prompts.</p>
-
           <div class="skill-box">
-
             <div class="skill-item" data-tilt>
               <div class="skill-head">
                 <span><i class="fa-solid fa-file-lines" aria-hidden="true"></i> LLMs</span>
@@ -401,7 +313,6 @@
               </div>
               <div class="bar"><div class="fill" data-level="5" aria-hidden="true"></div></div>
             </div>
-
             <div class="skill-item" data-tilt>
               <div class="skill-head">
                 <span><i class="fa-solid fa-robot" aria-hidden="true"></i> Agentic AI</span>
@@ -409,7 +320,6 @@
               </div>
               <div class="bar"><div class="fill" data-level="5" aria-hidden="true"></div></div>
             </div>
-
             <div class="skill-item" data-tilt>
               <div class="skill-head">
                 <span><i class="fa-solid fa-book" aria-hidden="true"></i> RAG</span>
@@ -417,7 +327,6 @@
               </div>
               <div class="bar"><div class="fill" data-level="5" aria-hidden="true"></div></div>
             </div>
-
             <div class="skill-item" data-tilt>
               <div class="skill-head">
                 <span><i class="fa-solid fa-terminal" aria-hidden="true"></i> Prompt Engineering</span>
@@ -425,45 +334,40 @@
               </div>
               <div class="bar"><div class="fill" data-level="5" aria-hidden="true"></div></div>
             </div>
-
           </div>
         </div>
 
       </div>
     </section>
 
-    <!-- CONTACT -->
     <section id="contact" class="contact section">
       <h2 class="section-title">Get In Touch</h2>
       <p class="section-subtext">Let’s work together or talk about a project.</p>
 
       <form id="contact-form" class="contact-form" novalidate>
-        <input type="text" id="name" placeholder="Your Name" required />
-        <input type="email" id="email" placeholder="Your Email" required />
-        <textarea id="message" placeholder="Your Message" required></textarea>
+        <input type="text" id="name" name="user_name" placeholder="Your Name" required />
+        <input type="email" id="email" name="user_email" placeholder="Your Email" required />
+        <textarea id="message" name="message" placeholder="Your Message" required></textarea>
         <button type="submit" class="send-btn">Send Message</button>
       </form>
     </section>
 
-    <!-- FOOTER -->
     <footer class="footer">
       <h3>Qofeno Labs</h3>
       <p>Mohd Zaheer Uddin</p>
       <div class="footer-socials">
         <a href="https://www.linkedin.com/in/mohd-zaheer-uddin-166b3b356/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-linkedin" aria-hidden="true"></i></a>
         <a href="https://github.com/SohailKhan0525" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github" aria-hidden="true"></i></a>
-        <a href="https://www.youtube.com/@OfficialSohailKhan5" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>
+        <a href="https://www.youtube.com/@SohailKhan0525" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>
         <a href="https://www.instagram.com/sohailkhan0525/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
       </div>
-      <p class="copyright">© 2025 Qofeno Labs. Made with ❤️ by Qofeno Labs.</p>
+      <p class="copyright">© 2025 Qofeno Labs. Made with ❤️ by Mohd Zaheer Uddin</p>
     </footer>
 
   </main>
 
-  <!-- EmailJS SDK (required by your script) -->
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js" defer></script>
 
-  <!-- Your main JS (deferred) -->
   <script src="script.js" defer></script>
 </body>
 </html>
