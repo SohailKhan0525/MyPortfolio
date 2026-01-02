@@ -2,6 +2,8 @@
    EMAILJS CONFIG
 ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
+  // Initialize EmailJS with your Public Key
+  // Make sure "YITu4swbGHXKFsR0q" is your actual Public Key from EmailJS dashboard
   emailjs.init("YITu4swbGHXKFsR0q");
 
   const form = document.getElementById("contact-form");
@@ -19,18 +21,27 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    const sendBtn = form.querySelector(".send-btn");
+    const originalText = sendBtn.textContent;
+    sendBtn.textContent = "Sending...";
+    sendBtn.disabled = true;
+
     try {
+      // Make sure Service ID and Template ID match your EmailJS dashboard
       await emailjs.send("service_kmvnnax", "template_yadt1ng", {
         from_name: name,
         reply_to: email,
-        message,
+        message: message,
       });
 
       showPopup("Message sent — thank you!", true);
       form.reset();
     } catch (err) {
-      console.error(err);
+      console.error("EmailJS Error:", err);
       showPopup("Failed to send — try again.", false);
+    } finally {
+      sendBtn.textContent = originalText;
+      sendBtn.disabled = false;
     }
   });
 });
@@ -46,23 +57,34 @@ function showPopup(msg, ok = true) {
     document.body.appendChild(p);
   }
 
+  // Reset styles to ensure it displays correctly
   Object.assign(p.style, {
     position: "fixed",
     bottom: "36px",
     left: "50%",
     transform: "translateX(-50%)",
-    padding: "12px 20px",
-    borderRadius: "10px",
-    fontWeight: "700",
+    padding: "12px 24px",
+    borderRadius: "50px",
+    fontWeight: "600",
     background: ok ? "#00c8ff" : "#ff4b4b",
     color: "#000",
-    opacity: "1",
-    zIndex: 9999,
-    transition: "opacity .6s ease",
+    opacity: "0",
+    zIndex: 99999,
+    transition: "opacity 0.4s ease, transform 0.4s ease",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
   });
 
+  // Trigger reflow
+  void p.offsetWidth;
+
   p.textContent = msg;
-  setTimeout(() => (p.style.opacity = "0"), 2600);
+  p.style.opacity = "1";
+  p.style.transform = "translateX(-50%) translateY(0)";
+
+  setTimeout(() => {
+    p.style.opacity = "0";
+    p.style.transform = "translateX(-50%) translateY(20px)";
+  }, 3000);
 }
 
 /* ============================================================
@@ -83,6 +105,7 @@ function showPopup(msg, ok = true) {
         const fills = cat.querySelectorAll(".fill");
         fills.forEach((f, i) => {
           const level = parseInt(f.getAttribute("data-level") || 0);
+          // Minimum width for visibility
           const width = level <= 5 ? 5 : level;
           setTimeout(() => (f.style.width = width + "%"), 200 + i * 120);
         });
@@ -90,7 +113,7 @@ function showPopup(msg, ok = true) {
         obs.unobserve(cat);
       });
     },
-    { threshold: 0.2 }
+    { threshold: 0.1 }
   );
 
   categories.forEach((c) => obs.observe(c));
@@ -100,24 +123,34 @@ function showPopup(msg, ok = true) {
    SKILL TILE 3D TILT
 ============================================================ */
 (function () {
-  if (!("ontouchstart" in window)) {
-  document.querySelectorAll("[data-tilt]").forEach((el) => {
-    el.addEventListener("mousemove", (e) => {
-      const r = el.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width;
-      const y = (e.clientY - r.top) / r.height;
+  // Check if device supports touch (to disable tilt on mobile)
+  const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
-      const rx = (y - 0.5) * 14;
-      const ry = (x - 0.5) * -14;
+  if (!isTouch) {
+    document.querySelectorAll("[data-tilt]").forEach((el) => {
+      el.addEventListener("mousemove", (e) => {
+        const r = el.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width;
+        const y = (e.clientY - r.top) / r.height;
 
-      el.style.transform =
-        `rotateX(${rx}deg) rotateY(${ry}deg) translateY(-6px) scale(1.03)`;
+        const rx = (y - 0.5) * 14;
+        const ry = (x - 0.5) * -14;
+
+        el.style.transform =
+          `rotateX(${rx}deg) rotateY(${ry}deg) translateY(-6px) scale(1.03)`;
+      });
+
+      el.addEventListener("mouseleave", () => {
+        el.style.transform = "translateY(0) scale(1)";
+        el.style.transition = "transform 0.5s ease";
+        
+        // Remove transition after it finishes to prevent lag on next mousemove
+        setTimeout(() => {
+            el.style.transition = "";
+        }, 500);
+      });
     });
-
-    el.addEventListener("mouseleave", () => {
-      el.style.transform = "";
-    });
-  });
+  } // <--- FIXED: Added missing closing brace for the if statement
 })();
 
 /* ============================================================
@@ -131,11 +164,14 @@ function showPopup(msg, ok = true) {
   // Smooth scroll
   navLinks.forEach((a) => {
     a.addEventListener("click", (e) => {
-      const target = document.querySelector(a.getAttribute("href"));
+      e.preventDefault();
+      const targetId = a.getAttribute("href");
+      if (targetId === "#") return;
+      
+      const target = document.querySelector(targetId);
       if (!target) return;
 
-      e.preventDefault();
-      const offset = target.getBoundingClientRect().top + window.scrollY - 90;
+      const offset = target.getBoundingClientRect().top + window.scrollY - 80;
 
       window.scrollTo({
         top: offset,
@@ -165,10 +201,12 @@ function showPopup(msg, ok = true) {
   function openNav() {
     nav.classList.add("open");
     toggle.setAttribute("aria-expanded", "true");
+    toggle.classList.add("active");
   }
   function closeNav() {
     nav.classList.remove("open");
     toggle.setAttribute("aria-expanded", "false");
+    toggle.classList.remove("active");
   }
 
   if (toggle) {
@@ -207,9 +245,11 @@ class ParticleSystem {
   }
 
   resize() {
-    this.canvas.width = this.canvas.clientWidth * this.dpr;
-    this.canvas.height = this.canvas.clientHeight * this.dpr;
-    this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    this.canvas.width = window.innerWidth * this.dpr;
+    this.canvas.height = window.innerHeight * this.dpr;
+    this.ctx.scale(this.dpr, this.dpr);
+    this.canvas.style.width = window.innerWidth + "px";
+    this.canvas.style.height = window.innerHeight + "px";
   }
 
   init() {
@@ -220,8 +260,8 @@ class ParticleSystem {
   }
 
   create() {
-    const w = this.canvas.clientWidth;
-    const h = this.canvas.clientHeight;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
 
     return {
       x: Math.random() * w,
@@ -237,18 +277,21 @@ class ParticleSystem {
 
   animate() {
     const now = performance.now();
-    const dt = now - this.last;
+    let dt = (now - this.last) / 16.66;
     this.last = now;
 
-    this.update(dt / 16.66);
+    // Prevent huge jumps if tab is inactive
+    if (dt > 5) dt = 1;
+
+    this.update(dt);
     this.draw();
 
     requestAnimationFrame(() => this.animate());
   }
 
   update(dt) {
-    const w = this.canvas.clientWidth;
-    const h = this.canvas.clientHeight;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
 
     for (const p of this.particles) {
       p.x += p.vx * dt;
@@ -263,8 +306,8 @@ class ParticleSystem {
 
   draw() {
     const ctx = this.ctx;
-    const w = this.canvas.clientWidth;
-    const h = this.canvas.clientHeight;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
 
     ctx.clearRect(0, 0, w, h);
     ctx.globalCompositeOperation = "lighter";
@@ -304,19 +347,11 @@ class ParticleSystem {
 (function () {
   const bg = document.getElementById("bg-canvas");
   if (!bg) return;
-
-  const resize = () => {
-    bg.style.width = window.innerWidth + "px";
-    bg.style.height = window.innerHeight + "px";
-  };
-  resize();
-
-  window.addEventListener("resize", resize);
   new ParticleSystem(bg);
 })();
 
 /* ============================================================
-   LOGO PARTICLE RING
+   LOGO PARTICLE RING (Desktop Only)
 ============================================================ */
 (function () {
   if (window.innerWidth < 900) return;
@@ -373,6 +408,7 @@ class ParticleSystem {
   let i = 0;
 
   setInterval(() => {
+    role.style.transition = "opacity 0.3s ease";
     role.style.opacity = "0";
 
     setTimeout(() => {
@@ -398,7 +434,7 @@ class ParticleSystem {
         }
       });
     },
-    { threshold: 0.2 }
+    { threshold: 0.1 }
   );
 
   cards.forEach((c) => obs.observe(c));
@@ -409,9 +445,11 @@ class ParticleSystem {
 ============================================================ */
 (function () {
   const cards = document.querySelectorAll(".project-card-3d");
+  
+  // Skip complex animations on small screens for performance
+  if (window.innerWidth < 900) return;
 
   cards.forEach((card) => {
-if (window.innerWidth < 900) return;
     /* Spark Canvas */
     const canvas = document.createElement("canvas");
     canvas.className = "project-glow-canvas";
@@ -480,7 +518,7 @@ if (window.innerWidth < 900) return;
     });
 
     /* Border Pulse */
-    let glow = 0;
+    let glow = Math.random() * 10;
     function glowBorder() {
       glow += 0.03;
       const t = (Math.sin(glow) + 1) / 2;
@@ -488,10 +526,13 @@ if (window.innerWidth < 900) return;
       const hue = 190 + t * 40;
       const alpha = 0.25 + t * 0.25;
 
-      card.style.boxShadow =
-        `0 0 ${14 + t * 16}px rgba(75,184,255,0.25)`;
-      card.style.border =
-        `1px solid hsla(${hue},90%,65%,${alpha})`;
+      // Only apply border glow if strict light mode isn't active 
+      // (or let CSS handle it via light-mode class to avoid JS conflicts)
+      if (!document.body.classList.contains("light-mode")) {
+         card.style.borderColor = `hsla(${hue},90%,65%,${alpha})`;
+      } else {
+         card.style.borderColor = "";
+      }
 
       requestAnimationFrame(glowBorder);
     }
@@ -505,6 +546,7 @@ if (window.innerWidth < 900) return;
 (function () {
   const toggle = document.getElementById("theme-toggle");
   const body = document.body;
+  if (!toggle) return;
 
   let saved = localStorage.getItem("theme");
   if (saved === "light") {
@@ -524,6 +566,7 @@ if (window.innerWidth < 900) return;
 ============================================================ */
 window.addEventListener("load", () => {
   const loader = document.getElementById("preloader");
+  if (!loader) return;
 
   loader.classList.add("fade-out");
 
@@ -532,9 +575,9 @@ window.addEventListener("load", () => {
   }, 600);
 });
 
-// ============================================================
-// NO LIVE DEMO POPUP HANDLER
-// ============================================================
+/* ============================================================
+   NO LIVE DEMO POPUP HANDLER
+============================================================ */
 document.querySelectorAll(".no-demo").forEach(btn => {
   btn.addEventListener("click", (e) => {
     e.preventDefault();
