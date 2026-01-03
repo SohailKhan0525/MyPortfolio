@@ -644,3 +644,7 @@ footer {
   letter-spacing: 2px;
   animation: blink 1s infinite;
 }
+
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+@keyframes blink { 50% { opacity: 0.5; } }
