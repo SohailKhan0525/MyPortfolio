@@ -518,3 +518,96 @@ footer {
     width: 25px; height: 2px; background: #fff;
   }
                     }
+
+/* ============================
+   ABOUT ME – 3D HERO SECTION
+============================ */
+
+.about-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 120px 10%;
+  position: relative;
+}
+
+.about-container {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 80px;
+  align-items: center;
+  width: 100%;
+  perspective: 1200px;
+}
+
+/* TEXT */
+.about-text {
+  opacity: 0;
+  transform: translateX(-80px) rotateY(10deg);
+  transition: all 1s ease;
+}
+
+.about-text.show {
+  opacity: 1;
+  transform: translateX(0) rotateY(0);
+}
+
+.about-title {
+  font-family: var(--font-header);
+  font-size: 3rem;
+  margin-bottom: 30px;
+  letter-spacing: 2px;
+}
+
+.about-text p {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+.about-text strong {
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+.about-goal {
+  margin-top: 30px;
+  border-left: 3px solid var(--neon-cyan);
+  padding-left: 20px;
+}
+
+/* LOGO */
+.about-logo {
+  opacity: 0;
+  transform: translateX(80px) rotateY(-15deg) scale(0.9);
+  transition: all 1.2s ease;
+}
+
+.about-logo.show {
+  opacity: 1;
+  transform: translateX(0) rotateY(0) scale(1);
+}
+
+.about-logo img {
+  width: 100%;
+  max-width: 380px;
+  filter: drop-shadow(0 30px 60px rgba(0, 243, 255, 0.25));
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .about-container {
+    grid-template-columns: 1fr;
+    gap: 60px;
+    text-align: center;
+  }
+
+  .about-text {
+    transform: translateY(40px);
+  }
+
+  .about-logo {
+    transform: translateY(40px);
+  }
+}
