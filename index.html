@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Portfolio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MOHD ZAHEER UDDIN | AI Engineer</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,7 +23,6 @@
   </div>
 
   <div class="noise-overlay"></div>
-
   <div class="cursor-dot" data-cursor-dot></div>
   <div class="cursor-outline" data-cursor-outline></div>
 
@@ -37,328 +36,216 @@
       <a href="#contact" class="magnetic-link">Contact</a>
     </div>
     <button id="mobile-toggle" aria-label="Menu">
-      <span></span><span></span>
+      <span></span><span></span><span></span>
     </button>
   </nav>
 
-  <main id="smooth-wrapper">
-    <div id="smooth-content">
-
-      <section id="home">
-        <div class="hero-container">
-          <div class="hero-text">
-            <h2 class="pre-title"><i class="fa-solid fa-user"></i> SYSTEM ONLINE <i class="fa-solid fa-user"></i></h2>
-            <h1 class="glitch-header" data-text="MOHD ZAHEER UDDIN">MOHD ZAHEER UDDIN</h1>
-            <div class="role-container">
-              <span class="role-prefix">>  I'm an: </span>
-              <span class="typewriter" id="typewriter"></span><span class="cursor-blink">|</span>
-            </div>
-            <p class="hero-bio">
-              Learning to design and train intelligent models at the intersection of <strong>AI</strong>, <strong>machine learning</strong>, and <strong>data science</strong>.
-            </p>
-            
-            <div class="cta-group">
-              <a href="#projects" class="btn-3d primary">
-                <span>VIEW PROJECTS</span>
-              </a>
-              <a href="#contact" class="btn-3d secondary">
-                <span>CONTACT ME</span>
-              </a>
-            </div>
+  <main>
+    <section id="home">
+      <div class="hero-container">
+        <div class="hero-text reveal">
+          <h2 class="pre-title"><i class="fa-solid fa-user"></i> SYSTEM ONLINE <i class="fa-solid fa-user"></i></h2>
+          <h1 class="glitch-header" data-text="MOHD ZAHEER UDDIN">MOHD ZAHEER UDDIN</h1>
+          <div class="role-container">
+            <span class="role-prefix">> I'm an: </span>
+            <span class="typewriter" id="typewriter"></span><span class="cursor-blink">|</span>
           </div>
-        </div>
-
-        <div class="scroll-indicator">
-          <span>SCROLL TO EXPLORE</span>
-          <div class="mouse-icon">
-            <div class="wheel"></div>
-          </div>
-        </div>
-      </section>
-
-      <section id="about" class="about-section">
-        <div class="about-container">
-          <div class="about-text">
-            <h2 class="about-title">ABOUT ME</h2>
-            <p>I’m an aspiring AI and machine learning engineer with a strong interest in building real-world intelligent applications.</p>
-            <p>I have completed Python programming and am currently learning machine learning to strengthen my technical foundation.</p>
-            <p>I enjoy working on practical projects such as AI assistants, talking robots, and prediction models, where I can apply what I learn to real problems.</p>
-            <p class="about-goal">My current goal is to secure an internship, continue improving my skills, and grow as an AI engineer through hands-on experience.</p>
-          </div>
-
-          <div class="about-logo">
-            <img src="main.png" alt="QOFENO Labs Logo">
-          </div>
-        </div>
-      </section>
-
-      <section id="projects">
-        <div class="section-header">
-          <h2 class="section-title">PROJECTS</h2>
-          <div class="line"></div>
-        </div>
-
-        <div class="project-gallery">
-          <div class="project-card glass-card tilt-effect">
-            <div class="card-glow"></div>
-            <div class="card-content">
-              <div class="tech-badge">ML MODEL</div>
-              <h3>House Price Prediction</h3>
-              <p>Advanced regression model utilizing Scikit-Learn to predict real estate values with high accuracy.</p>
-              <div class="card-links">
-                <a href="https://housepriceprediction-rqo8ykwgldxbpemwl6kvok.streamlit.app/" target="_blank" class="link-btn"><i class="fa-solid fa-play"></i> LIVE DEMO</a>
-                <a href="https://github.com/SohailKhan0525/HousePricePrediction" target="_blank" class="link-btn"><i class="fa-brands fa-github"></i> CODE</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="project-card glass-card tilt-effect">
-            <div class="card-glow"></div>
-            <div class="card-content">
-              <div class="tech-badge">ML MODEL</div>
-              <h3>Global Earthquake Prediction</h3>
-              <p>Seismic activity forecasting tool analyzing decades of geological data to assess risk factors.</p>
-              <div class="card-links">
-                <a href="#" id="model-only-btn" class="link-btn"><i class="fa-solid fa-lock"></i> MODEL ONLY</a>
-                <a href="https://github.com/SohailKhan0525/Global-Earthquake-Prediction" target="_blank" class="link-btn"><i class="fa-brands fa-github"></i> CODE</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="project-card glass-card tilt-effect">
-            <div class="card-glow"></div>
-            <div class="card-content">
-              <div class="tech-badge">ML MODEL</div>
-              <h3>Heart Disease Prediction</h3>
-              <p>Diagnostic support tool using logistic regression to identify potential cardiac health risks.</p>
-              <div class="card-links">
-                <a href="https://heartdiseaseml-4zrcurmudxpfxbwygcuyyt.streamlit.app/" target="_blank" class="link-btn"><i class="fa-solid fa-play"></i> LIVE DEMO</a>
-                <a href="https://github.com/SohailKhan0525/HeartDiseaseML" target="_blank" class="link-btn"><i class="fa-brands fa-github"></i> CODE</a>
-              </div>
-            </div>
-          </div>
+          <p class="hero-bio">
+            Learning to design and train intelligent models at the intersection of <strong>AI</strong>, <strong>machine learning</strong>, and <strong>data science</strong>.
+          </p>
           
-           <div class="project-card glass-card tilt-effect">
-            <div class="card-glow"></div>
-            <div class="card-content">
-              <div class="tech-badge">PYTHON</div>
-              <h3>Student Management</h3>
-              <p>Backend architecture for academic record keeping and student data processing.</p>
-              <div class="card-links">
-                <a href="https://studentmanagementproject-ulj54ytmcyj55upzakbzhn.streamlit.app/" target="_blank" class="link-btn"><i class="fa-solid fa-play"></i> LIVE DEMO</a>
-                <a href="https://github.com/SohailKhan0525/StudentManagementProject" target="_blank" class="link-btn"><i class="fa-brands fa-github"></i> CODE</a>
-              </div>
-            </div>
-          </div>
-
-           <div class="project-card glass-card tilt-effect">
-            <div class="card-glow"></div>
-            <div class="card-content">
-              <div class="tech-badge">PYTHON</div>
-              <h3>Bank Management</h3>
-              <p>A Python-based bank system for account creation, deposits, withdrawals, and inquiries.</p>
-              <div class="card-links">
-                <a href="https://bankmanagementproject-brt9pt282uavy8ddzzy7ql.streamlit.app/" target="_blank" class="link-btn"><i class="fa-solid fa-play"></i> LIVE DEMO</a>
-                <a href="https://github.com/SohailKhan0525/BankManagementProject" target="_blank" class="link-btn"><i class="fa-brands fa-github"></i> CODE</a>
-              </div>
-            </div>
-          </div>
-
-           <div class="project-card glass-card tilt-effect">
-            <div class="card-glow"></div>
-            <div class="card-content">
-              <div class="tech-badge">PYTHON</div>
-              <h3>File Handling</h3>
-              <p>A Python-based file handling system to create, read, update, and delete files.</p>
-              <div class="card-links">
-                <a href="https://filehandlingproject-mbevgff23iqepxbioy4hx5.streamlit.app/" target="_blank" class="link-btn"><i class="fa-solid fa-play"></i> LIVE DEMO</a>
-                <a href="https://github.com/SohailKhan0525/File_Handling_Project" target="_blank" class="link-btn"><i class="fa-brands fa-github"></i> CODE</a>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <section id="skills">
-        <div class="section-header">
-          <h2 class="section-title">SKILLS & TOOLS</h2>
-          <div class="line"></div>
-        </div>
-
-        <div class="skills-grid">
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-brands fa-python"></i></div>
-            <h4>Python</h4>
-            <div class="progress-bar"><div class="progress" style="width: 100%"></div></div>
-          </div>
-          
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-solid fa-brain"></i></div>
-            <h4>Machine Learning</h4>
-            <div class="progress-bar"><div class="progress" style="width: 70%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-solid fa-square-root-variable"></i></div>
-            <h4>Linear Algebra</h4>
-            <div class="progress-bar"><div class="progress" style="width: 60%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-solid fa-infinity"></i></div>
-            <h4>Calculus</h4>
-            <div class="progress-bar"><div class="progress" style="width: 50%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-solid fa-divide"></i></div>
-            <h4>Probability</h4>
-            <div class="progress-bar"><div class="progress" style="width: 50%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-solid fa-chart-area"></i></div>
-            <h4>Statistics</h4>
-            <div class="progress-bar"><div class="progress" style="width: 50%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-brands fa-git"></i></div>
-            <h4>Git and Github</h4>
-            <div class="progress-bar"><div class="progress" style="width: 100%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-brands fa-linux"></i></div>
-            <h4>Linux</h4>
-            <div class="progress-bar"><div class="progress" style="width: 50%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-solid fa-database"></i></div>
-            <h4>Data Structures</h4>
-            <div class="progress-bar"><div class="progress" style="width: 50%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-solid fa-network-wired"></i></div>
-            <h4>Deep Learning</h4>
-            <div class="progress-bar"><div class="progress" style="width: 1%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-solid fa-code"></i></div>
-            <h4>SQL</h4>
-            <div class="progress-bar"><div class="progress" style="width: 1%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-solid fa-broom"></i></div>
-            <h4>Data Cleaning and Analysis</h4>
-            <div class="progress-bar"><div class="progress" style="width: 40%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-solid fa-database"></i></div>
-            <h4>Data Visualization</h4>
-            <div class="progress-bar"><div class="progress" style="width: 30%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-solid fa-database"></i></div>
-            <h4>EDA</h4>
-            <div class="progress-bar"><div class="progress" style="width: 55%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-brands fa-python"></i></div>
-            <h4>Numpy</h4>
-            <div class="progress-bar"><div class="progress" style="width: 30%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-brands fa-python"></i></div>
-            <h4>Pandas</h4>
-            <div class="progress-bar"><div class="progress" style="width: 30%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-brands fa-python"></i></div>
-            <h4>Matplotlib</h4>
-            <div class="progress-bar"><div class="progress" style="width: 30%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-brands fa-python"></i></div>
-            <h4>Scikit-learn</h4>
-            <div class="progress-bar"><div class="progress" style="width: 40%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-solid fa-book"></i></div>
-            <h4>Jupyter Notebook</h4>
-            <div class="progress-bar"><div class="progress" style="width: 60%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-brands fa-kaggle"></i></div>
-            <h4>Kaggle Notebook</h4>
-            <div class="progress-bar"><div class="progress" style="width: 95%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-brands fa-python"></i></div>
-            <h4>Pytorch</h4>
-            <div class="progress-bar"><div class="progress" style="width: 1%"></div></div>
-          </div>
-
-          <div class="skill-block">
-            <div class="skill-icon"><i class="fa-brands fa-python"></i></div>
-            <h4>Seaborn</h4>
-            <div class="progress-bar"><div class="progress" style="width: 45%"></div></div>
+          <div class="cta-group">
+            <a href="#projects" class="btn-3d primary">
+              <span>VIEW PROJECTS</span>
+            </a>
+            <a href="#contact" class="btn-3d secondary">
+              <span>CONTACT ME</span>
+            </a>
           </div>
         </div>
-      </section>
+      </div>
 
-      <section id="contact">
-        <div class="glass-panel contact-panel">
-          <div class="contact-left">
-            <h2>Get in <br>Touch</h2>
-            <p>Interested in learning, collaborating, and working on AI and machine learning projects.</p>
-            <div class="social-links">
-              <a href="https://www.linkedin.com/in/mohd-zaheer-uddin-166b3b356/" target="_blank">LINKEDIN</a>
-              <a href="https://github.com/SohailKhan0525" target="_blank">GITHUB</a>
-              <a href="https://www.instagram.com/sohailkhan0525/" target="_blank">INSTAGRAM</a>
+      <div class="scroll-indicator">
+        <span>SCROLL TO EXPLORE</span>
+        <div class="mouse-icon">
+          <div class="wheel"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="about-section">
+      <div class="about-container">
+        <div class="about-text reveal">
+          <h2 class="about-title">ABOUT ME</h2>
+          <p>I’m an aspiring AI and machine learning engineer with a strong interest in building real-world intelligent applications.</p>
+          <p>I have completed Python programming and am currently learning machine learning to strengthen my technical foundation.</p>
+          <p>I enjoy working on practical projects such as AI assistants, talking robots, and prediction models, where I can apply what I learn to real problems.</p>
+          <p class="about-goal">My current goal is to secure an internship, continue improving my skills, and grow as an AI engineer through hands-on experience.</p>
+        </div>
+
+        <div class="about-logo reveal delay-200">
+          <img src="main.png" alt="QOFENO Labs Logo">
+        </div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <div class="section-header reveal">
+        <h2 class="section-title">PROJECTS</h2>
+        <div class="line"></div>
+      </div>
+
+      <div class="project-gallery">
+        <div class="project-card glass-card tilt-effect reveal">
+          <div class="card-glow"></div>
+          <div class="card-content">
+            <div class="tech-badge">ML MODEL</div>
+            <h3>House Price Prediction</h3>
+            <p>Advanced regression model utilizing Scikit-Learn to predict real estate values with high accuracy.</p>
+            <div class="card-links">
+              <a href="https://housepriceprediction-rqo8ykwgldxbpemwl6kvok.streamlit.app/" target="_blank" class="link-btn"><i class="fa-solid fa-play"></i> LIVE DEMO</a>
+              <a href="https://github.com/SohailKhan0525/HousePricePrediction" target="_blank" class="link-btn"><i class="fa-brands fa-github"></i> CODE</a>
             </div>
           </div>
-
-          <form id="contact-form">
-            <div class="form-group">
-              <input type="text" id="name" required placeholder=" " />
-              <label for="name">Your Name</label>
-            </div>
-            <div class="form-group">
-              <input type="email" id="email" required placeholder=" " />
-              <label for="email">Email Address</label>
-            </div>
-            <div class="form-group">
-              <textarea id="message" required placeholder=" "></textarea>
-              <label for="message">Your Message</label>
-            </div>
-            <button type="submit" class="submit-btn">
-              <span>SEND</span>
-              <div class="btn-bg"></div>
-            </button>
-          </form>
         </div>
-      </section>
 
-      <footer>
-        <p>© 2025 QOFENO LABS. Made with ♥️ by MOHD ZAHEER UDDIN</p>
-      </footer>
+        <div class="project-card glass-card tilt-effect reveal delay-100">
+          <div class="card-glow"></div>
+          <div class="card-content">
+            <div class="tech-badge">ML MODEL</div>
+            <h3>Global Earthquake Prediction</h3>
+            <p>Seismic activity forecasting tool analyzing decades of geological data to assess risk factors.</p>
+            <div class="card-links">
+              <a href="#" id="model-only-btn" class="link-btn"><i class="fa-solid fa-lock"></i> MODEL ONLY</a>
+              <a href="https://github.com/SohailKhan0525/Global-Earthquake-Prediction" target="_blank" class="link-btn"><i class="fa-brands fa-github"></i> CODE</a>
+            </div>
+          </div>
+        </div>
 
-    </div>
+        <div class="project-card glass-card tilt-effect reveal delay-200">
+          <div class="card-glow"></div>
+          <div class="card-content">
+            <div class="tech-badge">ML MODEL</div>
+            <h3>Heart Disease Prediction</h3>
+            <p>Diagnostic support tool using logistic regression to identify potential cardiac health risks.</p>
+            <div class="card-links">
+              <a href="https://heartdiseaseml-4zrcurmudxpfxbwygcuyyt.streamlit.app/" target="_blank" class="link-btn"><i class="fa-solid fa-play"></i> LIVE DEMO</a>
+              <a href="https://github.com/SohailKhan0525/HeartDiseaseML" target="_blank" class="link-btn"><i class="fa-brands fa-github"></i> CODE</a>
+            </div>
+          </div>
+        </div>
+        
+         <div class="project-card glass-card tilt-effect reveal">
+          <div class="card-glow"></div>
+          <div class="card-content">
+            <div class="tech-badge">PYTHON</div>
+            <h3>Student Management</h3>
+            <p>Backend architecture for academic record keeping and student data processing.</p>
+            <div class="card-links">
+              <a href="https://studentmanagementproject-ulj54ytmcyj55upzakbzhn.streamlit.app/" target="_blank" class="link-btn"><i class="fa-solid fa-play"></i> LIVE DEMO</a>
+              <a href="https://github.com/SohailKhan0525/StudentManagementProject" target="_blank" class="link-btn"><i class="fa-brands fa-github"></i> CODE</a>
+            </div>
+          </div>
+        </div>
+
+         <div class="project-card glass-card tilt-effect reveal delay-100">
+          <div class="card-glow"></div>
+          <div class="card-content">
+            <div class="tech-badge">PYTHON</div>
+            <h3>Bank Management</h3>
+            <p>A Python-based bank system for account creation, deposits, withdrawals, and inquiries.</p>
+            <div class="card-links">
+              <a href="https://bankmanagementproject-brt9pt282uavy8ddzzy7ql.streamlit.app/" target="_blank" class="link-btn"><i class="fa-solid fa-play"></i> LIVE DEMO</a>
+              <a href="https://github.com/SohailKhan0525/BankManagementProject" target="_blank" class="link-btn"><i class="fa-brands fa-github"></i> CODE</a>
+            </div>
+          </div>
+        </div>
+
+         <div class="project-card glass-card tilt-effect reveal delay-200">
+          <div class="card-glow"></div>
+          <div class="card-content">
+            <div class="tech-badge">PYTHON</div>
+            <h3>File Handling</h3>
+            <p>A Python-based file handling system to create, read, update, and delete files.</p>
+            <div class="card-links">
+              <a href="https://filehandlingproject-mbevgff23iqepxbioy4hx5.streamlit.app/" target="_blank" class="link-btn"><i class="fa-solid fa-play"></i> LIVE DEMO</a>
+              <a href="https://github.com/SohailKhan0525/File_Handling_Project" target="_blank" class="link-btn"><i class="fa-brands fa-github"></i> CODE</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="skills">
+      <div class="section-header reveal">
+        <h2 class="section-title">SKILLS & TOOLS</h2>
+        <div class="line"></div>
+      </div>
+
+      <div class="skills-grid reveal">
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-python"></i></div><h4>Python</h4><div class="progress-bar"><div class="progress" style="width: 100%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-brain"></i></div><h4>Machine Learning</h4><div class="progress-bar"><div class="progress" style="width: 70%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-square-root-variable"></i></div><h4>Linear Algebra</h4><div class="progress-bar"><div class="progress" style="width: 60%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-infinity"></i></div><h4>Calculus</h4><div class="progress-bar"><div class="progress" style="width: 50%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-divide"></i></div><h4>Probability</h4><div class="progress-bar"><div class="progress" style="width: 50%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-chart-area"></i></div><h4>Statistics</h4><div class="progress-bar"><div class="progress" style="width: 50%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-git"></i></div><h4>Git & Github</h4><div class="progress-bar"><div class="progress" style="width: 100%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-linux"></i></div><h4>Linux</h4><div class="progress-bar"><div class="progress" style="width: 50%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-database"></i></div><h4>Data Structures</h4><div class="progress-bar"><div class="progress" style="width: 50%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-network-wired"></i></div><h4>Deep Learning</h4><div class="progress-bar"><div class="progress" style="width: 1%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-code"></i></div><h4>SQL</h4><div class="progress-bar"><div class="progress" style="width: 1%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-broom"></i></div><h4>Data Cleaning</h4><div class="progress-bar"><div class="progress" style="width: 40%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-chart-pie"></i></div><h4>Data Visualization</h4><div class="progress-bar"><div class="progress" style="width: 30%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-magnifying-glass-chart"></i></div><h4>EDA</h4><div class="progress-bar"><div class="progress" style="width: 55%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-python"></i></div><h4>Numpy</h4><div class="progress-bar"><div class="progress" style="width: 30%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-python"></i></div><h4>Pandas</h4><div class="progress-bar"><div class="progress" style="width: 30%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-python"></i></div><h4>Matplotlib</h4><div class="progress-bar"><div class="progress" style="width: 30%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-python"></i></div><h4>Scikit-learn</h4><div class="progress-bar"><div class="progress" style="width: 40%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-book"></i></div><h4>Jupyter</h4><div class="progress-bar"><div class="progress" style="width: 60%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-kaggle"></i></div><h4>Kaggle</h4><div class="progress-bar"><div class="progress" style="width: 95%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-python"></i></div><h4>Pytorch</h4><div class="progress-bar"><div class="progress" style="width: 1%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-python"></i></div><h4>Seaborn</h4><div class="progress-bar"><div class="progress" style="width: 45%"></div></div></div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="glass-panel contact-panel reveal">
+        <div class="contact-left">
+          <h2>Get in <br>Touch</h2>
+          <p>Interested in learning, collaborating, and working on AI and machine learning projects.</p>
+          <div class="social-links">
+            <a href="https://www.linkedin.com/in/mohd-zaheer-uddin-166b3b356/" target="_blank">LINKEDIN</a>
+            <a href="https://github.com/SohailKhan0525" target="_blank">GITHUB</a>
+            <a href="https://www.instagram.com/sohailkhan0525/" target="_blank">INSTAGRAM</a>
+          </div>
+        </div>
+
+        <form id="contact-form">
+          <div class="form-group">
+            <input type="text" id="name" required placeholder=" " />
+            <label for="name">Your Name</label>
+          </div>
+          <div class="form-group">
+            <input type="email" id="email" required placeholder=" " />
+            <label for="email">Email Address</label>
+          </div>
+          <div class="form-group">
+            <textarea id="message" required placeholder=" "></textarea>
+            <label for="message">Your Message</label>
+          </div>
+          <button type="submit" class="submit-btn">
+            <span>SEND</span>
+            <div class="btn-bg"></div>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <footer>
+      <p>© 2025 QOFENO LABS. Made with ♥️ by MOHD ZAHEER UDDIN</p>
+    </footer>
+
   </main>
 
   <div id="custom-modal" class="modal-overlay">
