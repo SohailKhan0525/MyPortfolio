@@ -2,7 +2,7 @@
    1. CONFIGURATION
 ============================================================ */
 const CONFIG = {
-  // EmailJS Keys (Already configured with your provided key)
+  // EmailJS Keys
   emailJS: {
     publicKey: "YITu4swbGHXKFsR0q",
     serviceID: "service_kmvnnax",
@@ -265,7 +265,7 @@ if (aboutSection) observer.observe(aboutSection);
 
 
 /* ============================================================
-   2. PRELOADER
+   7. PRELOADER
 ============================================================ */
 window.addEventListener("load", () => {
   const preloader = document.getElementById("preloader");
@@ -291,7 +291,7 @@ window.addEventListener("load", () => {
 });
 
 /* ============================================================
-   7. CUSTOM MODEL POP-UP
+   8. CUSTOM MODEL POP-UP
 ============================================================ */
 const modelBtn = document.getElementById('model-only-btn');
 const modal = document.getElementById('custom-modal');
@@ -316,4 +316,3 @@ if (modelBtn && modal && closeModal) {
     }
   });
 }
-
