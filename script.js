@@ -205,6 +205,7 @@ if (contactForm) {
     try {
       await emailjs.send(CONFIG.emailJS.serviceID, CONFIG.emailJS.templateID, {
         from_name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
         reply_to: document.getElementById("email").value,
         message: document.getElementById("message").value
       });
