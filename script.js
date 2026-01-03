@@ -261,3 +261,30 @@ const observer = new IntersectionObserver(
 );
 
 if (aboutSection) observer.observe(aboutSection);
+
+
+/* ============================================================
+   2. PRELOADER
+============================================================ */
+window.addEventListener("load", () => {
+  const preloader = document.getElementById("preloader");
+  const loaderText = preloader.querySelector(".loader-text");
+  
+  // Simulate system boot sequence
+  const stages = ["LOADING CORE...", "CONNECTING NEURAL NETWORK", "SYSTEM READY"];
+  let step = 0;
+
+  const interval = setInterval(() => {
+    if (step < stages.length) {
+      loaderText.textContent = stages[step];
+      loaderText.setAttribute("data-text", stages[step]);
+      step++;
+    } else {
+      clearInterval(interval);
+      preloader.style.opacity = "0";
+      setTimeout(() => {
+        preloader.style.display = "none";
+      }, 500);
+    }
+  }, 600);
+});
