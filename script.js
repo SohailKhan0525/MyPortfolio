@@ -239,3 +239,25 @@ if (window.innerWidth > 900) {
     });
   });
 }
+
+/* ============================
+   ABOUT ME ANIMATION
+============================ */
+
+const aboutSection = document.querySelector(".about-section");
+const aboutText = document.querySelector(".about-text");
+const aboutLogo = document.querySelector(".about-logo");
+
+const observer = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        aboutText.classList.add("show");
+        aboutLogo.classList.add("show");
+      }
+    });
+  },
+  { threshold: 0.3 }
+);
+
+if (aboutSection) observer.observe(aboutSection);
