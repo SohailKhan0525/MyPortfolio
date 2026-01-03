@@ -150,7 +150,6 @@ section {
 .hero-container {
   display: flex;
   align-items: center;
-  /* Space for 3D sphere on right */
   width: 100%;
 }
 
@@ -517,7 +516,7 @@ footer {
   #mobile-toggle span {
     width: 25px; height: 2px; background: #fff;
   }
-                    }
+}
 
 /* ============================
    ABOUT ME – 3D HERO SECTION
