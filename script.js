@@ -289,3 +289,31 @@ window.addEventListener("load", () => {
     }
   }, 600);
 });
+
+/* ============================================================
+   7. CUSTOM MODEL POP-UP
+============================================================ */
+const modelBtn = document.getElementById('model-only-btn');
+const modal = document.getElementById('custom-modal');
+const closeModal = document.getElementById('close-modal');
+
+if (modelBtn && modal && closeModal) {
+  // Show Modal
+  modelBtn.addEventListener('click', (e) => {
+    e.preventDefault(); // Stop link from navigating
+    modal.classList.add('active');
+  });
+
+  // Hide Modal (Close Button)
+  closeModal.addEventListener('click', () => {
+    modal.classList.remove('active');
+  });
+
+  // Hide Modal (Click Outside)
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.remove('active');
+    }
+  });
+}
+
