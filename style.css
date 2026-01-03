@@ -642,9 +642,9 @@ footer {
   font-family: var(--font-tech);
   color: var(--neon-cyan);
   letter-spacing: 2px;
-  animation: blink 1s infinite;
+  animation: blink1 1s infinite;
 }
 
 
 @keyframes spin { 100% { transform: rotate(360deg); } }
-@keyframes blink { 50% { opacity: 0.5; } }
+@keyframes blink1 { 50% { opacity: 0.5; } }
