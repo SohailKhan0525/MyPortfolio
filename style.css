@@ -639,7 +639,7 @@ footer {
 
 .loader-text {
   margin-top: 20px;
-  font-family: var(--font-tech);
+  font-family: var(--font-header);
   color: var(--neon-cyan);
   letter-spacing: 2px;
   animation: blink1 1s infinite;
