@@ -286,3 +286,23 @@ window.addEventListener("load", () => {
     }
   }, 600);
 });
+
+/* ============================================================
+   8. SKILLS PROGRESS HOVER LOGIC
+============================================================ */
+document.querySelectorAll(".skill-block").forEach(skill => {
+  const progress = skill.querySelector(".progress");
+  const percentText = skill.querySelector(".skill-percent");
+
+  if (!progress || !percentText) return;
+
+  const value = parseInt(progress.style.width);
+
+  percentText.textContent = `${value}%`;
+
+  if (value >= 70) {
+    percentText.classList.add("green");
+  } else {
+    percentText.classList.add("red");
+  }
+});
