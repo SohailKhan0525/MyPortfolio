@@ -216,6 +216,10 @@ if (window.innerWidth > 900) {
     cursorDot.style.top = `${posY}px`;
     cursorOutline.animate({ left: `${posX}px`, top: `${posY}px` }, { duration: 500, fill: "forwards" });
   });
+   document.querySelectorAll('a, button, input, textarea').forEach(el => {
+  el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+  el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+});
 }
 
 
