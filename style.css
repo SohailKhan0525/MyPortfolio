@@ -103,7 +103,7 @@ body.hovering .cursor-outline {
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--glass-border);
   border-radius: 50px;
-  z-index: 1000;
+  z-index: 100;
   transition: 0.3s;
 }
 
