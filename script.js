@@ -23,10 +23,11 @@ document.addEventListener("DOMContentLoaded", () => {
 ============================================================ */
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: 'high-performance' });
 
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // High DPI fix
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); // Optimized DPI for performance
+renderer.sortObjects = false; // Disable automatic sorting for better performance
 document.getElementById('canvas-container').appendChild(renderer.domElement);
 
 // --- GEOMETRY: PARTICLE SPHERE ---
@@ -76,10 +77,17 @@ let gyroY = 0;
 const windowHalfX = window.innerWidth / 2;
 const windowHalfY = window.innerHeight / 2;
 
-// --- MOUSE MOVEMENT (DESKTOP) ---
+// --- MOUSE MOVEMENT (DESKTOP) - THROTTLED ---
+let lastMouseMove = 0;
+const MOUSE_THROTTLE = 16; // ~60fps
+
 document.addEventListener('mousemove', (event) => {
-  mouseX = (event.clientX - windowHalfX);
-  mouseY = (event.clientY - windowHalfY);
+  const now = Date.now();
+  if (now - lastMouseMove >= MOUSE_THROTTLE) {
+    mouseX = (event.clientX - windowHalfX);
+    mouseY = (event.clientY - windowHalfY);
+    lastMouseMove = now;
+  }
 });
 
 // --- GYROSCOPE (MOBILE) ---
@@ -184,6 +192,7 @@ if(typeTarget) type();
 
 
 /* ============================================================
+/* ============================================================
    5. MOBILE MENU & CURSOR
 ============================================================ */
 const mobileToggle = document.getElementById('mobile-toggle');
@@ -204,18 +213,45 @@ if (mobileToggle) {
   });
 }
 
-// Custom Cursor Logic (Desktop Only)
+// Custom Cursor Logic (Desktop Only) - Optimized with RAF
 const cursorDot = document.querySelector("[data-cursor-dot]");
 const cursorOutline = document.querySelector("[data-cursor-outline]");
+let cursorX = 0, cursorY = 0;
+let outlineX = 0, outlineY = 0;
 
 if (window.innerWidth > 900) {
-  window.addEventListener("mousemove", (e) => {
-    const posX = e.clientX;
-    const posY = e.clientY;
-    cursorDot.style.left = `${posX}px`;
-    cursorDot.style.top = `${posY}px`;
-    cursorOutline.animate({ left: `${posX}px`, top: `${posY}px` }, { duration: 500, fill: "forwards" });
-  });
+  // Smooth cursor outline following
+  function animateCursor() {
+    outlineX += (cursorX - outlineX) * 0.2;
+    outlineY += (cursorY - outlineY) * 0.2;
+    cursorOutline.style.left = `${outlineX}px`;
+    cursorOutline.style.top = `${outlineY}px`;
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+  
+  // Optimized mousemove with cursor position update
+  let cursorMoveHandler = (e) => {
+    cursorX = e.clientX;
+    cursorY = e.clientY;
+    cursorDot.style.left = `${cursorX}px`;
+    cursorDot.style.top = `${cursorY}px`;
+  };
+  
+  document.addEventListener("mousemove", cursorMoveHandler);
+  
+  // Event delegation for interactive elements - OPTIMIZED
+  const selectiveSelectors = 'a, button, input, textarea, select, .link-btn, .btn-3d, .submit-btn, .nav-links a, .magnetic-link, .resume-btn, .social-links a, .project-card, .skill-block, .card-links a';
+  
+  document.addEventListener('mouseenter', (e) => {
+    const target = e.target.closest(selectiveSelectors);
+    if (target) document.body.classList.add('cursor-interactive');
+  }, true);
+  
+  document.addEventListener('mouseleave', (e) => {
+    const target = e.target.closest(selectiveSelectors);
+    if (target) document.body.classList.remove('cursor-interactive');
+  }, true);
 }
 
 

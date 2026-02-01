@@ -37,7 +37,7 @@ html {
 /* Custom Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-dark); }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; will-change: auto; }
 ::-webkit-scrollbar-thumb:hover { background: var(--neon-cyan); }
 
 /* ===================================================================
@@ -57,7 +57,7 @@ html {
   top: 0; left: 0;
   width: 100%; height: 100%;
   z-index: -1;
-  opacity: 0.05;
+  opacity: 0.02;
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
@@ -73,17 +73,44 @@ html {
   border-radius: 50%;
   pointer-events: none;
   z-index: 9999;
+  will-change: transform;
 }
 .cursor-dot { width: 8px; height: 8px; background-color: var(--neon-cyan); }
 .cursor-outline {
   width: 40px; height: 40px;
   border: 1px solid rgba(255, 255, 255, 0.5);
-  transition: width 0.2s, height 0.2s, background-color 0.2s;
+  transition: width 0.15s ease, height 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  will-change: width, height;
 }
 body.hovering .cursor-outline {
   width: 60px; height: 60px;
   background-color: rgba(255, 255, 255, 0.1);
   border-color: transparent;
+}
+
+/* Interactive Elements - Custom Cursor on Hover */
+a, button, [role="button"],
+.link-btn, .btn-3d, .submit-btn,
+.nav-links a, .magnetic-link,
+.resume-btn, .social-links a,
+input, textarea, select,
+.project-card, .skill-block,
+.card-links a {
+  transition: all 0.15s ease;
+  will-change: transform, color, background-color;
+}
+
+body.cursor-interactive .cursor-dot {
+  width: 12px; height: 12px;
+  background-color: var(--neon-cyan);
+  box-shadow: 0 0 15px var(--neon-cyan), 0 0 30px rgba(0, 243, 255, 0.5);
+}
+
+body.cursor-interactive .cursor-outline {
+  width: 50px; height: 50px;
+  border: 2px solid var(--neon-cyan);
+  background-color: rgba(0, 243, 255, 0.05);
+  box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
 }
 
 /* ===================================================================
@@ -215,7 +242,7 @@ section {
   font-size: 0.9rem;
   letter-spacing: 1px;
   transition: transform 0.2s;
-  cursor: pointer; /* Ensure clickable */
+  cursor: none;
 }
 .btn-3d.primary {
   background: var(--text-main);
@@ -259,7 +286,8 @@ section {
 .reveal {
   opacity: 0;
   transform: translateY(40px);
-  transition: all 0.8s var(--easing);
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: opacity, transform;
 }
 
 .reveal.active {
@@ -290,8 +318,9 @@ section {
   border: 1px solid var(--glass-border);
   border-radius: 16px;
   padding: 30px;
-  transition: transform 0.4s var(--easing), box-shadow 0.4s var(--easing);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   overflow: hidden;
+  will-change: transform, box-shadow;
 }
 .project-card:hover {
   transform: translateY(-10px);
@@ -318,7 +347,7 @@ section {
 .card-links { display: flex; gap: 20px; }
 .link-btn {
   text-decoration: none; color: var(--text-main); font-size: 0.9rem; font-weight: 600;
-  display: flex; align-items: center; gap: 8px; transition: 0.2s; cursor: pointer;
+  display: flex; align-items: center; gap: 8px; transition: 0.2s; cursor: none;
 }
 .link-btn:hover { color: var(--neon-cyan); }
 
@@ -390,7 +419,7 @@ section {
 }
 .contact-left h2 { font-family: var(--font-header); font-size: 2.5rem; margin-bottom: 20px; }
 .social-links { display: flex; flex-direction: column; gap: 15px; margin-top: 40px; }
-.social-links a { color: var(--text-muted); text-decoration: none; letter-spacing: 2px; font-size: 0.9rem; transition: 0.2s; cursor: pointer; }
+.social-links a { color: var(--text-muted); text-decoration: none; letter-spacing: 2px; font-size: 0.9rem; transition: 0.2s; cursor: none; }
 .social-links a:hover { color: var(--neon-cyan); padding-left: 10px; }
 
 #contact-form { flex: 1.5; padding: 50px; }
@@ -398,7 +427,7 @@ section {
 .form-group input, .form-group textarea {
   width: 100%; background: transparent; border: none;
   border-bottom: 1px solid rgba(255,255,255,0.2);
-  color: #fff; font-size: 1rem; padding: 10px 0; outline: none; cursor: text;
+  color: #fff; font-size: 1rem; padding: 10px 0; outline: none; cursor: none;
 }
 .form-group label {
   position: absolute; top: 10px; left: 0; color: var(--text-muted);
@@ -410,7 +439,7 @@ section {
 }
 .submit-btn {
   background: transparent; color: #fff; border: 1px solid var(--neon-cyan);
-  padding: 12px 40px; font-family: var(--font-header); cursor: pointer;
+  padding: 12px 40px; font-family: var(--font-header); cursor: none;
   position: relative; overflow: hidden; transition: 0.3s;
 }
 .submit-btn:hover { background: var(--neon-cyan); color: #000; box-shadow: 0 0 20px var(--neon-cyan); }
@@ -528,7 +557,7 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
 @media (max-width: 900px) {
   /* Cursor: Hide custom cursor on touch devices */
   .cursor-dot, .cursor-outline { display: none; }
-  * { cursor: auto; }
+  * { cursor: auto !important; }
 
   /* Navbar */
   .glass-nav {
@@ -550,7 +579,7 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
   /* Hamburger */
   #mobile-toggle {
     display: flex; flex-direction: column; gap: 6px;
-    background: transparent; border: none; cursor: pointer; z-index: 1001;
+    background: transparent; border: none; cursor: none; z-index: 1001;
   }
   #mobile-toggle span {
     width: 30px; height: 2px; background: #fff;
