@@ -141,6 +141,53 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
+/* ============================================================
+   2.1 SMOOTH SCROLL + DEPTH PARALLAX
+============================================================ */
+let currentScroll = window.scrollY || 0;
+let targetScroll = currentScroll;
+let isSmoothScrolling = false;
+const smoothStrength = 0.12;
+const maxScroll = () => Math.max(0, document.body.scrollHeight - window.innerHeight);
+const canvasContainer = document.getElementById('canvas-container');
+
+const updateParallax = () => {
+  if (!canvasContainer) return;
+  const depth = currentScroll * 0.08;
+  canvasContainer.style.transform = `translateY(${depth}px)`;
+};
+
+const smoothScrollLoop = () => {
+  currentScroll += (targetScroll - currentScroll) * smoothStrength;
+  if (Math.abs(targetScroll - currentScroll) < 0.5) {
+    currentScroll = targetScroll;
+    isSmoothScrolling = false;
+  } else {
+    requestAnimationFrame(smoothScrollLoop);
+  }
+  window.scrollTo(0, currentScroll);
+  updateParallax();
+};
+
+window.addEventListener('wheel', (e) => {
+  if (window.innerWidth <= 900) return;
+  if (modal && modal.classList.contains('active')) return;
+  e.preventDefault();
+  targetScroll = Math.min(maxScroll(), Math.max(0, targetScroll + e.deltaY));
+  if (!isSmoothScrolling) {
+    isSmoothScrolling = true;
+    requestAnimationFrame(smoothScrollLoop);
+  }
+}, { passive: false });
+
+window.addEventListener('scroll', () => {
+  if (!isSmoothScrolling) {
+    currentScroll = window.scrollY || 0;
+    targetScroll = currentScroll;
+    updateParallax();
+  }
+}, { passive: true });
+
 
 /* ============================================================
    3. SCROLL REVEAL ANIMATIONS (Intersection Observer)
@@ -345,7 +392,10 @@ window.addEventListener("load", () => {
     } else {
       clearInterval(interval);
       preloader.style.opacity = "0";
-      setTimeout(() => preloader.style.display = "none", 500);
+      setTimeout(() => {
+        preloader.style.display = "none";
+        document.body.classList.add("page-loaded");
+      }, 500);
     }
   }, 600);
 });

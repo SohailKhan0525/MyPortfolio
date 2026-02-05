@@ -28,6 +28,14 @@ body {
   font-family: var(--font-body);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+body.page-loaded {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 html {
@@ -49,6 +57,7 @@ html {
   width: 100vw; height: 100vh;
   z-index: -2;
   pointer-events: none; 
+  will-change: transform;
 }
 
 /* Cinematic Grain */
