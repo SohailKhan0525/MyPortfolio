@@ -28,6 +28,7 @@ Modern, animated, single-page portfolio showcasing projects, skills, and contact
 - **Responsive layout** for mobile and desktop
 - **Contact form** using EmailJS
 - **Modal popup** for model-only project notice
+- **Project cards** linking to GitHub/live demos (including Student Pass/Fail Predictor)
 
 ---
 
