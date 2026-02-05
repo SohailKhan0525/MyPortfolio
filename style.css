@@ -72,7 +72,7 @@ html {
   transform: translate(-50%, -50%);
   border-radius: 50%;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 10002;
   will-change: transform;
 }
 .cursor-dot { width: 8px; height: 8px; background-color: var(--neon-cyan); }
