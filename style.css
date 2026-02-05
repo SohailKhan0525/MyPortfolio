@@ -351,6 +351,24 @@ section {
 }
 .link-btn:hover { color: var(--neon-cyan); }
 
+/* Model-only button improvements */
+.model-only {
+  background: transparent;
+  border: 1px dashed rgba(0, 243, 255, 0.35);
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: var(--text-muted);
+}
+.model-only:hover {
+  color: var(--neon-cyan);
+  border-color: rgba(0, 243, 255, 0.7);
+  box-shadow: 0 0 12px rgba(0, 243, 255, 0.2);
+}
+.model-only:focus-visible {
+  outline: 2px solid var(--neon-cyan);
+  outline-offset: 3px;
+}
+
 /* ===================================================================
    SKILLS
 =================================================================== */

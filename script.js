@@ -289,15 +289,41 @@ if (contactForm) {
 const modelBtn = document.getElementById('model-only-btn');
 const modal = document.getElementById('custom-modal');
 const closeModal = document.getElementById('close-modal');
+let lastFocusedElement = null;
+
+const openModelModal = () => {
+  if (!modal || !modelBtn || !closeModal) return;
+  lastFocusedElement = document.activeElement;
+  modal.classList.add('active');
+  modal.setAttribute('aria-hidden', 'false');
+  modelBtn.setAttribute('aria-expanded', 'true');
+  closeModal.focus();
+};
+
+const closeModelModal = () => {
+  if (!modal || !modelBtn) return;
+  modal.classList.remove('active');
+  modal.setAttribute('aria-hidden', 'true');
+  modelBtn.setAttribute('aria-expanded', 'false');
+  if (lastFocusedElement) lastFocusedElement.focus();
+};
 
 if (modelBtn && modal && closeModal) {
-  modelBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    modal.classList.add('active');
+  modelBtn.addEventListener('click', openModelModal);
+  modelBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openModelModal();
+    }
   });
-  closeModal.addEventListener('click', () => modal.classList.remove('active'));
+  closeModal.addEventListener('click', closeModelModal);
   modal.addEventListener('click', (e) => {
-    if (e.target === modal) modal.classList.remove('active');
+    if (e.target === modal) closeModelModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('active')) {
+      closeModelModal();
+    }
   });
 }
 
