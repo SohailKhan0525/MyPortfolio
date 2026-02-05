@@ -289,6 +289,7 @@ if (contactForm) {
 const modelBtn = document.getElementById('model-only-btn');
 const modal = document.getElementById('custom-modal');
 const closeModal = document.getElementById('close-modal');
+const modalCloseButtons = document.querySelectorAll('[data-modal-close]');
 let lastFocusedElement = null;
 
 const openModelModal = () => {
@@ -316,7 +317,7 @@ if (modelBtn && modal && closeModal) {
       openModelModal();
     }
   });
-  closeModal.addEventListener('click', closeModelModal);
+  modalCloseButtons.forEach(btn => btn.addEventListener('click', closeModelModal));
   modal.addEventListener('click', (e) => {
     if (e.target === modal) closeModelModal();
   });

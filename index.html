@@ -272,9 +272,11 @@
 
   <div id="custom-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="model-modal-title" aria-describedby="model-modal-desc" aria-hidden="true">
     <div class="modal-content glass-panel">
+      <button type="button" class="modal-close" data-modal-close aria-label="Close dialog">&times;</button>
+      <div class="status-pill" aria-hidden="true">MODEL ONLY</div>
       <h3 id="model-modal-title"><i class="fa-solid fa-robot"></i> MODEL STATUS</h3>
-      <p id="model-modal-desc">This is a pure Machine Learning model backend. It currently does not have a live interactive frontend interface.</p>
-      <button type="button" id="close-modal" class="btn-3d primary small">UNDERSTOOD</button>
+      <p id="model-modal-desc">This project has a trained model available, but no live interactive demo is currently deployed.</p>
+      <button type="button" id="close-modal" class="btn-3d primary small" data-modal-close>UNDERSTOOD</button>
     </div>
   </div>
 
