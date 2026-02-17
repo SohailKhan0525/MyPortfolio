@@ -27,7 +27,7 @@
   <div class="cursor-outline" data-cursor-outline></div>
 
   <nav class="glass-nav">
-    <div class="logo">QOFENO<span class="highlight"> Labs</span></div>
+    <div class="logo">MOHD ZAHEER<span class="highlight"> UDDIN</span></div>
     <div class="nav-links">
       <a href="#home" class="magnetic-link">Home</a>
       <a href="#projects" class="magnetic-link">Projects</a>
@@ -77,16 +77,22 @@
       <div class="about-container">
         <div class="about-text reveal">
           <h2 class="about-title">ABOUT ME</h2>
-          <p>I’m an aspiring AI and machine learning engineer with a strong interest in building real-world intelligent applications.</p>
-          <p>I have completed Python programming and am currently learning machine learning to strengthen my technical foundation.</p>
-          <p>I enjoy working on practical projects such as AI assistants, talking robots, and prediction models, where I can apply what I learn to real problems.</p>
-          <p class="about-goal">My current goal is to secure an internship, continue improving my skills, and grow as an AI engineer through hands-on experience.</p>
-          <a href="MohdZaheerUddinResume.pdf" 
-   target="_blank" 
-   class="resume-btn">
-  <span>VIEW RESUME</span>
-  <i class="fa-solid fa-file-lines"></i>
-</a>
+          <p>I am a Computer Science (CSIT) undergraduate specializing in Machine Learning and Data Science. I focus on building predictive models and deploying real-world ML applications using Python and Scikit-learn.</p>
+          <p>I have a strong foundation in data analysis, statistical modeling, and Python programming with hands-on experience in regression, classification, and neural networks.</p>
+          <p>I'm passionate about solving real-world problems through machine learning and actively seeking internship opportunities to grow my expertise and contribute to impactful AI projects.</p>
+          <p class="about-goal">My goal is to become a proficient ML Engineer while continuously learning and applying cutting-edge techniques to solve complex problems.</p>
+          <div class="about-buttons">
+            <a href="MohdZaheerUddinResume.pdf" 
+     target="_blank" 
+     class="resume-btn">
+      <span>VIEW RESUME</span>
+      <i class="fa-solid fa-file-lines"></i>
+    </a>
+            <a href="#contact" class="hire-me-btn">
+      <span>HIRE ME</span>
+      <i class="fa-solid fa-handshake"></i>
+    </a>
+          </div>
 
         </div>
 
@@ -103,8 +109,12 @@
       </div>
 
       <div class="project-gallery">
-        <div class="project-card glass-card tilt-effect reveal">
+        <div class="project-card glass-card tilt-effect reveal" data-project="house-price">
           <div class="card-glow"></div>
+          <div class="card-hint">
+            <i class="fa-solid fa-computer"></i>
+            <span>Click to learn more</span>
+          </div>
           <div class="card-content">
             <div class="tech-badge">ML MODEL</div>
             <h3>House Price Prediction</h3>
@@ -116,8 +126,12 @@
           </div>
         </div>
 
-        <div class="project-card glass-card tilt-effect reveal delay-100">
+        <div class="project-card glass-card tilt-effect reveal delay-100" data-project="earthquake">
           <div class="card-glow"></div>
+          <div class="card-hint">
+            <i class="fa-solid fa-computer"></i>
+            <span>Click to learn more</span>
+          </div>
           <div class="card-content">
             <div class="tech-badge">ML MODEL</div>
             <h3>Global Earthquake Prediction</h3>
@@ -131,8 +145,12 @@
           </div>
         </div>
 
-        <div class="project-card glass-card tilt-effect reveal delay-200">
+        <div class="project-card glass-card tilt-effect reveal delay-200" data-project="heart-disease">
           <div class="card-glow"></div>
+          <div class="card-hint">
+            <i class="fa-solid fa-computer"></i>
+            <span>Click to learn more</span>
+          </div>
           <div class="card-content">
             <div class="tech-badge">ML MODEL</div>
             <h3>Heart Disease Prediction</h3>
@@ -144,8 +162,12 @@
           </div>
         </div>
         
-         <div class="project-card glass-card tilt-effect reveal">
+         <div class="project-card glass-card tilt-effect reveal" data-project="student-mgmt">
           <div class="card-glow"></div>
+          <div class="card-hint">
+            <i class="fa-solid fa-computer"></i>
+            <span>Click to learn more</span>
+          </div>
           <div class="card-content">
             <div class="tech-badge">PYTHON</div>
             <h3>Student Management</h3>
@@ -157,8 +179,12 @@
           </div>
         </div>
 
-         <div class="project-card glass-card tilt-effect reveal delay-100">
+         <div class="project-card glass-card tilt-effect reveal delay-100" data-project="student-pass">
           <div class="card-glow"></div>
+          <div class="card-hint">
+            <i class="fa-solid fa-computer"></i>
+            <span>Click to learn more</span>
+          </div>
           <div class="card-content">
             <div class="tech-badge">ML MODEL</div>
             <h3>Student Pass/Fail Predictor</h3>
@@ -170,8 +196,12 @@
           </div>
         </div>
 
-         <div class="project-card glass-card tilt-effect reveal delay-100">
+         <div class="project-card glass-card tilt-effect reveal delay-100" data-project="bank">
           <div class="card-glow"></div>
+          <div class="card-hint">
+            <i class="fa-solid fa-computer"></i>
+            <span>Click to learn more</span>
+          </div>
           <div class="card-content">
             <div class="tech-badge">PYTHON</div>
             <h3>Bank Management</h3>
@@ -183,8 +213,12 @@
           </div>
         </div>
 
-         <div class="project-card glass-card tilt-effect reveal delay-200">
+         <div class="project-card glass-card tilt-effect reveal delay-200" data-project="file-handling">
           <div class="card-glow"></div>
+          <div class="card-hint">
+            <i class="fa-solid fa-computer"></i>
+            <span>Click to learn more</span>
+          </div>
           <div class="card-content">
             <div class="tech-badge">PYTHON</div>
             <h3>File Handling</h3>
@@ -269,6 +303,15 @@
     </footer>
 
   </main>
+
+  <!-- HOVER PANEL -->
+  <div id="hover-panel" class="hover-panel">
+    <button type="button" class="close-panel-btn" aria-label="Close panel">&times;</button>
+    <div class="panel-content">
+      <h3 id="panel-title">Coming Soon</h3>
+      <p id="panel-description">This project is being updated with more details</p>
+    </div>
+  </div>
 
   <div id="custom-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="model-modal-title" aria-describedby="model-modal-desc" aria-hidden="true">
     <div class="modal-content glass-panel">

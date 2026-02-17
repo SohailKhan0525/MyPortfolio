@@ -114,6 +114,278 @@ body.cursor-interactive .cursor-outline {
 }
 
 /* ===================================================================
+   GLOW SWEEP ANIMATION - On Hover (Improved - Smooth & Subtle)
+=================================================================== */
+@keyframes glow-sweep {
+  0% {
+    box-shadow: 0 0 0px rgba(0, 243, 255, 0);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(0, 243, 255, 0.15);
+  }
+  100% {
+    box-shadow: 0 0 0px rgba(0, 243, 255, 0);
+  }
+}
+
+/* Glow sweep effect for all interactive elements - Improved */
+.project-card::before,
+.skill-block::before,
+.contact-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(0, 243, 255, 0.08),
+    rgba(0, 243, 255, 0.04),
+    transparent
+  );
+  transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.project-card:hover::before,
+.skill-block:hover::before,
+.contact-panel:hover::before {
+  left: 100%;
+}
+
+/* ===================================================================
+   HOVER PANEL - Right Side Panel
+=================================================================== */
+.hover-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 40%;
+  max-width: 500px;
+  height: 100vh;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.98) 0%, rgba(5, 5, 30, 0.98) 100%);
+  backdrop-filter: blur(20px);
+  border-left: 2px solid rgba(0, 243, 255, 0.4);
+  z-index: 999;
+  padding: 50px 40px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transform: translateX(520px);
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  pointer-events: none;
+  will-change: transform;
+  box-shadow: inset 1px 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.hover-panel.active {
+  transform: translateX(0);
+  pointer-events: all;
+  box-shadow: -15px 0 50px rgba(0, 243, 255, 0.2), inset 1px 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.close-panel-btn {
+  position: sticky;
+  top: 20px;
+  right: 20px;
+  width: 45px;
+  height: 45px;
+  background: linear-gradient(135deg, rgba(0, 243, 255, 0.1), rgba(188, 19, 254, 0.1));
+  border: 1.5px solid rgba(0, 243, 255, 0.5);
+  color: var(--neon-cyan);
+  font-size: 26px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  float: right;
+  margin-bottom: 20px;
+}
+
+.close-panel-btn:hover {
+  color: #fff;
+  border-color: rgba(0, 243, 255, 0.9);
+  background: linear-gradient(135deg, rgba(0, 243, 255, 0.2), rgba(188, 19, 254, 0.2));
+  box-shadow: 0 0 20px rgba(0, 243, 255, 0.4), inset 0 0 10px rgba(0, 243, 255, 0.1);
+  transform: scale(1.05);
+}
+
+.panel-content {
+  clear: both;
+  animation: panelSlideIn 0.5s ease-out;
+}
+
+@keyframes panelSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.panel-content h3 {
+  font-family: var(--font-header);
+  font-size: 1.6rem;
+  color: var(--neon-cyan);
+  margin-bottom: 20px;
+  margin-top: 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  line-height: 1.4;
+  text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
+.panel-content p {
+  color: var(--text-muted);
+  line-height: 1.9;
+  font-size: 0.95rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* ===================================================================
+   HOVER PANEL - Mobile Responsive
+=================================================================== */
+@media (max-width: 1024px) {
+  .hover-panel {
+    width: 50%;
+    max-width: 450px;
+    padding: 40px 30px;
+    transform: translateX(505px);
+  }
+  
+  .hover-panel.active {
+    transform: translateX(0);
+  }
+  
+  .panel-content h3 {
+    font-size: 1.4rem;
+  }
+  
+  .panel-content p {
+    font-size: 0.9rem;
+  }
+
+  /* About Buttons - Tablet */
+  .about-buttons {
+    gap: 15px;
+  }
+
+  .resume-btn,
+  .hire-me-btn {
+    padding: 13px 30px;
+    font-size: 0.88rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hover-panel {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    max-width: none;
+    height: auto;
+    max-height: 60vh;
+    border-left: none;
+    border-top: 2px solid rgba(0, 243, 255, 0.4);
+    border-radius: 20px 20px 0 0;
+    padding: 30px 20px;
+    transform: translateY(100%);
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow-y: auto;
+    box-shadow: inset 0 -1px 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  .hover-panel.active {
+    transform: translateY(0);
+    box-shadow: 0 -15px 50px rgba(0, 243, 255, 0.2), inset 0 -1px 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  .close-panel-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    font-size: 22px;
+  }
+  
+  .panel-content {
+    margin-top: 10px;
+  }
+  
+  .panel-content h3 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+  }
+  
+  .panel-content p {
+    font-size: 0.85rem;
+  }
+
+  /* Card Hint - Mobile Responsive */
+  .card-hint {
+    top: 30px;
+    right: 20px;
+    font-size: 0.65rem;
+    padding: 6px 10px;
+    background: rgba(0, 243, 255, 0.07);
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    opacity: 0.85;
+  }
+
+  .card-hint i {
+    font-size: 0.7rem;
+  }
+
+  .project-card:hover .card-hint {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .hover-panel {
+    max-height: 55vh;
+    padding: 25px 15px;
+  }
+  
+  .panel-content h3 {
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+  }
+  
+  .panel-content p {
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+
+  /* Card Hint - Extra Small Screens */
+  .card-hint {
+    top: 30px;
+    right: 15px;
+    font-size: 0.6rem;
+    padding: 5px 9px;
+    gap: 5px;
+    background: rgba(0, 243, 255, 0.06);
+    border: 1px solid rgba(0, 243, 255, 0.25);
+  }
+
+  .card-hint i {
+    font-size: 0.65rem;
+  }
+}
+
+/* ===================================================================
    NAVBAR
 =================================================================== */
 .glass-nav {
@@ -321,6 +593,7 @@ section {
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   overflow: hidden;
   will-change: transform, box-shadow;
+  cursor: pointer;
 }
 .project-card:hover {
   transform: translateY(-10px);
@@ -334,6 +607,44 @@ section {
   transition: opacity 0.3s; transform: translate(-50%, -50%); top: 0; left: 0;
 }
 .project-card:hover .card-glow { opacity: 1; }
+
+/* Card Click Hint - Top Right Position */
+.card-hint {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 243, 255, 0.08);
+  border: 1px solid rgba(0, 243, 255, 0.35);
+  padding: 7px 12px;
+  border-radius: 18px;
+  font-size: 0.7rem;
+  color: var(--neon-cyan);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+  letter-spacing: 0.5px;
+}
+
+.card-hint i {
+  font-size: 0.8rem;
+  animation: pulse-hint 2s ease-in-out infinite;
+}
+
+@keyframes pulse-hint {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+.project-card:hover .card-hint {
+  opacity: 1;
+  transform: translateY(-5px);
+}
 
 .tech-badge {
   font-size: 0.75rem; color: var(--neon-cyan);
@@ -378,12 +689,17 @@ section {
   gap: 30px;
 }
 .skill-block {
+  position: relative;
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(255,255,255,0.05);
   padding: 25px; border-radius: 12px; text-align: center;
   transition: 0.3s;
+  overflow: hidden;
 }
-.skill-block:hover { background: rgba(255,255,255,0.05); }
+.skill-block:hover { 
+  background: rgba(255,255,255,0.05);
+  box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+}
 .skill-icon { font-size: 2.5rem; color: var(--text-muted); margin-bottom: 15px; }
 .skill-block:hover .skill-icon { color: var(--neon-cyan); }
 .skill-block h4 { font-family: var(--font-header); margin-bottom: 15px; font-size: 0.9rem; }
@@ -423,6 +739,7 @@ section {
    CONTACT
 =================================================================== */
 .contact-panel {
+  position: relative;
   display: flex;
   background: rgba(15, 15, 20, 0.6);
   backdrop-filter: blur(15px);
@@ -506,10 +823,11 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
   background: linear-gradient(
     120deg,
     transparent,
-    rgba(0, 243, 255, 0.4),
+    rgba(0, 243, 255, 0.08),
+    rgba(0, 243, 255, 0.04),
     transparent
   );
-  transition: 0.6s;
+  transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .resume-btn:hover::before {
@@ -528,6 +846,69 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
 }
 
 .resume-btn:hover i {
+  transform: translateX(4px);
+}
+
+/* About Buttons Container */
+.about-buttons {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+/* Hire Me Button - Identical to Resume Button */
+.hire-me-btn {
+  margin-top: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 32px;
+  font-family: var(--font-header);
+  font-size: 0.9rem;
+  letter-spacing: 2px;
+  text-decoration: none;
+  color: var(--neon-cyan);
+  border: 1px solid rgba(0, 243, 255, 0.5);
+  border-radius: 50px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.hire-me-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(0, 243, 255, 0.08),
+    rgba(0, 243, 255, 0.04),
+    transparent
+  );
+  transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hire-me-btn:hover::before {
+  left: 100%;
+}
+
+.hire-me-btn:hover {
+  background: rgba(0, 243, 255, 0.1);
+  box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
+  transform: translateY(-3px);
+}
+
+.hire-me-btn i {
+  font-size: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.hire-me-btn:hover i {
   transform: translateX(4px);
 }
 
@@ -660,6 +1041,24 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
   .about-container { grid-template-columns: 1fr; gap: 40px; text-align: center; }
   .about-logo { order: -1; } /* Logo on top for mobile */
   .about-logo img { max-width: 250px; }
+  
+  /* About Buttons - Responsive */
+  .about-buttons {
+    justify-content: center;
+    gap: 10px;
+    flex-direction: column;
+  }
+
+  .resume-btn,
+  .hire-me-btn {
+    padding: 12px 24px;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    margin-top: 10px !important;
+    width: 100%;
+    max-width: 250px;
+    justify-content: center;
+  }
 
   /* Projects & Skills */
   .project-gallery { grid-template-columns: 1fr; }

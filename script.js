@@ -161,7 +161,7 @@ revealElements.forEach((el) => revealObserver.observe(el));
 /* ============================================================
    4. TYPEWRITER EFFECT
 ============================================================ */
-const roles = ["AI ENGINEER", "ML ENGINEER", "DATA SCIENTIST"];
+const roles = ["ML ENGINEER IN BEGINNER"];
 let roleIndex = 0;
 let charIndex = 0;
 let isDeleting = false;
@@ -179,6 +179,10 @@ function type() {
   }
 
   if (!isDeleting && charIndex === currentRole.length) {
+    // Don't delete if only one role, just stay at the end
+    if (roles.length === 1) {
+      return;
+    }
     setTimeout(() => isDeleting = true, 2000);
   } else if (isDeleting && charIndex === 0) {
     isDeleting = false;
@@ -213,6 +217,93 @@ if (mobileToggle) {
   });
 }
 
+/* ============================================================
+   HOVER PANEL - Show/Hide on Project Card Click
+============================================================ */
+const hoverPanel = document.getElementById('hover-panel');
+const panelTitle = document.getElementById('panel-title');
+const panelDescription = document.getElementById('panel-description');
+const closePanelBtn = document.querySelector('.close-panel-btn');
+
+// Project data for hover panel
+const projectData = {
+  'house-price': {
+    title: 'HOUSE PRICE PREDICTION',
+    description: 'Advanced regression model using Scikit-Learn to predict real estate values with high accuracy. Built with Python and deployed on Streamlit for live predictions.'
+  },
+  'earthquake': {
+    title: 'GLOBAL EARTHQUAKE PREDICTION',
+    description: 'Seismic activity forecasting tool analyzing decades of geological data to assess risk factors. Trained ML model available with predictive capabilities.'
+  },
+  'heart-disease': {
+    title: 'HEART DISEASE PREDICTION',
+    description: 'Diagnostic support tool using logistic regression to identify potential cardiac health risks. ML model trained on medical datasets for disease prediction.'
+  },
+  'student-mgmt': {
+    title: 'STUDENT MANAGEMENT',
+    description: 'Backend architecture for academic record keeping and student data processing. Python-based system for managing student information and records.'
+  },
+  'student-pass': {
+    title: 'STUDENT PASS/FAIL PREDICTOR',
+    description: 'Classification model to predict student pass or fail outcomes based on academic features. ML model trained to forecast academic performance.'
+  },
+  'bank': {
+    title: 'BANK MANAGEMENT',
+    description: 'Python-based bank system for account creation, deposits, withdrawals, and inquiries. Complete banking operations management system.'
+  },
+  'file-handling': {
+    title: 'FILE HANDLING SYSTEM',
+    description: 'Python-based file handling system to create, read, update, and delete files. Complete file management operations implementation.'
+  }
+};
+
+// Smooth panel open function
+function openPanel(projectKey) {
+  if (projectKey && projectData[projectKey]) {
+    const data = projectData[projectKey];
+    panelTitle.textContent = data.title;
+    panelDescription.textContent = data.description;
+    
+    // Trigger animation
+    requestAnimationFrame(() => {
+      if (hoverPanel) hoverPanel.classList.add('active');
+    });
+  }
+}
+
+// Smooth panel close function
+function closePanel() {
+  if (hoverPanel) {
+    hoverPanel.classList.remove('active');
+  }
+}
+
+// Click behavior for all devices
+document.querySelectorAll('.project-card').forEach(card => {
+  card.addEventListener('click', (e) => {
+    // Don't trigger if clicking on links
+    if (e.target.closest('.link-btn')) {
+      return;
+    }
+    const projectKey = card.getAttribute('data-project');
+    openPanel(projectKey);
+  });
+});
+
+// Close panel button
+if (closePanelBtn) {
+  closePanelBtn.addEventListener('click', closePanel);
+}
+
+// Close panel when clicking outside
+if (hoverPanel) {
+  document.addEventListener('click', (e) => {
+    if (!hoverPanel.contains(e.target) && !e.target.closest('.project-card')) {
+      closePanel();
+    }
+  });
+}
+
 // Custom Cursor Logic (Desktop Only) - Optimized with RAF
 const cursorDot = document.querySelector("[data-cursor-dot]");
 const cursorOutline = document.querySelector("[data-cursor-outline]");
@@ -241,7 +332,7 @@ if (window.innerWidth > 900) {
   document.addEventListener("mousemove", cursorMoveHandler);
   
   // Event delegation for interactive elements - OPTIMIZED
-  const selectiveSelectors = 'a, button, input, textarea, select, .link-btn, .btn-3d, .submit-btn, .nav-links a, .magnetic-link, .resume-btn, .social-links a, .project-card, .skill-block, .card-links a';
+  const selectiveSelectors = 'a, button, input, textarea, select, .link-btn, .btn-3d, .submit-btn, .nav-links a, .magnetic-link, .resume-btn, .hire-me-btn, .social-links a, .project-card, .skill-block, .card-links a';
   
   document.addEventListener('mouseenter', (e) => {
     const target = e.target.closest(selectiveSelectors);
