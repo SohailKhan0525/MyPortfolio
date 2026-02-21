@@ -262,7 +262,7 @@ function openPanel(projectKey) {
   if (projectKey && projectData[projectKey]) {
     const data = projectData[projectKey];
     panelTitle.textContent = data.title;
-    panelDescription.textContent = data.description;
+    panelDescription.innerHTML = data.description;
     
     // Trigger animation
     requestAnimationFrame(() => {
