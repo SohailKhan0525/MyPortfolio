@@ -253,7 +253,7 @@ const projectData = {
   },
   'file-handling': {
     title: 'FILE HANDLING SYSTEM',
-    description: 'Python-based file handling system to create, read, update, and delete files. Complete file management operations implementation.'
+    description: `A menu-driven CLI application using <b>Python</b> to create, read, and delete files through a clean <b>while True</b> loop interface.<br><br><b>📚 What I Learned</b><br><br><b>1) Using <code>pathlib</code> for Path and File Operations</b><br><code>Path('')</code> creates a Path object for the current directory. <code>path.rglob('*')</code> recursively lists every file and folder — cleaner than nested <code>os.walk()</code> calls. <code>p.exists()</code> and <code>p.is_file()</code> guard operations before acting on a path.<br><br><b>2) Working with <code>open()</code> and Context Managers</b><br>Using the <b>with statement</b> ensures the file is automatically closed even if an error occurs. <code>open(p, 'w')</code> creates or overwrites for writing; <code>open(p, 'r')</code> opens for reading.<br><br><b>3) Deleting Files with <code>os.remove()</code></b><br><code>os.remove(name)</code> permanently removes a file. Always verify the file exists and is a regular file before calling it to avoid unexpected errors.<br><br><b>4) Building a Menu-Driven CLI with a <code>while True</code> Loop</b><br>A <code>while True</code> loop combined with a <code>break</code> statement creates an infinite menu that exits only when the user explicitly chooses to quit. <code>if / elif / else</code> chains map each numeric choice to its handler function.<br><br><b>5) Enumerating a List with <code>enumerate()</code></b><br><code>enumerate(items)</code> pairs each item with a zero-based index, making it easy to print a numbered list without a manual counter variable.<br><br><b>6) Error Handling with <code>try / except</code></b><br>Wrapping risky operations in <code>try / except Exception as err</code> prevents the program from crashing unexpectedly and surfaces helpful error messages while keeping the program running.<br><br><b>7) f-Strings for Clean Output</b><br>Python f-strings allow variables and expressions to be embedded directly inside string literals — more readable than <code>+</code> concatenation or <code>.format()</code>.<br><br><b>8) Organising Code into Functions</b><br>Each operation (<code>readfileandfolder</code>, <code>createfile</code>, <code>readfile</code>, <code>deletefile</code>) is encapsulated in its own function — keeping the main loop short and each concern isolated.`
   }
 };
 
@@ -378,36 +378,51 @@ if (contactForm) {
 
 // Model Popup
 const modelBtn = document.getElementById('model-only-btn');
+const noLiveDemoBtn = document.getElementById('no-live-demo-btn');
 const modal = document.getElementById('custom-modal');
 const closeModal = document.getElementById('close-modal');
 const modalCloseButtons = document.querySelectorAll('[data-modal-close]');
 let lastFocusedElement = null;
 
-const openModelModal = () => {
-  if (!modal || !modelBtn || !closeModal) return;
+const openModelModal = (triggerBtn) => {
+  if (!modal || !closeModal) return;
   lastFocusedElement = document.activeElement;
   modal.classList.add('active');
   modal.setAttribute('aria-hidden', 'false');
-  modelBtn.setAttribute('aria-expanded', 'true');
+  if (triggerBtn) triggerBtn.setAttribute('aria-expanded', 'true');
   closeModal.focus();
 };
 
 const closeModelModal = () => {
-  if (!modal || !modelBtn) return;
+  if (!modal) return;
   modal.classList.remove('active');
   modal.setAttribute('aria-hidden', 'true');
-  modelBtn.setAttribute('aria-expanded', 'false');
+  if (modelBtn) modelBtn.setAttribute('aria-expanded', 'false');
+  if (noLiveDemoBtn) noLiveDemoBtn.setAttribute('aria-expanded', 'false');
   if (lastFocusedElement) lastFocusedElement.focus();
 };
 
 if (modelBtn && modal && closeModal) {
-  modelBtn.addEventListener('click', openModelModal);
+  modelBtn.addEventListener('click', () => openModelModal(modelBtn));
   modelBtn.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      openModelModal();
+      openModelModal(modelBtn);
     }
   });
+}
+
+if (noLiveDemoBtn && modal && closeModal) {
+  noLiveDemoBtn.addEventListener('click', () => openModelModal(noLiveDemoBtn));
+  noLiveDemoBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openModelModal(noLiveDemoBtn);
+    }
+  });
+}
+
+if (modal && closeModal) {
   modalCloseButtons.forEach(btn => btn.addEventListener('click', closeModelModal));
   modal.addEventListener('click', (e) => {
     if (e.target === modal) closeModelModal();
