@@ -278,6 +278,19 @@ function closePanel() {
   }
 }
 
+// Detect touch-primary devices (excludes hybrid laptops with touchscreens)
+const isTouchDevice = () => window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
+// Change hint text on touch devices
+if (isTouchDevice()) {
+  document.querySelectorAll('.card-hint span').forEach(span => {
+    span.textContent = 'Tap to learn more';
+  });
+}
+
+// Track the currently tapped card for efficient class management
+let tappedCard = null;
+
 // Click behavior for all devices
 document.querySelectorAll('.project-card').forEach(card => {
   card.addEventListener('click', (e) => {
@@ -286,6 +299,21 @@ document.querySelectorAll('.project-card').forEach(card => {
       return;
     }
     const projectKey = card.getAttribute('data-project');
+
+    // Two-tap behavior on touch devices
+    if (isTouchDevice() && card !== tappedCard) {
+      // First tap: highlight the card and show the hint
+      if (tappedCard) tappedCard.classList.remove('card-tapped');
+      tappedCard = card;
+      card.classList.add('card-tapped');
+      return;
+    }
+
+    // Second tap (or desktop click): open panel
+    if (tappedCard) {
+      tappedCard.classList.remove('card-tapped');
+      tappedCard = null;
+    }
     openPanel(projectKey);
   });
 });
@@ -300,6 +328,10 @@ if (hoverPanel) {
   document.addEventListener('click', (e) => {
     if (!hoverPanel.contains(e.target) && !e.target.closest('.project-card')) {
       closePanel();
+      if (tappedCard) {
+        tappedCard.classList.remove('card-tapped');
+        tappedCard = null;
+      }
     }
   });
 }

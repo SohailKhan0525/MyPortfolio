@@ -351,6 +351,19 @@ body.cursor-interactive .cursor-outline {
   .project-card:hover .card-hint {
     opacity: 1;
   }
+
+  .project-card.card-tapped .card-hint {
+    opacity: 1;
+    transform: translateY(-5px);
+  }
+
+  .project-card.card-tapped {
+    transform: translateY(-8px) scale(1.02);
+  }
+
+  .project-card.card-tapped .card-glow {
+    opacity: 1;
+  }
 }
 
 @media (max-width: 480px) {
