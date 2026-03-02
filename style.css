@@ -1011,6 +1011,41 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
 /* ===================================================================
    RESUME SECTION
 =================================================================== */
+/* ===================================================================
+   RESUME & CERT ANIMATIONS
+=================================================================== */
+@keyframes resume-scan {
+  0% { top: -2%; opacity: 0; }
+  5% { opacity: 1; }
+  95% { opacity: 1; }
+  100% { top: 102%; opacity: 0; }
+}
+
+@keyframes frame-border-pulse {
+  0%, 100% { box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 243, 255, 0.08); }
+  50% { box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 243, 255, 0.18), 0 0 0 1px rgba(0, 243, 255, 0.2); }
+}
+
+@keyframes cert-icon-pulse {
+  0%, 100% { color: rgba(0, 243, 255, 0.3); filter: drop-shadow(0 0 6px rgba(0, 243, 255, 0.1)); }
+  50% { color: rgba(0, 243, 255, 0.75); filter: drop-shadow(0 0 22px rgba(0, 243, 255, 0.5)); }
+}
+
+@keyframes cert-border-glow {
+  0%, 100% { border-color: rgba(0, 243, 255, 0.2); box-shadow: none; }
+  50% { border-color: rgba(0, 243, 255, 0.45); box-shadow: 0 0 24px rgba(0, 243, 255, 0.08), inset 0 0 24px rgba(0, 243, 255, 0.03); }
+}
+
+@keyframes cert-ring-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes cert-ring-spin-reverse {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
 .resume-wrapper {
   max-width: 900px;
   margin: 0 auto;
@@ -1022,6 +1057,7 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
   gap: 16px;
   margin-bottom: 24px;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .resume-action-btn {
@@ -1088,6 +1124,21 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 243, 255, 0.08);
   background: rgba(255, 255, 255, 0.02);
   position: relative;
+  animation: frame-border-pulse 4s ease-in-out infinite;
+}
+
+.resume-frame-container::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -2%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  opacity: 0;
+  animation: resume-scan 5s linear infinite;
+  pointer-events: none;
+  z-index: 2;
 }
 
 .resume-iframe {
@@ -1112,6 +1163,47 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
 
 .resume-fallback-link:hover {
   text-decoration: underline;
+}
+
+/* Mobile-only resume card (shown on touch devices when iframe can't display PDF) */
+.resume-mobile-card {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 50px 30px;
+  border: 1px solid rgba(0, 243, 255, 0.25);
+  border-radius: 16px;
+  background: rgba(0, 243, 255, 0.03);
+  text-align: center;
+  animation: cert-border-glow 4s ease-in-out infinite;
+}
+
+.resume-mobile-icon {
+  font-size: 3.5rem;
+  color: var(--neon-cyan);
+  filter: drop-shadow(0 0 16px rgba(0, 243, 255, 0.4));
+}
+
+.resume-mobile-title {
+  font-family: var(--font-header);
+  font-size: 1.3rem;
+  letter-spacing: 3px;
+  color: var(--text-main);
+}
+
+.resume-mobile-subtitle {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  max-width: 320px;
+}
+
+.resume-mobile-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 /* ===================================================================
@@ -1177,24 +1269,68 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 24px;
   padding: 80px 40px;
   border: 1px dashed rgba(0, 243, 255, 0.25);
   border-radius: 16px;
   background: rgba(0, 243, 255, 0.02);
   text-align: center;
+  animation: cert-border-glow 4s ease-in-out infinite;
+}
+
+.cert-placeholder-rings {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cert-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 243, 255, 0.2);
+}
+
+.cert-ring-1 {
+  width: 90px;
+  height: 90px;
+  border-top-color: rgba(0, 243, 255, 0.5);
+  animation: cert-ring-spin 6s linear infinite;
+}
+
+.cert-ring-2 {
+  width: 70px;
+  height: 70px;
+  border-right-color: rgba(188, 19, 254, 0.5);
+  animation: cert-ring-spin-reverse 4s linear infinite;
 }
 
 .cert-placeholder-icon {
-  font-size: 3rem;
-  color: rgba(0, 243, 255, 0.3);
+  font-size: 2.4rem;
+  position: relative;
+  z-index: 1;
+  animation: cert-icon-pulse 3s ease-in-out infinite;
 }
 
 .cert-placeholder-text {
-  color: var(--text-muted);
+  color: var(--text-main);
   font-family: var(--font-header);
-  font-size: 1.1rem;
-  letter-spacing: 1px;
+  font-size: 1.2rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.cert-placeholder-subtext {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.cert-placeholder-highlight {
+  color: var(--neon-cyan);
+  font-weight: 600;
 }
 
 /* ===================================================================
@@ -1206,8 +1342,7 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
   }
 
   .resume-actions {
-    flex-direction: column;
-    align-items: flex-start;
+    justify-content: center;
     gap: 12px;
   }
 
@@ -1223,8 +1358,17 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
 }
 
 @media (max-width: 480px) {
-  .resume-iframe {
-    height: 380px;
+  /* On small mobile, hide the iframe and show the mobile card */
+  .resume-frame-container {
+    display: none;
+  }
+
+  .resume-actions {
+    display: none;
+  }
+
+  .resume-mobile-card {
+    display: flex;
   }
 
   .resume-action-btn {
@@ -1238,15 +1382,16 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
   }
 
   .cert-placeholder-icon {
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
 
   .cert-placeholder-text {
     font-size: 1rem;
+    letter-spacing: 2px;
   }
 }
 
-
+@media (max-width: 768px) {
   /* Cursor: Hide custom cursor on touch devices */
   .cursor-dot, .cursor-outline { display: none; }
   * { cursor: auto !important; }
