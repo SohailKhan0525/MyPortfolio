@@ -1008,7 +1008,245 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
 /* ===================================================================
    RESPONSIVE DESIGN & MOBILE OPTIMIZATIONS
 =================================================================== */
-@media (max-width: 900px) {
+/* ===================================================================
+   RESUME SECTION
+=================================================================== */
+.resume-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.resume-actions {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.resume-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 28px;
+  font-family: var(--font-header);
+  font-size: 0.88rem;
+  letter-spacing: 1.5px;
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  cursor: none;
+}
+
+.resume-action-btn.primary-action {
+  color: #000;
+  background: var(--neon-cyan);
+  border: 1px solid var(--neon-cyan);
+  box-shadow: 0 0 16px rgba(0, 243, 255, 0.35);
+}
+
+.resume-action-btn.primary-action:hover {
+  background: transparent;
+  color: var(--neon-cyan);
+  box-shadow: 0 0 24px rgba(0, 243, 255, 0.6);
+  transform: translateY(-3px);
+}
+
+.resume-action-btn.secondary-action {
+  color: var(--neon-cyan);
+  background: transparent;
+  border: 1px solid rgba(0, 243, 255, 0.5);
+}
+
+.resume-action-btn.secondary-action:hover {
+  background: rgba(0, 243, 255, 0.08);
+  box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+  transform: translateY(-3px);
+}
+
+.resume-action-btn i {
+  font-size: 0.9rem;
+  transition: transform 0.3s ease;
+}
+
+.resume-action-btn.primary-action:hover i {
+  transform: scale(1.2);
+}
+
+.resume-action-btn.secondary-action:hover i {
+  transform: translateY(2px);
+}
+
+.resume-frame-container {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 243, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  position: relative;
+}
+
+.resume-iframe {
+  display: block;
+  width: 100%;
+  height: 700px;
+  border: none;
+}
+
+.resume-fallback {
+  display: none;
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.resume-fallback-link {
+  color: var(--neon-cyan);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.resume-fallback-link:hover {
+  text-decoration: underline;
+}
+
+/* ===================================================================
+   CERTIFICATIONS SECTION
+=================================================================== */
+.cert-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 30px;
+  width: 100%;
+}
+
+/* Future certificate card style (for easy addition later) */
+.cert-card {
+  position: relative;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.cert-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 243, 255, 0.15);
+  border-color: rgba(0, 243, 255, 0.4);
+}
+
+.cert-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.cert-card:hover img {
+  transform: scale(1.05);
+}
+
+.cert-card-body {
+  padding: 20px;
+}
+
+.cert-card-body h4 {
+  font-family: var(--font-header);
+  font-size: 1rem;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.cert-card-body p {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+/* Placeholder state */
+.cert-placeholder {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 80px 40px;
+  border: 1px dashed rgba(0, 243, 255, 0.25);
+  border-radius: 16px;
+  background: rgba(0, 243, 255, 0.02);
+  text-align: center;
+}
+
+.cert-placeholder-icon {
+  font-size: 3rem;
+  color: rgba(0, 243, 255, 0.3);
+}
+
+.cert-placeholder-text {
+  color: var(--text-muted);
+  font-family: var(--font-header);
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+}
+
+/* ===================================================================
+   RESPONSIVE: RESUME & CERTIFICATIONS
+=================================================================== */
+@media (max-width: 768px) {
+  .resume-iframe {
+    height: 480px;
+  }
+
+  .resume-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .resume-action-btn {
+    width: 100%;
+    max-width: 260px;
+    justify-content: center;
+  }
+
+  .cert-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .resume-iframe {
+    height: 380px;
+  }
+
+  .resume-action-btn {
+    max-width: 100%;
+    padding: 11px 20px;
+    font-size: 0.82rem;
+  }
+
+  .cert-placeholder {
+    padding: 50px 20px;
+  }
+
+  .cert-placeholder-icon {
+    font-size: 2.5rem;
+  }
+
+  .cert-placeholder-text {
+    font-size: 1rem;
+  }
+}
+
+
   /* Cursor: Hide custom cursor on touch devices */
   .cursor-dot, .cursor-outline { display: none; }
   * { cursor: auto !important; }
