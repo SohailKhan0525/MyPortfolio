@@ -1141,7 +1141,7 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
   z-index: 2;
 }
 
-.resume-iframe {
+.resume-embed {
   display: block;
   width: 100%;
   height: 700px;
@@ -1337,28 +1337,7 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
    RESPONSIVE: RESUME & CERTIFICATIONS
 =================================================================== */
 @media (max-width: 768px) {
-  .resume-iframe {
-    height: 480px;
-  }
-
-  .resume-actions {
-    justify-content: center;
-    gap: 12px;
-  }
-
-  .resume-action-btn {
-    width: 100%;
-    max-width: 260px;
-    justify-content: center;
-  }
-
-  .cert-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 480px) {
-  /* On small mobile, hide the iframe and show the mobile card */
+  /* On mobile, hide the embed and show the mobile card */
   .resume-frame-container {
     display: none;
   }
@@ -1377,6 +1356,13 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
     font-size: 0.82rem;
   }
 
+  .cert-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Compact certificate placeholder on very small screens */
   .cert-placeholder {
     padding: 50px 20px;
   }
