@@ -1395,14 +1395,25 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
     justify-content: center; align-items: center;
     transform: translateX(100%);
     transition: transform 0.4s ease;
-    z-index: -1;
+    z-index: 999;
   }
   .nav-links.active { transform: translateX(0); }
+
+  /* Mobile nav backdrop */
+  #nav-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    backdrop-filter: blur(2px);
+  }
+  #nav-backdrop.active { display: block; }
   
   /* Hamburger */
   #mobile-toggle {
     display: flex; flex-direction: column; gap: 6px;
-    background: transparent; border: none; cursor: none; z-index: 1001;
+    background: transparent; border: none; cursor: auto; z-index: 1001;
   }
   #mobile-toggle span {
     width: 30px; height: 2px; background: #fff;
@@ -1412,6 +1423,12 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
   #mobile-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
   #mobile-toggle.active span:nth-child(2) { opacity: 0; }
   #mobile-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
+
+  /* Section padding on mobile */
+  section { padding: 80px 5%; }
+
+  /* Section title on mobile */
+  .section-title { font-size: 2rem; }
 
   /* Hero */
   .hero-container { flex-direction: column; text-align: center; padding-top: 60px; }
@@ -1450,4 +1467,19 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
   .contact-panel { flex-direction: column; }
   .contact-left { padding: 30px; text-align: center; }
   #contact-form { padding: 30px; }
+}
+
+/* ===================================================================
+   RESPONSIVE: EXTRA SMALL SCREENS (≤480px)
+   Must come after ≤768px block so these rules override it for small screens
+=================================================================== */
+@media (max-width: 480px) {
+  /* Small screen section padding */
+  section { padding: 60px 4%; }
+
+  /* Small screen font sizes */
+  .glitch-header { font-size: 2.2rem; }
+  .section-title { font-size: 1.7rem; }
+  .about-title { font-size: 2.2rem; }
+  .contact-left h2 { font-size: 2rem; }
 }
