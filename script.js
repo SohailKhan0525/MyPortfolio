@@ -32,7 +32,7 @@ document.getElementById('canvas-container').appendChild(renderer.domElement);
 
 // --- GEOMETRY: PARTICLE SPHERE ---
 const isMobile = window.innerWidth < 768;
-const particlesCount = isMobile ? 600 : 1500; // Performance optimization for mobile
+const particlesCount = isMobile ? 300 : 1200; // Performance optimization for mobile
 const posArray = new Float32Array(particlesCount * 3);
 
 for (let i = 0; i < particlesCount * 3; i++) {
@@ -92,7 +92,13 @@ document.addEventListener('mousemove', (event) => {
 
 // --- GYROSCOPE (MOBILE) ---
 // This detects phone rotation and updates gyro variables
+let lastGyroUpdate = 0;
+const GYRO_THROTTLE = 33; // ~30fps
+
 window.addEventListener('deviceorientation', (event) => {
+  const now = performance.now();
+  if (now - lastGyroUpdate < GYRO_THROTTLE) return;
+  lastGyroUpdate = now;
   // gamma: left-to-right tilt in degrees, beta: front-to-back tilt
   if (event.gamma && event.beta) {
     gyroX = event.gamma * 2; // Multiplier for sensitivity
@@ -102,8 +108,19 @@ window.addEventListener('deviceorientation', (event) => {
 
 // --- ANIMATION LOOP ---
 const clock = new THREE.Clock();
+const MOBILE_FRAME_INTERVAL = 1000 / 30; // 30fps cap on mobile
+let lastFrameTime = 0;
+let animationId;
 
-function animate() {
+function animate(time = 0) {
+  animationId = requestAnimationFrame(animate);
+
+  // Cap to 30fps on mobile to reduce GPU load
+  if (isMobile) {
+    if (time - lastFrameTime < MOBILE_FRAME_INTERVAL) return;
+    lastFrameTime = time;
+  }
+
   const elapsedTime = clock.getElapsedTime();
 
   // Determine target based on device type (Mouse or Gyro)
@@ -130,15 +147,30 @@ function animate() {
   wireframeSphere.scale.set(scale, scale, scale);
 
   renderer.render(scene, camera);
-  requestAnimationFrame(animate);
 }
 animate();
 
-// --- RESIZE HANDLER ---
+// Pause Three.js when the browser tab is hidden to save GPU/CPU
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    cancelAnimationFrame(animationId);
+    clock.stop();
+  } else {
+    clock.start();
+    lastFrameTime = 0;
+    animate();
+  }
+});
+
+// --- RESIZE HANDLER (debounced) ---
+let resizeTimer;
 window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }, 100);
 });
 
 
