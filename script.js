@@ -196,25 +196,42 @@ if(typeTarget) type();
 
 
 /* ============================================================
-/* ============================================================
    5. MOBILE MENU & CURSOR
 ============================================================ */
 const mobileToggle = document.getElementById('mobile-toggle');
 const navLinks = document.querySelector('.nav-links');
+const navBackdrop = document.getElementById('nav-backdrop');
+
+function openMobileNav() {
+  navLinks.classList.add('active');
+  mobileToggle.classList.add('active');
+  if (navBackdrop) navBackdrop.classList.add('active');
+}
+
+function closeMobileNav() {
+  navLinks.classList.remove('active');
+  mobileToggle.classList.remove('active');
+  if (navBackdrop) navBackdrop.classList.remove('active');
+}
 
 if (mobileToggle) {
   mobileToggle.addEventListener('click', () => {
-    navLinks.classList.toggle('active');
-    mobileToggle.classList.toggle('active'); // Animate hamburger
+    if (navLinks.classList.contains('active')) {
+      closeMobileNav();
+    } else {
+      openMobileNav();
+    }
   });
   
   // Close menu when a link is clicked
   document.querySelectorAll('.nav-links a').forEach(link => {
-    link.addEventListener('click', () => {
-      navLinks.classList.remove('active');
-      mobileToggle.classList.remove('active');
-    });
+    link.addEventListener('click', closeMobileNav);
   });
+}
+
+// Close mobile nav when clicking the backdrop
+if (navBackdrop) {
+  navBackdrop.addEventListener('click', closeMobileNav);
 }
 
 /* ============================================================
