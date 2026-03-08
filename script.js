@@ -106,6 +106,28 @@ window.addEventListener('deviceorientation', (event) => {
   }
 });
 
+// --- SMOOTH SCROLL CAMERA PARALLAX ---
+let rawScrollY = 0;
+let smoothScrollY = 0;
+const SCROLL_LERP = 0.04;           // Smoothing factor: lower = silkier, higher = snappier
+const CAMERA_Z_BASE = 3;            // Default camera z distance from scene
+const CAMERA_Y_FACTOR = 0.0002;     // How much camera drifts down per scroll pixel
+const CAMERA_Z_FACTOR = 0.0001;     // How much camera pulls back per scroll pixel
+const PARTICLES_SCROLL_FACTOR = 0.00025;  // Parallax speed for particle cloud
+const SPHERE_SCROLL_FACTOR = 0.00012;     // Parallax speed for wireframe sphere
+
+const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+let prefersReducedMotion = reducedMotionQuery.matches;
+reducedMotionQuery.addEventListener('change', (e) => {
+  prefersReducedMotion = e.matches;
+  // Sync smoothScrollY so there is no jarring jump on preference change
+  smoothScrollY = rawScrollY;
+});
+
+window.addEventListener('scroll', () => {
+  rawScrollY = window.scrollY;
+}, { passive: true });
+
 // --- ANIMATION LOOP ---
 const clock = new THREE.Clock();
 const MOBILE_FRAME_INTERVAL = 1000 / 30; // 30fps cap on mobile
@@ -145,6 +167,20 @@ function animate(time = 0) {
   // Breathing/Pulse effect
   const scale = 1 + Math.sin(elapsedTime * 2) * 0.05;
   wireframeSphere.scale.set(scale, scale, scale);
+
+  // Smooth camera scroll parallax (premium cinematic feel)
+  if (!prefersReducedMotion) {
+    smoothScrollY += (rawScrollY - smoothScrollY) * SCROLL_LERP;
+  } else {
+    // Keep smoothScrollY in sync so toggling preference never causes a jump
+    smoothScrollY = rawScrollY;
+  }
+  if (!prefersReducedMotion) {
+    camera.position.y = -smoothScrollY * CAMERA_Y_FACTOR;
+    camera.position.z = CAMERA_Z_BASE + smoothScrollY * CAMERA_Z_FACTOR;
+    particlesMesh.position.y = smoothScrollY * PARTICLES_SCROLL_FACTOR;
+    wireframeSphere.position.y = -smoothScrollY * SPHERE_SCROLL_FACTOR;
+  }
 
   renderer.render(scene, camera);
 }
