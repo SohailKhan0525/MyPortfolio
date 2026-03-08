@@ -124,9 +124,53 @@ reducedMotionQuery.addEventListener('change', (e) => {
   smoothScrollY = rawScrollY;
 });
 
-window.addEventListener('scroll', () => {
-  rawScrollY = window.scrollY;
-}, { passive: true });
+// --- SCROLL PROGRESS BAR ---
+const scrollProgressEl = document.getElementById('scroll-progress');
+function updateScrollProgress(progress) {
+  if (scrollProgressEl) scrollProgressEl.style.width = (progress * 100) + '%';
+}
+
+// --- LENIS SMOOTH SCROLLING ---
+let lenis;
+if (!prefersReducedMotion && typeof Lenis !== 'undefined') {
+  lenis = new Lenis({
+    duration: 1.2,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    smoothTouch: false,
+  });
+
+  lenis.on('scroll', ({ scroll, limit }) => {
+    rawScrollY = scroll;
+    const progress = limit > 0 ? scroll / limit : 0;
+    updateScrollProgress(progress);
+  });
+} else {
+  // Fallback: native scroll tracking
+  window.addEventListener('scroll', () => {
+    rawScrollY = window.scrollY;
+    const limit = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = limit > 0 ? rawScrollY / limit : 0;
+    updateScrollProgress(progress);
+  }, { passive: true });
+}
+
+// --- HERO PARALLAX ZOOM ON SCROLL ---
+const heroTextEl = document.querySelector('.hero-text');
+const HERO_PARALLAX_SPEED = 0.25;    // How fast hero content moves relative to scroll
+const HERO_FADE_MULTIPLIER = 1.4;    // How quickly hero fades as user scrolls past
+const HERO_SCALE_FACTOR = 0.06;      // Max scale increase at bottom of hero section
+const HERO_REVEAL_TRANSITION_MS = 900; // Slightly longer than the 0.8s reveal CSS transition
+
+function updateHeroParallax(scrollY) {
+  if (!heroTextEl || prefersReducedMotion) return;
+  const heroH = window.innerHeight;
+  const progress = Math.min(scrollY / heroH, 1);
+  const translateY = scrollY * HERO_PARALLAX_SPEED;
+  const opacity = 1 - progress * HERO_FADE_MULTIPLIER;
+  const scale = 1 + progress * HERO_SCALE_FACTOR;
+  heroTextEl.style.transform = `translateY(${translateY}px) scale(${scale})`;
+  heroTextEl.style.opacity = Math.max(0, opacity);
+}
 
 // --- ANIMATION LOOP ---
 const clock = new THREE.Clock();
@@ -136,6 +180,9 @@ let animationId;
 
 function animate(time = 0) {
   animationId = requestAnimationFrame(animate);
+
+  // Drive Lenis smooth scroll each frame
+  if (lenis) lenis.raf(time);
 
   // Cap to 30fps on mobile to reduce GPU load
   if (isMobile) {
@@ -180,6 +227,7 @@ function animate(time = 0) {
     camera.position.z = CAMERA_Z_BASE + smoothScrollY * CAMERA_Z_FACTOR;
     particlesMesh.position.y = smoothScrollY * PARTICLES_SCROLL_FACTOR;
     wireframeSphere.position.y = -smoothScrollY * SPHERE_SCROLL_FACTOR;
+    updateHeroParallax(smoothScrollY);
   }
 
   renderer.render(scene, camera);
@@ -211,7 +259,7 @@ window.addEventListener('resize', () => {
 
 
 /* ============================================================
-   3. SCROLL REVEAL ANIMATIONS (Intersection Observer)
+   3. SCROLL REVEAL ANIMATIONS (Intersection Observer — with reverse)
 ============================================================ */
 const revealElements = document.querySelectorAll(".reveal");
 
@@ -219,15 +267,29 @@ const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
       entry.target.classList.add("active");
+      // Once hero-text has revealed, remove the CSS transition so
+      // real-time scroll parallax updates run without CSS easing interference
+      if (entry.target.classList.contains('hero-text')) {
+        setTimeout(() => {
+          entry.target.style.transition = 'none';
+        }, HERO_REVEAL_TRANSITION_MS);
+      }
+    } else if (entry.boundingClientRect.top > 0) {
+      // Element is below the viewport — user scrolled back up; reset for re-entry
+      entry.target.classList.remove("active");
+      // Restore transition so the re-entry animation looks cinematic
+      if (entry.target.classList.contains('hero-text')) {
+        entry.target.style.transition = '';
+      }
     }
   });
-}, { threshold: 0.15 });
+}, { threshold: 0.1 });
 
 revealElements.forEach((el) => revealObserver.observe(el));
 
 
 /* ============================================================
-   4. TYPEWRITER EFFECT
+   4. TYPEWRITER EFFECT (role — started after name typing finishes)
 ============================================================ */
 const roles = ["ML ENGINEER IN BEGINNER"];
 let roleIndex = 0;
@@ -260,7 +322,7 @@ function type() {
   const speed = isDeleting ? 50 : 100;
   setTimeout(type, speed);
 }
-if(typeTarget) type();
+// Role typing is started by startHeroTyping() after name is done
 
 
 /* ============================================================
@@ -568,10 +630,59 @@ window.addEventListener("load", () => {
     } else {
       clearInterval(interval);
       preloader.style.opacity = "0";
-      setTimeout(() => preloader.style.display = "none", 500);
+      setTimeout(() => {
+        preloader.style.display = "none";
+        startHeroTyping();
+      }, 500);
     }
   }, 600);
 });
+
+/* ============================================================
+   HERO NAME TYPING EFFECT
+============================================================ */
+function startHeroTyping() {
+  const nameEl = document.querySelector('.glitch-header');
+  if (!nameEl) {
+    if (typeTarget) type();
+    return;
+  }
+
+  const fullName = nameEl.getAttribute('data-text') || 'MOHD ZAHEER UDDIN';
+
+  if (prefersReducedMotion) {
+    // Skip typing animation; show immediately and enable glitch
+    nameEl.textContent = fullName;
+    nameEl.setAttribute('data-text', fullName);
+    nameEl.classList.add('typing-done');
+    if (typeTarget) type();
+    return;
+  }
+
+  // Clear visible text for typing effect
+  nameEl.textContent = '';
+  let idx = 0;
+
+  function typeNameChar() {
+    const current = fullName.slice(0, idx);
+    nameEl.textContent = current;
+    nameEl.setAttribute('data-text', current);
+
+    if (idx < fullName.length) {
+      idx++;
+      setTimeout(typeNameChar, 75);
+    } else {
+      // Full name displayed — restore data-text and enable glitch effect
+      nameEl.setAttribute('data-text', fullName);
+      nameEl.classList.add('typing-done');
+      // Small pause, then start role typewriter
+      setTimeout(() => {
+        if (typeTarget) type();
+      }, 300);
+    }
+  }
+  typeNameChar();
+}
 
 /* ============================================================
    8. SKILLS PROGRESS HOVER LOGIC
