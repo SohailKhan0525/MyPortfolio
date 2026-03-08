@@ -23,7 +23,7 @@
 }
 
 body {
-  background-color: var(--bg-dark);
+  background: radial-gradient(ellipse at 50% 0%, #0a0520 0%, #050510 35%, var(--bg-dark) 70%);
   color: var(--text-main);
   font-family: var(--font-body);
   overflow-x: hidden;
@@ -60,6 +60,19 @@ html {
   opacity: 0.02;
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Premium depth gradient overlay: cosmic glow + cinematic vignette */
+.gradient-bg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 110% 55% at 50% 0%, rgba(5, 0, 35, 0.65) 0%, transparent 65%),
+    radial-gradient(ellipse 100% 100% at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.45) 100%),
+    radial-gradient(ellipse 55% 45% at 8% 92%, rgba(188, 19, 254, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 45% at 92% 8%, rgba(0, 243, 255, 0.05) 0%, transparent 60%);
 }
 
 /* ===================================================================
