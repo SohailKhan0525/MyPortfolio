@@ -109,12 +109,45 @@ window.addEventListener('deviceorientation', (event) => {
 // --- SMOOTH SCROLL CAMERA PARALLAX ---
 let rawScrollY = 0;
 let smoothScrollY = 0;
-const SCROLL_LERP = 0.04;           // Smoothing factor: lower = silkier, higher = snappier
-const CAMERA_Z_BASE = 3;            // Default camera z distance from scene
-const CAMERA_Y_FACTOR = 0.0002;     // How much camera drifts down per scroll pixel
-const CAMERA_Z_FACTOR = 0.0001;     // How much camera pulls back per scroll pixel
-const PARTICLES_SCROLL_FACTOR = 0.00025;  // Parallax speed for particle cloud
-const SPHERE_SCROLL_FACTOR = 0.00012;     // Parallax speed for wireframe sphere
+const SCROLL_LERP = 0.04;                    // Smoothing factor: lower = silkier
+const PARTICLES_SCROLL_FACTOR = 0.00025;     // Parallax speed for particle cloud
+const SPHERE_SCROLL_FACTOR = 0.00012;        // Parallax speed for wireframe sphere
+
+// --- SECTION-AWARE CINEMATIC CAMERA TARGETS ---
+// Each section defines where the Three.js camera smoothly travels to
+const sectionCameraTargets = {
+  'home':           { z: 3.0, y:  0.00, fov: 75, pOpacity: 0.80, sOpacity: 0.15 },
+  'about':          { z: 3.9, y: -0.15, fov: 72, pOpacity: 0.55, sOpacity: 0.10 },
+  'projects':       { z: 4.7, y: -0.20, fov: 70, pOpacity: 0.45, sOpacity: 0.08 },
+  'skills':         { z: 5.3, y: -0.15, fov: 68, pOpacity: 0.40, sOpacity: 0.12 },
+  'resume':         { z: 4.8, y: -0.30, fov: 70, pOpacity: 0.35, sOpacity: 0.10 },
+  'certifications': { z: 5.5, y: -0.25, fov: 67, pOpacity: 0.30, sOpacity: 0.10 },
+  'contact':        { z: 4.2, y:  0.05, fov: 73, pOpacity: 0.55, sOpacity: 0.15 }
+};
+// Start at home target; updated by sectionCameraObserver
+let activeCameraTarget = { ...sectionCameraTargets['home'] };
+// Lerp speed — slightly slower on mobile for smoothness at 30 fps
+const CAMERA_SECTION_LERP = isMobile ? 0.015 : 0.025;
+// Opacity lerp for particle field transitions
+const OPACITY_LERP = 0.02;
+// Camera tilt lerp — how quickly the tilt snaps back after scrolling
+const TILT_LERP = 0.06;
+
+// Scroll-velocity tilt — camera tilts forward when scrolling fast (cinematic dolly)
+let prevRawScrollY = 0;
+let cameraXTilt = 0;
+const TILT_STRENGTH = isMobile ? 0.00007 : 0.00013;
+
+// Observe each section; update camera target when it enters the viewport
+const sectionCameraObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const target = sectionCameraTargets[entry.target.id];
+      if (target) Object.assign(activeCameraTarget, target);
+    }
+  });
+}, { threshold: 0.35 });
+document.querySelectorAll('section[id]').forEach(s => sectionCameraObserver.observe(s));
 
 const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 let prefersReducedMotion = reducedMotionQuery.matches;
@@ -122,6 +155,14 @@ reducedMotionQuery.addEventListener('change', (e) => {
   prefersReducedMotion = e.matches;
   // Sync smoothScrollY so there is no jarring jump on preference change
   smoothScrollY = rawScrollY;
+  // Snap camera to active target immediately (no lerp drift)
+  if (e.matches) {
+    camera.position.z = activeCameraTarget.z;
+    camera.position.y = activeCameraTarget.y;
+    camera.rotation.x = 0;
+    camera.fov = activeCameraTarget.fov;
+    camera.updateProjectionMatrix();
+  }
 });
 
 // --- SCROLL PROGRESS BAR ---
@@ -223,10 +264,30 @@ function animate(time = 0) {
     smoothScrollY = rawScrollY;
   }
   if (!prefersReducedMotion) {
-    camera.position.y = -smoothScrollY * CAMERA_Y_FACTOR;
-    camera.position.z = CAMERA_Z_BASE + smoothScrollY * CAMERA_Z_FACTOR;
+    // Section-aware camera: lerp toward the target Z/Y for the active section
+    camera.position.z += (activeCameraTarget.z - camera.position.z) * CAMERA_SECTION_LERP;
+    camera.position.y += (activeCameraTarget.y - camera.position.y) * CAMERA_SECTION_LERP;
+
+    // Cinematic tilt: forward lean based on scroll velocity (dolly-push feel)
+    const scrollVelocityNow = rawScrollY - prevRawScrollY;
+    prevRawScrollY = rawScrollY;
+    cameraXTilt = scrollVelocityNow * TILT_STRENGTH;
+    camera.rotation.x += (cameraXTilt - camera.rotation.x) * TILT_LERP;
+
+    // FOV breathing per section — widens on hero, narrows as user explores deeper
+    if (Math.abs(camera.fov - activeCameraTarget.fov) > 0.05) {
+      camera.fov += (activeCameraTarget.fov - camera.fov) * CAMERA_SECTION_LERP;
+      camera.updateProjectionMatrix();
+    }
+
+    // Particle field visual density transitions per section
+    particlesMaterial.opacity += (activeCameraTarget.pOpacity - particlesMaterial.opacity) * OPACITY_LERP;
+    material2.opacity += (activeCameraTarget.sOpacity - material2.opacity) * OPACITY_LERP;
+
+    // Particle cloud and sphere slow parallax (depth layers)
     particlesMesh.position.y = smoothScrollY * PARTICLES_SCROLL_FACTOR;
     wireframeSphere.position.y = -smoothScrollY * SPHERE_SCROLL_FACTOR;
+
     updateHeroParallax(smoothScrollY);
   }
 
@@ -286,6 +347,19 @@ const revealObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.1 });
 
 revealElements.forEach((el) => revealObserver.observe(el));
+
+// Directional reveal elements (reveal-left / reveal-right)
+const directionalRevealEls = document.querySelectorAll('.reveal-left, .reveal-right');
+const directionalRevealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('active');
+    } else if (entry.boundingClientRect.top > 0) {
+      entry.target.classList.remove('active');
+    }
+  });
+}, { threshold: 0.1 });
+directionalRevealEls.forEach(el => directionalRevealObserver.observe(el));
 
 
 /* ============================================================
@@ -632,6 +706,10 @@ window.addEventListener("load", () => {
       preloader.style.opacity = "0";
       setTimeout(() => {
         preloader.style.display = "none";
+        // Open cinematic letterbox bars (black edges animate out)
+        document.querySelectorAll('.letterbox-bar').forEach(bar => {
+          requestAnimationFrame(() => bar.classList.add('open'));
+        });
         startHeroTyping();
       }, 500);
     }

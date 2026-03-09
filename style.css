@@ -58,6 +58,34 @@ html {
 }
 
 /* ===================================================================
+   CINEMATIC LETTERBOX BARS
+   Present during preloader; animate away (.open) after site loads.
+=================================================================== */
+.letterbox-bar {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  background: #000;
+  z-index: 9999;
+  pointer-events: none;
+  height: 70px;
+  will-change: height;
+}
+.letterbox-top { top: 0; }
+.letterbox-bottom { bottom: 0; }
+.letterbox-bar.open {
+  height: 0;
+  transition: height 1.6s var(--easing);
+}
+
+@media (max-width: 768px) {
+  .letterbox-bar { height: 45px; }
+}
+@media (max-width: 480px) {
+  .letterbox-bar { height: 28px; }
+}
+
+/* ===================================================================
    CORE LAYOUT & BACKGROUNDS
 =================================================================== */
 #canvas-container {
@@ -620,9 +648,47 @@ section {
   transform: translateY(0) scale(1);
 }
 
+/* Directional reveal variants for cinematic stagger */
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-55px) scale(0.97);
+  transition: opacity 0.9s var(--easing), transform 0.9s var(--easing);
+  will-change: opacity, transform;
+}
+.reveal-right {
+  opacity: 0;
+  transform: translateX(55px) scale(0.97);
+  transition: opacity 0.9s var(--easing), transform 0.9s var(--easing);
+  will-change: opacity, transform;
+}
+.reveal-left.active,
+.reveal-right.active {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
+
 .delay-100 { transition-delay: 0.12s; }
 .delay-200 { transition-delay: 0.24s; }
 .delay-300 { transition-delay: 0.36s; }
+
+/* Cinematic section-entry ambient line */
+section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(0, 243, 255, 0.12) 30%,
+    rgba(188, 19, 254, 0.12) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+#home::before { display: none; } /* No line above hero */
 
 /* ===================================================================
    PROJECTS
@@ -1587,6 +1653,19 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
   }
   .reveal.active {
     transform: none;
+  }
+  .reveal-left,
+  .reveal-right {
+    transition: opacity 0.3s ease;
+    transform: none;
+  }
+  .reveal-left.active,
+  .reveal-right.active {
+    transform: none;
+  }
+  .letterbox-bar {
+    height: 0 !important;
+    transition: none !important;
   }
   #scroll-progress {
     transition: none;
