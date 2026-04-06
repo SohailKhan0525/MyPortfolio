@@ -881,7 +881,7 @@ section::before {
 .form-group input, .form-group textarea {
   width: 100%; background: transparent; border: none;
   border-bottom: 1px solid rgba(255,255,255,0.2);
-  color: #fff; font-size: 1rem; padding: 10px 0; outline: none; cursor: none;
+  color: #fff; font-size: 1rem; padding: 10px 0; outline: none; cursor: text;
 }
 .form-group label {
   position: absolute; top: 10px; left: 0; color: var(--text-muted);
@@ -1487,6 +1487,8 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
   /* Cursor: Hide custom cursor on touch devices */
   .cursor-dot, .cursor-outline { display: none; }
   * { cursor: auto !important; }
+  a, button, [role="button"], .link-btn, .btn-3d, .submit-btn, .resume-btn, .hire-me-btn, .resume-action-btn, .cert-card { cursor: pointer !important; }
+  input, textarea, select { cursor: text !important; }
 
   /* Navbar */
   .glass-nav {
