@@ -3,9 +3,9 @@ import emailjs from '@emailjs/browser';
 
 const CONFIG = {
   emailJS: {
-    publicKey: "YITu4swbGHXKFsR0q",
-    serviceID: "service_kmvnnax",
-    templateID: "template_yadt1ng"
+    publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY || "YITu4swbGHXKFsR0q",
+    serviceID: import.meta.env.VITE_EMAILJS_SERVICE_ID || "service_kmvnnax",
+    templateID: import.meta.env.VITE_EMAILJS_TEMPLATE_ID || "template_yadt1ng"
   }
 };
 

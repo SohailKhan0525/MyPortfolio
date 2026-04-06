@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -12,22 +11,6 @@ import useThreeBackground from './hooks/useThreeBackground';
 import useScrollReveal from './hooks/useScrollReveal';
 import usePreloader from './hooks/usePreloader';
 import useCustomCursor from './hooks/useCustomCursor';
-
-// Google Fonts & Font Awesome (external CSS)
-const fontLinks = [
-  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@300;500;700&display=swap',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css',
-];
-
-// Inject external link tags once
-fontLinks.forEach(href => {
-  if (!document.querySelector(`link[href="${href}"]`)) {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = href;
-    document.head.appendChild(link);
-  }
-});
 
 function App() {
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
