@@ -2,14 +2,11 @@ import { useEffect } from 'react';
 
 const usePreloader = (prefersReducedMotion) => {
   useEffect(() => {
-    const preloader = document.getElementById('preloader');
-    if (!preloader) return;
-
-    const loaderText = preloader.querySelector('.loader-text');
-    const stages = ["LOADING CORE...", "CONNECTING NEURAL NETWORK", "SYSTEM READY"];
-    let step = 0;
+    let active = true;
 
     const startHeroTyping = () => {
+      if (!active) return;
+
       const nameEl = document.querySelector('.glitch-header');
       if (!nameEl) {
         if (window._startRoleTyping) window._startRoleTyping();
@@ -30,6 +27,7 @@ const usePreloader = (prefersReducedMotion) => {
       let idx = 0;
 
       function typeNameChar() {
+        if (!active) return;
         const current = fullName.slice(0, idx);
         nameEl.textContent = current;
         nameEl.setAttribute('data-text', current);
@@ -40,31 +38,27 @@ const usePreloader = (prefersReducedMotion) => {
           nameEl.setAttribute('data-text', fullName);
           nameEl.classList.add('typing-done');
           setTimeout(() => {
-            if (window._startRoleTyping) window._startRoleTyping();
+            if (active && window._startRoleTyping) window._startRoleTyping();
           }, 300);
         }
       }
       typeNameChar();
     };
 
-    const interval = setInterval(() => {
-      if (step < stages.length) {
-        if (loaderText) loaderText.textContent = stages[step];
-        step++;
-      } else {
-        clearInterval(interval);
-        preloader.style.opacity = '0';
-        setTimeout(() => {
-          preloader.style.display = 'none';
-          document.querySelectorAll('.letterbox-bar').forEach(bar => {
-            requestAnimationFrame(() => bar.classList.add('open'));
-          });
-          startHeroTyping();
-        }, 500);
-      }
-    }, 600);
+    if (window._preloaderDone) {
+      // Preloader already hidden by the inline script; start hero typing now
+      startHeroTyping();
+    } else {
+      // Inline script will call this when the preloader finishes hiding
+      window._onPreloaderDone = startHeroTyping;
+    }
 
-    return () => clearInterval(interval);
+    return () => {
+      active = false;
+      if (window._onPreloaderDone === startHeroTyping) {
+        delete window._onPreloaderDone;
+      }
+    };
   }, [prefersReducedMotion]);
 };
 

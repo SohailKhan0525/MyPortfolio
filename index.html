@@ -44,6 +44,36 @@
       @media(max-width:768px){.letterbox-bar{height:45px}}
       @media(max-width:480px){.letterbox-bar{height:28px}}
     </style>
+    <!-- Preloader script: runs immediately, independent of the React bundle -->
+    <script>
+      (function () {
+        var stages = ['LOADING CORE...', 'CONNECTING NEURAL NETWORK', 'SYSTEM READY'];
+        var step = 0;
+        var timer = setInterval(function () {
+          var preloader = document.getElementById('preloader');
+          var loaderText = preloader && preloader.querySelector('.loader-text');
+          if (step < stages.length) {
+            if (loaderText) loaderText.textContent = stages[step];
+            step++;
+          } else {
+            clearInterval(timer);
+            if (preloader) {
+              preloader.style.opacity = '0';
+              setTimeout(function () {
+                preloader.style.display = 'none';
+                document.querySelectorAll('.letterbox-bar').forEach(function (bar) {
+                  requestAnimationFrame(function () { bar.classList.add('open'); });
+                });
+                window._preloaderDone = true;
+                if (typeof window._onPreloaderDone === 'function') {
+                  window._onPreloaderDone();
+                }
+              }, 500);
+            }
+          }
+        }, 600);
+      })();
+    </script>
   </head>
   <body>
     <!-- Preloader shown immediately before React loads -->
