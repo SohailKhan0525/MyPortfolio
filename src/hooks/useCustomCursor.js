@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 const useCustomCursor = () => {
   useEffect(() => {
-    if (window.innerWidth <= 900) return;
+    if (window.innerWidth <= 768) return;
 
     const cursorDot = document.querySelector('[data-cursor-dot]');
     const cursorOutline = document.querySelector('[data-cursor-outline]');

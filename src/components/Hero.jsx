@@ -14,7 +14,7 @@ const Hero = ({ prefersReducedMotion }) => {
     const typeTarget = typewriterRef.current;
     if (!typeTarget) return;
 
-    const roles = ["ML ENGINEER IN BEGINNER"];
+    const roles = ["BEGINNER ML ENGINEER"];
     let roleIndex = 0;
     let charIndex = 0;
     let isDeleting = false;
@@ -82,7 +82,7 @@ const Hero = ({ prefersReducedMotion }) => {
           borderWidth="1.5px"
           style={{ display: 'inline-block', maxWidth: '640px', width: '100%' }}
         >
-          <div className="hero-text reveal" ref={heroTextRef} style={{ background: 'transparent' }}>
+          <div className="hero-text" ref={heroTextRef} style={{ background: 'transparent' }}>
             <h2 className="pre-title"><i className="fa-solid fa-user"></i> SYSTEM ONLINE <i className="fa-solid fa-user"></i></h2>
             <h1 className="glitch-header" data-text="MOHD ZAHEER UDDIN">MOHD ZAHEER UDDIN</h1>
             <div className="role-container">
