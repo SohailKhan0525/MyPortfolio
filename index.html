@@ -1,131 +1,409 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MOHD ZAHEER UDDIN | AI Engineer</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@300;500;700&display=swap" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <style>
-      /* Critical inline CSS: prevents white flash and shows preloader before JS loads */
-      *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-      html{background-color:#050505;scroll-behavior:smooth}
-      body{
-        background-color:#050505;
-        background-image:radial-gradient(ellipse at 50% 0%,#0a0520 0%,#050510 35%,#050505 70%);
-        color:#fff;
-        overflow-x:hidden;
-        -webkit-font-smoothing:antialiased;
-        font-family:'Inter',sans-serif;
-      }
-      #preloader{
-        position:fixed;inset:0;background:#000;z-index:10000;
-        display:flex;flex-direction:column;justify-content:center;align-items:center;
-        transition:opacity 0.5s ease;
-      }
-      .cyber-loader{
-        width:60px;height:60px;border:4px solid #00f3ff;
-        border-left-color:transparent;border-right-color:transparent;
-        border-radius:50%;animation:spin 1s linear infinite;
-        box-shadow:0 0 15px #00f3ff;
-      }
-      .loader-text{
-        margin-top:20px;font-family:'Space Grotesk','Inter',sans-serif;
-        color:#00f3ff;letter-spacing:2px;font-size:0.9rem;
-      }
-      @keyframes spin{100%{transform:rotate(360deg)}}
-      .letterbox-bar{
-        position:fixed;left:0;width:100%;background:#000;
-        z-index:9999;pointer-events:none;height:70px;will-change:height;
-      }
-      .letterbox-top{top:0}
-      .letterbox-bottom{bottom:0}
-      .letterbox-bar.open{height:0;transition:height 1.6s cubic-bezier(0.23,1,0.32,1)}
-      @media(max-width:768px){.letterbox-bar{height:45px}}
-      @media(max-width:480px){.letterbox-bar{height:28px}}
-    </style>
-    <!-- Preloader script: runs immediately, independent of the React bundle -->
-    <script>
-      (function () {
-        var stages = ['LOADING CORE...', 'CONNECTING NEURAL NETWORK', 'SYSTEM READY'];
-        var step = 0;
-        var minTimerDone = false;
-        var hidden = false;
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MOHD ZAHEER UDDIN | AI Engineer</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
 
-        var timer = setInterval(function () {
-          var preloader = document.getElementById('preloader');
-          var loaderText = preloader && preloader.querySelector('.loader-text');
-          if (step < stages.length) {
-            if (loaderText) loaderText.textContent = stages[step];
-            step++;
-          } else {
-            clearInterval(timer);
-            minTimerDone = true;
-            tryHide();
-          }
-        }, 600);
+  <div id="scroll-progress" aria-hidden="true"></div>
 
-        function doHide() {
-          if (hidden) return;
-          hidden = true;
-          var preloader = document.getElementById('preloader');
-          if (!preloader) {
-            window._preloaderDone = true;
-            if (typeof window._onPreloaderDone === 'function') window._onPreloaderDone();
-            return;
-          }
-          preloader.style.opacity = '0';
-          setTimeout(function () {
-            preloader.style.display = 'none';
-            document.querySelectorAll('.letterbox-bar').forEach(function (bar) {
-              requestAnimationFrame(function () { bar.classList.add('open'); });
-            });
-            window._preloaderDone = true;
-            if (typeof window._onPreloaderDone === 'function') {
-              window._onPreloaderDone();
-            }
-          }, 500);
-        }
+  <div id="canvas-container"></div>
+  
+  <div id="preloader">
+    <div class="cyber-loader"></div>
+    <div class="loader-text" data-text="INITIALIZING SYSTEM...">INITIALIZING SYSTEM...</div>
+  </div>
 
-        function tryHide(attempts) {
-          if (!minTimerDone) return;
-          attempts = attempts || 0;
-          var root = document.getElementById('root');
-          // Wait for React to render content into #root (up to 5s timeout)
-          if (root && root.firstElementChild) {
-            doHide();
-          } else if (attempts < 100) {
-            setTimeout(function () { tryHide(attempts + 1); }, 50);
-          } else {
-            // Fallback: React never rendered — hide anyway to avoid infinite loader
-            doHide();
-          }
-        }
+  <div class="letterbox-bar letterbox-top" aria-hidden="true"></div>
+  <div class="letterbox-bar letterbox-bottom" aria-hidden="true"></div>
 
-        // Detect JS bundle load failure (e.g. 404 or network error on script tags)
-        window.addEventListener('error', function (e) {
-          if (e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
-            minTimerDone = true;
-            tryHide(999);
-          }
-        }, true);
+  <div class="gradient-bg-overlay" aria-hidden="true"></div>
+  <div class="noise-overlay"></div>
+  <div class="cursor-dot" data-cursor-dot></div>
+  <div class="cursor-outline" data-cursor-outline></div>
 
-        // Safety net: always dismiss after 8 seconds regardless of everything else
-        setTimeout(function () { minTimerDone = true; tryHide(999); }, 8000);
-      })();
-    </script>
-  </head>
-  <body>
-    <!-- Preloader shown immediately before React loads -->
-    <div id="preloader">
-      <div class="cyber-loader"></div>
-      <div class="loader-text" data-text="INITIALIZING SYSTEM...">INITIALIZING SYSTEM...</div>
+  <div id="nav-backdrop"></div>
+
+  <nav class="glass-nav">
+    <div class="logo">MOHD ZAHEER<span class="highlight"> UDDIN</span></div>
+    <div class="nav-links">
+      <a href="#home" class="magnetic-link">Home</a>
+      <a href="#projects" class="magnetic-link">Projects</a>
+      <a href="#about" class="magnetic-link">About Me</a>
+      <a href="#skills" class="magnetic-link">Skills</a>
+      <a href="#resume" class="magnetic-link">Resume</a>
+      <a href="#certifications" class="magnetic-link">Certifications</a>
+      <a href="#contact" class="magnetic-link">Contact</a>
     </div>
-    <!-- Letterbox bars for cinematic effect -->
-    <div class="letterbox-bar letterbox-top" aria-hidden="true"></div>
-    <div class="letterbox-bar letterbox-bottom" aria-hidden="true"></div>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+    <button id="mobile-toggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <main>
+    <section id="home">
+      <div class="hero-container">
+        <div class="hero-text reveal">
+          <h2 class="pre-title"><i class="fa-solid fa-user"></i> SYSTEM ONLINE <i class="fa-solid fa-user"></i></h2>
+          <h1 class="glitch-header" data-text="MOHD ZAHEER UDDIN">MOHD ZAHEER UDDIN</h1>
+          <div class="role-container">
+            <span class="role-prefix">> I'm an: </span>
+            <span class="typewriter" id="typewriter"></span><span class="cursor-blink">|</span>
+          </div>
+          <p class="hero-bio">
+            Learning to design and train intelligent models at the intersection of <strong>AI</strong>, <strong>machine learning</strong>, and <strong>data science</strong>.
+          </p>
+          
+          <div class="cta-group">
+            <a href="#projects" class="btn-3d primary">
+              <span>VIEW PROJECTS</span>
+            </a>
+            <a href="#contact" class="btn-3d secondary">
+              <span>CONTACT ME</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="scroll-indicator">
+        <span>SCROLL TO EXPLORE</span>
+        <div class="mouse-icon">
+          <div class="wheel"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="about-section">
+      <div class="about-container">
+        <div class="about-text reveal reveal-left">
+          <h2 class="about-title">ABOUT ME</h2>
+          <p>I am a Computer Science (CSIT) undergraduate specializing in Machine Learning and Data Science. I focus on building predictive models and deploying real-world ML applications using Python and Scikit-learn.</p>
+          <p>I have a strong foundation in data analysis, statistical modeling, and Python programming with hands-on experience in regression, classification, and neural networks.</p>
+          <p>I'm passionate about solving real-world problems through machine learning and actively seeking internship opportunities to grow my expertise and contribute to impactful AI projects.</p>
+          <p class="about-goal">My goal is to become a proficient ML Engineer while continuously learning and applying cutting-edge techniques to solve complex problems.</p>
+          <div class="about-buttons">
+            <a href="#resume" 
+     class="resume-btn">
+      <span>VIEW RESUME</span>
+      <i class="fa-solid fa-arrow-down"></i>
+    </a>
+            <a href="#contact" class="hire-me-btn">
+      <span>HIRE ME</span>
+      <i class="fa-solid fa-handshake"></i>
+    </a>
+          </div>
+
+        </div>
+
+        <div class="about-logo reveal reveal-right delay-200">
+          <img src="main.png" alt="QOFENO Labs Logo">
+        </div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <div class="section-header reveal">
+        <h2 class="section-title">PROJECTS</h2>
+        <div class="line"></div>
+      </div>
+
+      <div class="project-gallery">
+        <div class="project-card glass-card tilt-effect reveal" data-project="house-price">
+          <div class="card-glow"></div>
+          <div class="card-hint">
+            <i class="fa-solid fa-computer"></i>
+            <span>Click to learn more</span>
+          </div>
+          <div class="card-content">
+            <div class="tech-badge">ML MODEL</div>
+            <h3>House Price Prediction</h3>
+            <p>Advanced regression model utilizing Scikit-Learn to predict real estate values with high accuracy.</p>
+            <div class="card-links">
+              <a href="https://housepriceprediction-rqo8ykwgldxbpemwl6kvok.streamlit.app/" target="_blank" class="link-btn"><i class="fa-solid fa-play"></i> LIVE DEMO</a>
+              <a href="https://github.com/SohailKhan0525/HousePricePrediction" target="_blank" class="link-btn"><i class="fa-brands fa-github"></i> CODE</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="project-card glass-card tilt-effect reveal delay-100" data-project="earthquake">
+          <div class="card-glow"></div>
+          <div class="card-hint">
+            <i class="fa-solid fa-computer"></i>
+            <span>Click to learn more</span>
+          </div>
+          <div class="card-content">
+            <div class="tech-badge">ML MODEL</div>
+            <h3>Global Earthquake Prediction</h3>
+            <p>Seismic activity forecasting tool analyzing decades of geological data to assess risk factors.</p>
+            <div class="card-links">
+              <button type="button" id="model-only-btn" class="link-btn model-only" aria-haspopup="dialog" aria-controls="custom-modal" aria-expanded="false" title="Model only (no live demo)">
+                <i class="fa-solid fa-lock"></i> MODEL ONLY
+              </button>
+              <a href="https://github.com/SohailKhan0525/Global-Earthquake-Prediction" target="_blank" class="link-btn"><i class="fa-brands fa-github"></i> CODE</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="project-card glass-card tilt-effect reveal delay-200" data-project="heart-disease">
+          <div class="card-glow"></div>
+          <div class="card-hint">
+            <i class="fa-solid fa-computer"></i>
+            <span>Click to learn more</span>
+          </div>
+          <div class="card-content">
+            <div class="tech-badge">ML MODEL</div>
+            <h3>Heart Disease Prediction</h3>
+            <p>Diagnostic support tool using logistic regression to identify potential cardiac health risks.</p>
+            <div class="card-links">
+              <a href="https://heartdiseaseml-4zrcurmudxpfxbwygcuyyt.streamlit.app/" target="_blank" class="link-btn"><i class="fa-solid fa-play"></i> LIVE DEMO</a>
+              <a href="https://github.com/SohailKhan0525/HeartDiseaseML" target="_blank" class="link-btn"><i class="fa-brands fa-github"></i> CODE</a>
+            </div>
+          </div>
+        </div>
+        
+         <div class="project-card glass-card tilt-effect reveal" data-project="student-mgmt">
+          <div class="card-glow"></div>
+          <div class="card-hint">
+            <i class="fa-solid fa-computer"></i>
+            <span>Click to learn more</span>
+          </div>
+          <div class="card-content">
+            <div class="tech-badge">PYTHON</div>
+            <h3>Student Management</h3>
+            <p>Backend architecture for academic record keeping and student data processing.</p>
+            <div class="card-links">
+              <a href="https://studentmanagementproject-ulj54ytmcyj55upzakbzhn.streamlit.app/" target="_blank" class="link-btn"><i class="fa-solid fa-play"></i> LIVE DEMO</a>
+              <a href="https://github.com/SohailKhan0525/StudentManagementProject" target="_blank" class="link-btn"><i class="fa-brands fa-github"></i> CODE</a>
+            </div>
+          </div>
+        </div>
+
+         <div class="project-card glass-card tilt-effect reveal delay-100" data-project="student-pass">
+          <div class="card-glow"></div>
+          <div class="card-hint">
+            <i class="fa-solid fa-computer"></i>
+            <span>Click to learn more</span>
+          </div>
+          <div class="card-content">
+            <div class="tech-badge">ML MODEL</div>
+            <h3>Student Pass/Fail Predictor</h3>
+            <p>Classification model to predict student pass or fail outcomes based on academic features.</p>
+            <div class="card-links">
+              <a href="https://studentfailpasspredictor-hjymwbpsp4bksec9ycb2xz.streamlit.app" target="_blank" class="link-btn"><i class="fa-solid fa-play"></i> LIVE DEMO</a>
+              <a href="https://github.com/SohailKhan0525/StudentFailPassPredictor" target="_blank" class="link-btn"><i class="fa-brands fa-github"></i> CODE</a>
+            </div>
+          </div>
+        </div>
+
+         <div class="project-card glass-card tilt-effect reveal delay-100" data-project="bank">
+          <div class="card-glow"></div>
+          <div class="card-hint">
+            <i class="fa-solid fa-computer"></i>
+            <span>Click to learn more</span>
+          </div>
+          <div class="card-content">
+            <div class="tech-badge">PYTHON</div>
+            <h3>Bank Management</h3>
+            <p>A Python-based bank system for account creation, deposits, withdrawals, and inquiries.</p>
+            <div class="card-links">
+              <a href="https://bankmanagementproject-brt9pt282uavy8ddzzy7ql.streamlit.app/" target="_blank" class="link-btn"><i class="fa-solid fa-play"></i> LIVE DEMO</a>
+              <a href="https://github.com/SohailKhan0525/BankManagementProject" target="_blank" class="link-btn"><i class="fa-brands fa-github"></i> CODE</a>
+            </div>
+          </div>
+        </div>
+
+         <div class="project-card glass-card tilt-effect reveal delay-200" data-project="file-handling">
+          <div class="card-glow"></div>
+          <div class="card-hint">
+            <i class="fa-solid fa-computer"></i>
+            <span>Click to learn more</span>
+          </div>
+          <div class="card-content">
+            <div class="tech-badge">PYTHON</div>
+            <h3>File Handling</h3>
+            <p>A menu-driven CLI app using <code>pathlib</code> and <code>os</code> to create, read, and delete files with error handling.</p>
+            <div class="card-links">
+              <button type="button" id="no-live-demo-btn" class="link-btn model-only" aria-haspopup="dialog" aria-controls="custom-modal" aria-expanded="false" title="No live demo available">
+                <i class="fa-solid fa-lock"></i> NO LIVE DEMO
+              </button>
+              <a href="https://github.com/SohailKhan0525/File_Handling_Project" target="_blank" class="link-btn"><i class="fa-brands fa-github"></i> CODE</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="skills">
+      <div class="section-header reveal">
+        <h2 class="section-title">SKILLS & TOOLS I KNOW</h2>
+        <div class="line"></div>
+      </div>
+
+      <div class="skills-grid reveal">
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-python"></i></div><h4>Python</h4><span class="skill-percent">100%</span><div class="progress-bar"><div class="progress" style="width: 100%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-brain"></i></div><h4>Machine Learning</h4><span class="skill-percent">70%</span><div class="progress-bar"><div class="progress" style="width: 70%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-square-root-variable"></i></div><h4>Linear Algebra</h4><span class="skill-percent">60%</span><div class="progress-bar"><div class="progress" style="width: 60%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-infinity"></i></div><h4>Calculus</h4><span class="skill-percent">50%</span><div class="progress-bar"><div class="progress" style="width: 50%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-divide"></i></div><h4>Probability</h4><span class="skill-percent">50%</span><div class="progress-bar"><div class="progress" style="width: 50%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-chart-area"></i></div><h4>Statistics</h4><span class="skill-percent">50%</span><div class="progress-bar"><div class="progress" style="width: 50%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-git"></i></div><h4>Git & Github</h4><span class="skill-percent">100%</span><div class="progress-bar"><div class="progress" style="width: 100%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-linux"></i></div><h4>Linux</h4><span class="skill-percent">50%</span><div class="progress-bar"><div class="progress" style="width: 50%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-database"></i></div><h4>Data Structures</h4><span class="skill-percent">50%</span><div class="progress-bar"><div class="progress" style="width: 50%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-network-wired"></i></div><h4>Deep Learning</h4><span class="skill-percent">1%</span><div class="progress-bar"><div class="progress" style="width: 1%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-code"></i></div><h4>SQL</h4><span class="skill-percent">1%</span><div class="progress-bar"><div class="progress" style="width: 1%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-broom"></i></div><h4>Data Cleaning</h4><span class="skill-percent">40%</span><div class="progress-bar"><div class="progress" style="width: 40%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-chart-pie"></i></div><h4>Data Visualization</h4><span class="skill-percent">30%</span><div class="progress-bar"><div class="progress" style="width: 30%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-magnifying-glass-chart"></i></div><h4>EDA</h4><span class="skill-percent">55%</span><div class="progress-bar"><div class="progress" style="width: 55%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-python"></i></div><h4>Numpy</h4><span class="skill-percent">30%</span><div class="progress-bar"><div class="progress" style="width: 30%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-python"></i></div><h4>Pandas</h4><span class="skill-percent">30%</span><div class="progress-bar"><div class="progress" style="width: 30%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-python"></i></div><h4>Matplotlib</h4><span class="skill-percent">30%</span><div class="progress-bar"><div class="progress" style="width: 30%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-python"></i></div><h4>Scikit-learn</h4><span class="skill-percent">40%</span><div class="progress-bar"><div class="progress" style="width: 40%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-solid fa-book"></i></div><h4>Jupyter</h4><span class="skill-percent">60%</span><div class="progress-bar"><div class="progress" style="width: 60%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-kaggle"></i></div><h4>Kaggle</h4><span class="skill-percent">95%</span><div class="progress-bar"><div class="progress" style="width: 95%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-python"></i></div><h4>Pytorch</h4><span class="skill-percent">1%</span><div class="progress-bar"><div class="progress" style="width: 1%"></div></div></div>
+        <div class="skill-block"><div class="skill-icon"><i class="fa-brands fa-python"></i></div><h4>Seaborn</h4><span class="skill-percent">45%</span><div class="progress-bar"><div class="progress" style="width: 45%"></div></div></div>
+      </div>
+    </section>
+
+    <section id="resume">
+      <div class="section-header reveal">
+        <h2 class="section-title">RESUME</h2>
+        <div class="line"></div>
+      </div>
+
+      <div class="resume-wrapper reveal">
+        <div class="resume-actions">
+          <a href="MohdZaheerUddinResume.pdf" target="_blank" class="resume-action-btn primary-action">
+            <i class="fa-solid fa-expand"></i>
+            <span>View Fullscreen</span>
+          </a>
+          <a href="MohdZaheerUddinResume.pdf" download class="resume-action-btn secondary-action">
+            <i class="fa-solid fa-download"></i>
+            <span>Download Resume</span>
+          </a>
+        </div>
+        <div class="resume-frame-container">
+          <embed
+            src="MohdZaheerUddinResume.pdf#toolbar=0&navpanes=0"
+            type="application/pdf"
+            title="Mohd Zaheer Uddin Resume"
+            class="resume-embed"
+          />
+          <div class="resume-fallback">
+            <p>Unable to display PDF.
+              <a href="MohdZaheerUddinResume.pdf" target="_blank" class="resume-fallback-link">Open in new tab</a>
+            </p>
+          </div>
+        </div>
+        <div class="resume-mobile-card">
+          <i class="fa-solid fa-file-lines resume-mobile-icon"></i>
+          <p class="resume-mobile-title">MY RESUME</p>
+          <p class="resume-mobile-subtitle">PDF preview is not supported on mobile. Use the buttons below to open or download.</p>
+          <div class="resume-mobile-actions">
+            <a href="MohdZaheerUddinResume.pdf" target="_blank" class="resume-action-btn primary-action">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              <span>Open Resume</span>
+            </a>
+            <a href="MohdZaheerUddinResume.pdf" download class="resume-action-btn secondary-action">
+              <i class="fa-solid fa-download"></i>
+              <span>Download</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="certifications">
+      <div class="section-header reveal">
+        <h2 class="section-title">CERTIFICATIONS</h2>
+        <div class="line"></div>
+      </div>
+
+      <div class="cert-grid reveal">
+        <div class="cert-placeholder">
+          <div class="cert-placeholder-rings">
+            <div class="cert-ring cert-ring-1"></div>
+            <div class="cert-ring cert-ring-2"></div>
+            <i class="fa-solid fa-certificate cert-placeholder-icon"></i>
+          </div>
+          <p class="cert-placeholder-text">CERTIFICATIONS</p>
+          <p class="cert-placeholder-subtext">Achievements &amp; courses — <span class="cert-placeholder-highlight">coming soon</span></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="glass-panel contact-panel reveal reveal-left">
+        <div class="contact-left">
+          <h2>Get in <br>Touch</h2>
+          <p>Interested in learning, collaborating, and working on AI and machine learning projects.</p>
+          <div class="social-links">
+            <a href="https://www.linkedin.com/in/mohd-zaheer-uddin-166b3b356/" target="_blank">LINKEDIN</a>
+            <a href="https://github.com/SohailKhan0525" target="_blank">GITHUB</a>
+            <a href="https://www.instagram.com/sohailkhan0525/" target="_blank">INSTAGRAM</a>
+          </div>
+        </div>
+
+        <form id="contact-form">
+          <div class="form-group">
+            <input type="text" id="name" required placeholder=" " />
+            <label for="name">Your Name</label>
+          </div>
+          <div class="form-group">
+            <input type="email" id="email" required placeholder=" " />
+            <label for="email">Email Address</label>
+          </div>
+          <div class="form-group">
+            <textarea id="message" required placeholder=" "></textarea>
+            <label for="message">Your Message</label>
+          </div>
+          <button type="submit" class="submit-btn">
+            <span>SEND</span>
+            <div class="btn-bg"></div>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <footer>
+      <p>© 2025 QOFENO LABS. Made with ♥️ by MOHD ZAHEER UDDIN</p>
+    </footer>
+
+  </main>
+
+  <!-- HOVER PANEL -->
+  <div id="hover-panel" class="hover-panel">
+    <button type="button" class="close-panel-btn" aria-label="Close panel">&times;</button>
+    <div class="panel-content">
+      <h3 id="panel-title">Coming Soon</h3>
+      <p id="panel-description">This project is being updated with more details</p>
+    </div>
+  </div>
+
+  <div id="custom-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="model-modal-title" aria-describedby="model-modal-desc" aria-hidden="true">
+    <div class="modal-content glass-panel">
+      <button type="button" class="modal-close" data-modal-close aria-label="Close dialog">&times;</button>
+      <div class="status-pill" aria-hidden="true">MODEL ONLY</div>
+      <h3 id="model-modal-title"><i class="fa-solid fa-robot"></i> MODEL STATUS</h3>
+      <p id="model-modal-desc">This project has a trained model available, but no live interactive demo is currently deployed.</p>
+      <button type="button" id="close-modal" class="btn-3d primary small" data-modal-close>UNDERSTOOD</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script src="script.js"></script>
+</body>
 </html>
