@@ -51,6 +51,7 @@
         var stages = ['LOADING CORE...', 'CONNECTING NEURAL NETWORK', 'SYSTEM READY'];
         var step = 0;
         var minTimerDone = false;
+        var hidden = false;
 
         var timer = setInterval(function () {
           var preloader = document.getElementById('preloader');
@@ -66,8 +67,14 @@
         }, 600);
 
         function doHide() {
+          if (hidden) return;
+          hidden = true;
           var preloader = document.getElementById('preloader');
-          if (!preloader) return;
+          if (!preloader) {
+            window._preloaderDone = true;
+            if (typeof window._onPreloaderDone === 'function') window._onPreloaderDone();
+            return;
+          }
           preloader.style.opacity = '0';
           setTimeout(function () {
             preloader.style.display = 'none';
@@ -85,16 +92,27 @@
           if (!minTimerDone) return;
           attempts = attempts || 0;
           var root = document.getElementById('root');
-          // Wait for React to render content into #root (up to 10s timeout)
+          // Wait for React to render content into #root (up to 5s timeout)
           if (root && root.firstElementChild) {
             doHide();
-          } else if (attempts < 200) {
+          } else if (attempts < 100) {
             setTimeout(function () { tryHide(attempts + 1); }, 50);
           } else {
             // Fallback: React never rendered — hide anyway to avoid infinite loader
             doHide();
           }
         }
+
+        // Detect JS bundle load failure (e.g. 404 or network error on script tags)
+        window.addEventListener('error', function (e) {
+          if (e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
+            minTimerDone = true;
+            tryHide(999);
+          }
+        }, true);
+
+        // Safety net: always dismiss after 8 seconds regardless of everything else
+        setTimeout(function () { minTimerDone = true; tryHide(999); }, 8000);
       })();
     </script>
   </head>
