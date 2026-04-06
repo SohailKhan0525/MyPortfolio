@@ -1,0 +1,52 @@
+.border-glow-wrapper {
+  --glow-x: 50%;
+  --glow-y: 50%;
+  --glow-color: #00f3ff;
+  --bg-color: rgba(0, 0, 0, 0.6);
+  --border-radius: 12px;
+  --border-width: 1.5px;
+
+  position: relative;
+  border-radius: var(--border-radius);
+  padding: var(--border-width);
+  background: radial-gradient(
+    circle at var(--glow-x) var(--glow-y),
+    var(--glow-color) 0%,
+    transparent 60%
+  );
+  transition: background 0.1s ease;
+}
+
+.border-glow-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--border-radius);
+  padding: var(--border-width);
+  background: radial-gradient(
+    circle at var(--glow-x) var(--glow-y),
+    var(--glow-color),
+    transparent 60%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.border-glow-wrapper:hover::before {
+  opacity: 1;
+}
+
+.border-glow-inner {
+  position: relative;
+  border-radius: calc(var(--border-radius) - var(--border-width));
+  background: var(--bg-color);
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
