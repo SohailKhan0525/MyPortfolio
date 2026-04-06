@@ -11,6 +11,7 @@ import useThreeBackground from './hooks/useThreeBackground';
 import useScrollReveal from './hooks/useScrollReveal';
 import usePreloader from './hooks/usePreloader';
 import useCustomCursor from './hooks/useCustomCursor';
+import { Aurora } from './reactbits';
 
 function App() {
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -24,6 +25,13 @@ function App() {
     <>
       {/* Scroll Progress Bar */}
       <div id="scroll-progress" aria-hidden="true"></div>
+
+      {/* Aurora animated gradient background */}
+      <Aurora
+        colorStops={['#00f3ff11', '#8b5cf611', '#06b6d411']}
+        speed={0.5}
+        blend="screen"
+      />
 
       {/* Three.js Canvas Container */}
       <div id="canvas-container"></div>
