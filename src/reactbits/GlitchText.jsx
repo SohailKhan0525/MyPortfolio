@@ -23,8 +23,10 @@ const GlitchText = ({
     if (!front || !back1 || !back2) return;
 
     const duration = 0.1 / speed;
+    // pauseBetweenCycles: seconds of pause between each glitch sequence
+    const pauseBetweenCycles = 3 / speed;
 
-    tlRef.current = gsap.timeline({ repeat: -1, repeatDelay: 3 / speed })
+    tlRef.current = gsap.timeline({ repeat: -1, repeatDelay: pauseBetweenCycles })
       .to([back1, back2], { duration: 0, skewX: 0, x: 0, opacity: 0 })
       .to(back1, { duration, skewX: 10, x: -4, opacity: 0.8, color: '#ff00c1' })
       .to(back2, { duration, skewX: -10, x: 4, opacity: 0.8, color: '#00fff9', y: 2 }, '<')

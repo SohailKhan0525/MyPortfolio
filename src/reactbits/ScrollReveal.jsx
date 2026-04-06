@@ -32,7 +32,7 @@ const ScrollReveal = ({
 
     observer.observe(container);
     return () => observer.disconnect();
-  }, [delay, duration, ease]);
+  }, [animationFrom, animationTo, threshold, delay, duration, ease]);
 
   return (
     <div ref={containerRef} className={className} style={style}>
