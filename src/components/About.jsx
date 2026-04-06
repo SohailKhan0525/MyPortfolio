@@ -20,7 +20,7 @@ const About = () => {
           </div>
         </div>
         <div className="about-logo reveal reveal-right delay-200">
-          <img src="/main.png" alt="QOFENO Labs Logo" />
+          <img src={`${import.meta.env.BASE_URL}main.png`} alt="QOFENO Labs Logo" />
         </div>
       </div>
     </section>
