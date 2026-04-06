@@ -7,8 +7,53 @@
     <title>MOHD ZAHEER UDDIN | AI Engineer</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@300;500;700&display=swap" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <style>
+      /* Critical inline CSS: prevents white flash and shows preloader before JS loads */
+      *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+      html{scroll-behavior:smooth}
+      body{
+        background:radial-gradient(ellipse at 50% 0%,#0a0520 0%,#050510 35%,#050505 70%);
+        color:#fff;
+        overflow-x:hidden;
+        -webkit-font-smoothing:antialiased;
+        font-family:'Inter',sans-serif;
+      }
+      #preloader{
+        position:fixed;inset:0;background:#000;z-index:10000;
+        display:flex;flex-direction:column;justify-content:center;align-items:center;
+        transition:opacity 0.5s ease;
+      }
+      .cyber-loader{
+        width:60px;height:60px;border:4px solid #00f3ff;
+        border-left-color:transparent;border-right-color:transparent;
+        border-radius:50%;animation:spin 1s linear infinite;
+        box-shadow:0 0 15px #00f3ff;
+      }
+      .loader-text{
+        margin-top:20px;font-family:'Space Grotesk','Inter',sans-serif;
+        color:#00f3ff;letter-spacing:2px;font-size:0.9rem;
+      }
+      @keyframes spin{100%{transform:rotate(360deg)}}
+      .letterbox-bar{
+        position:fixed;left:0;width:100%;background:#000;
+        z-index:9999;pointer-events:none;height:70px;will-change:height;
+      }
+      .letterbox-top{top:0}
+      .letterbox-bottom{bottom:0}
+      .letterbox-bar.open{height:0;transition:height 1.6s cubic-bezier(0.23,1,0.32,1)}
+      @media(max-width:768px){.letterbox-bar{height:45px}}
+      @media(max-width:480px){.letterbox-bar{height:28px}}
+    </style>
   </head>
   <body>
+    <!-- Preloader shown immediately before React loads -->
+    <div id="preloader">
+      <div class="cyber-loader"></div>
+      <div class="loader-text" data-text="INITIALIZING SYSTEM...">INITIALIZING SYSTEM...</div>
+    </div>
+    <!-- Letterbox bars for cinematic effect -->
+    <div class="letterbox-bar letterbox-top" aria-hidden="true"></div>
+    <div class="letterbox-bar letterbox-bottom" aria-hidden="true"></div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

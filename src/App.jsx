@@ -28,16 +28,6 @@ function App() {
       {/* Three.js Canvas Container */}
       <div id="canvas-container"></div>
 
-      {/* Preloader */}
-      <div id="preloader">
-        <div className="cyber-loader"></div>
-        <div className="loader-text" data-text="INITIALIZING SYSTEM...">INITIALIZING SYSTEM...</div>
-      </div>
-
-      {/* Letterbox Bars */}
-      <div className="letterbox-bar letterbox-top" aria-hidden="true"></div>
-      <div className="letterbox-bar letterbox-bottom" aria-hidden="true"></div>
-
       {/* Background Effects */}
       <div className="gradient-bg-overlay" aria-hidden="true"></div>
       <div className="noise-overlay"></div>
