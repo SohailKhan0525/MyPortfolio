@@ -1,45 +1,42 @@
 import { useEffect } from 'react';
+import { gsap } from 'gsap';
 
 const useScrollReveal = () => {
   useEffect(() => {
+    const animateReveal = (el) => {
+      gsap.to(el, { opacity: 1, y: 0, x: 0, duration: 0.8, ease: 'power3.out' });
+    };
+
+    const resetReveal = (el) => {
+      const isLeft = el.classList.contains('reveal-left');
+      const isRight = el.classList.contains('reveal-right');
+      gsap.set(el, {
+        opacity: 0,
+        y: isLeft || isRight ? 0 : 30,
+        x: isLeft ? -50 : isRight ? 50 : 0,
+      });
+    };
+
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          entry.target.classList.add("active");
-          if (entry.target.classList.contains('hero-text')) {
-            setTimeout(() => {
-              entry.target.style.transition = 'none';
-            }, 900);
-          }
+          animateReveal(entry.target);
         } else if (entry.boundingClientRect.top > 0) {
-          entry.target.classList.remove("active");
-          if (entry.target.classList.contains('hero-text')) {
-            entry.target.style.transition = '';
-          }
+          resetReveal(entry.target);
         }
       });
     }, { threshold: 0.1 });
 
-    const directionalRevealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('active');
-        } else if (entry.boundingClientRect.top > 0) {
-          entry.target.classList.remove('active');
-        }
-      });
-    }, { threshold: 0.1 });
-
-    // Observe after a tick to allow DOM to render
     const timer = setTimeout(() => {
-      document.querySelectorAll(".reveal").forEach((el) => revealObserver.observe(el));
-      document.querySelectorAll('.reveal-left, .reveal-right').forEach(el => directionalRevealObserver.observe(el));
+      document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach((el) => {
+        resetReveal(el);
+        revealObserver.observe(el);
+      });
     }, 100);
 
     return () => {
       clearTimeout(timer);
       revealObserver.disconnect();
-      directionalRevealObserver.disconnect();
     };
   }, []);
 };

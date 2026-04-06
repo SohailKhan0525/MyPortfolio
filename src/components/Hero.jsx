@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import BorderGlow from './BorderGlow/BorderGlow';
+import { GlitchText, TextReveal, MagneticButton } from '../reactbits';
 
 const HERO_PARALLAX_SPEED = 0.25;
 const HERO_FADE_MULTIPLIER = 1.4;
@@ -84,22 +85,30 @@ const Hero = ({ prefersReducedMotion }) => {
         >
           <div className="hero-text" ref={heroTextRef} style={{ background: 'transparent' }}>
             <h2 className="pre-title"><i className="fa-solid fa-user"></i> SYSTEM ONLINE <i className="fa-solid fa-user"></i></h2>
-            <h1 className="glitch-header" data-text="MOHD ZAHEER UDDIN">MOHD ZAHEER UDDIN</h1>
+            <h1 className="glitch-header">
+              <GlitchText text="MOHD ZAHEER UDDIN" speed={2} enableShadows />
+            </h1>
             <div className="role-container">
               <span className="role-prefix">{"> I'm an: "}</span>
               <span className="typewriter" id="typewriter" ref={typewriterRef}></span>
               <span className="cursor-blink">|</span>
             </div>
-            <p className="hero-bio">
-              Learning to design and train intelligent models at the intersection of <strong>AI</strong>, <strong>machine learning</strong>, and <strong>data science</strong>.
-            </p>
+            <TextReveal delay={0.3}>
+              <p className="hero-bio">
+                Learning to design and train intelligent models at the intersection of <strong>AI</strong>, <strong>machine learning</strong>, and <strong>data science</strong>.
+              </p>
+            </TextReveal>
             <div className="cta-group">
-              <a href="#projects" className="btn-3d primary">
-                <span>VIEW PROJECTS</span>
-              </a>
-              <a href="#contact" className="btn-3d secondary">
-                <span>CONTACT ME</span>
-              </a>
+              <MagneticButton>
+                <a href="#projects" className="btn-3d primary">
+                  <span>VIEW PROJECTS</span>
+                </a>
+              </MagneticButton>
+              <MagneticButton>
+                <a href="#contact" className="btn-3d secondary">
+                  <span>CONTACT ME</span>
+                </a>
+              </MagneticButton>
             </div>
           </div>
         </BorderGlow>
