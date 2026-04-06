@@ -10,9 +10,10 @@
     <style>
       /* Critical inline CSS: prevents white flash and shows preloader before JS loads */
       *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-      html{scroll-behavior:smooth}
+      html{background-color:#050505;scroll-behavior:smooth}
       body{
-        background:radial-gradient(ellipse at 50% 0%,#0a0520 0%,#050510 35%,#050505 70%);
+        background-color:#050505;
+        background-image:radial-gradient(ellipse at 50% 0%,#0a0520 0%,#050510 35%,#050505 70%);
         color:#fff;
         overflow-x:hidden;
         -webkit-font-smoothing:antialiased;
@@ -49,6 +50,8 @@
       (function () {
         var stages = ['LOADING CORE...', 'CONNECTING NEURAL NETWORK', 'SYSTEM READY'];
         var step = 0;
+        var minTimerDone = false;
+
         var timer = setInterval(function () {
           var preloader = document.getElementById('preloader');
           var loaderText = preloader && preloader.querySelector('.loader-text');
@@ -57,21 +60,41 @@
             step++;
           } else {
             clearInterval(timer);
-            if (preloader) {
-              preloader.style.opacity = '0';
-              setTimeout(function () {
-                preloader.style.display = 'none';
-                document.querySelectorAll('.letterbox-bar').forEach(function (bar) {
-                  requestAnimationFrame(function () { bar.classList.add('open'); });
-                });
-                window._preloaderDone = true;
-                if (typeof window._onPreloaderDone === 'function') {
-                  window._onPreloaderDone();
-                }
-              }, 500);
-            }
+            minTimerDone = true;
+            tryHide();
           }
         }, 600);
+
+        function doHide() {
+          var preloader = document.getElementById('preloader');
+          if (!preloader) return;
+          preloader.style.opacity = '0';
+          setTimeout(function () {
+            preloader.style.display = 'none';
+            document.querySelectorAll('.letterbox-bar').forEach(function (bar) {
+              requestAnimationFrame(function () { bar.classList.add('open'); });
+            });
+            window._preloaderDone = true;
+            if (typeof window._onPreloaderDone === 'function') {
+              window._onPreloaderDone();
+            }
+          }, 500);
+        }
+
+        function tryHide(attempts) {
+          if (!minTimerDone) return;
+          attempts = attempts || 0;
+          var root = document.getElementById('root');
+          // Wait for React to render content into #root (up to 10s timeout)
+          if (root && root.firstElementChild) {
+            doHide();
+          } else if (attempts < 200) {
+            setTimeout(function () { tryHide(attempts + 1); }, 50);
+          } else {
+            // Fallback: React never rendered — hide anyway to avoid infinite loader
+            doHide();
+          }
+        }
       })();
     </script>
   </head>
