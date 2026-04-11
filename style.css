@@ -123,25 +123,33 @@ html {
 /* ===================================================================
    CUSTOM CURSOR
    (Hidden on touch devices via media query below)
+   Uses transform for positioning (GPU-composited, no layout reflow)
 =================================================================== */
 .cursor-dot, .cursor-outline {
   position: fixed;
   top: 0; left: 0;
-  transform: translate(-50%, -50%);
   border-radius: 50%;
   pointer-events: none;
   z-index: 10002;
   will-change: transform;
 }
-.cursor-dot { width: 8px; height: 8px; background-color: var(--neon-cyan); }
+.cursor-dot {
+  width: 8px; height: 8px;
+  background-color: var(--neon-cyan);
+  /* Centered via negative margin instead of transform so JS can use transform freely */
+  margin-left: -4px; margin-top: -4px;
+}
 .cursor-outline {
   width: 40px; height: 40px;
+  margin-left: -20px; margin-top: -20px;
   border: 1px solid rgba(255, 255, 255, 0.5);
-  transition: width 0.15s ease, height 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
-  will-change: width, height;
+  transition: width 0.15s ease, height 0.15s ease,
+              background-color 0.15s ease, border-color 0.15s ease;
+  will-change: transform;
 }
 body.hovering .cursor-outline {
   width: 60px; height: 60px;
+  margin-left: -30px; margin-top: -30px;
   background-color: rgba(255, 255, 255, 0.1);
   border-color: transparent;
 }
@@ -159,17 +167,18 @@ input, textarea, select,
 
 body.cursor-interactive .cursor-dot {
   width: 12px; height: 12px;
+  margin-left: -6px; margin-top: -6px;
   background-color: var(--neon-cyan);
   box-shadow: 0 0 15px var(--neon-cyan), 0 0 30px rgba(0, 243, 255, 0.5);
 }
 
 body.cursor-interactive .cursor-outline {
   width: 50px; height: 50px;
+  margin-left: -25px; margin-top: -25px;
   border: 2px solid var(--neon-cyan);
   background-color: rgba(0, 243, 255, 0.05);
   box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
 }
-
 /* ===================================================================
    GLOW SWEEP ANIMATION - On Hover (Improved - Smooth & Subtle)
 =================================================================== */
@@ -720,10 +729,15 @@ section::before {
   border-color: var(--glass-highlight);
 }
 .card-glow {
-  position: absolute; width: 100px; height: 100px;
-  background: radial-gradient(circle, rgba(0,243,255,0.2), transparent 70%);
+  position: absolute;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(0,243,255,0.18), transparent 70%);
   border-radius: 50%; pointer-events: none; opacity: 0;
-  transition: opacity 0.3s; transform: translate(-50%, -50%); top: 0; left: 0;
+  transition: opacity 0.3s ease;
+  /* Positioned via CSS custom properties set by JS — GPU-composited */
+  left: 50%; top: 50%;
+  transform: translate(calc(-50% + var(--gx, 0px)), calc(-50% + var(--gy, 0px)));
+  will-change: transform, opacity;
 }
 .project-card:hover .card-glow { opacity: 1; }
 
@@ -800,6 +814,61 @@ section::before {
 }
 
 /* ===================================================================
+   PROJECT CARD — STATS & TECH CHIPS
+=================================================================== */
+.card-stats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 0 10px;
+}
+
+.card-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.7rem;
+  color: var(--neon-cyan);
+  background: rgba(0, 243, 255, 0.07);
+  border: 1px solid rgba(0, 243, 255, 0.2);
+  padding: 3px 9px;
+  border-radius: 5px;
+  font-family: var(--font-header);
+  letter-spacing: 0.5px;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.project-card:hover .card-stat {
+  background: rgba(0, 243, 255, 0.12);
+  border-color: rgba(0, 243, 255, 0.35);
+}
+
+.card-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.chip {
+  font-size: 0.67rem;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(188, 19, 254, 0.35);
+  color: rgba(188, 19, 254, 0.85);
+  background: rgba(188, 19, 254, 0.07);
+  font-family: var(--font-header);
+  letter-spacing: 0.5px;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.project-card:hover .chip {
+  border-color: rgba(188, 19, 254, 0.55);
+  background: rgba(188, 19, 254, 0.13);
+  color: rgba(220, 100, 255, 0.95);
+}
+
+/* ===================================================================
    SKILLS
 =================================================================== */
 .skills-grid {
@@ -824,7 +893,13 @@ section::before {
 .skill-block h4 { font-family: var(--font-header); margin-bottom: 15px; font-size: 0.9rem; }
 
 .progress-bar { width: 100%; height: 4px; background: #222; border-radius: 2px; overflow: hidden; }
-.progress { height: 100%; background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); }
+.progress {
+  height: 100%;
+  background: var(--neon-purple);
+  box-shadow: 0 0 10px var(--neon-purple);
+  width: 0; /* Start at 0; animated to target width by JS on scroll */
+  transition: width 1.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
 /* Skill Percentage */
 .skill-percent {
   display: block;
@@ -911,7 +986,17 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
 .about-text p { color: var(--text-muted); font-size: 1.05rem; line-height: 1.8; margin-bottom: 20px; }
 .about-text strong { color: var(--text-main); font-weight: 500; }
 .about-goal { margin-top: 30px; border-left: 3px solid var(--neon-cyan); padding-left: 20px; }
-.about-logo img { width: 100%; max-width: 380px; filter: drop-shadow(0 30px 60px rgba(0, 243, 255, 0.25)); }
+.about-logo img {
+  width: 100%;
+  max-width: 380px;
+  filter: drop-shadow(0 30px 60px rgba(0, 243, 255, 0.25));
+  animation: float-logo 6s ease-in-out infinite;
+}
+
+@keyframes float-logo {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-18px); }
+}
 /* Resume Button */
 .resume-btn {
   margin-top: 30px;
@@ -1128,18 +1213,18 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
 }
 
 @keyframes frame-border-pulse {
-  0%, 100% { box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 243, 255, 0.08); }
-  50% { box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 243, 255, 0.18), 0 0 0 1px rgba(0, 243, 255, 0.2); }
+  0%, 100% { opacity: 0.85; }
+  50%       { opacity: 1; }
 }
 
 @keyframes cert-icon-pulse {
-  0%, 100% { color: rgba(0, 243, 255, 0.3); filter: drop-shadow(0 0 6px rgba(0, 243, 255, 0.1)); }
-  50% { color: rgba(0, 243, 255, 0.75); filter: drop-shadow(0 0 22px rgba(0, 243, 255, 0.5)); }
+  0%, 100% { opacity: 0.35; filter: drop-shadow(0 0 6px rgba(0, 243, 255, 0.1)); }
+  50%       { opacity: 0.85; filter: drop-shadow(0 0 22px rgba(0, 243, 255, 0.5)); }
 }
 
 @keyframes cert-border-glow {
-  0%, 100% { border-color: rgba(0, 243, 255, 0.2); box-shadow: none; }
-  50% { border-color: rgba(0, 243, 255, 0.45); box-shadow: 0 0 24px rgba(0, 243, 255, 0.08), inset 0 0 24px rgba(0, 243, 255, 0.03); }
+  0%, 100% { opacity: 0.8; }
+  50%       { opacity: 1; }
 }
 
 @keyframes cert-ring-spin {
@@ -1232,7 +1317,6 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
   position: relative;
   animation: frame-border-pulse 4s ease-in-out infinite;
 }
-
 .resume-frame-container::after {
   content: '';
   position: absolute;
@@ -1645,6 +1729,9 @@ footer { text-align: center; padding: 40px; color: #444; font-size: 0.8rem; font
     animation: none;
   }
   .resume-frame-container::after {
+    animation: none;
+  }
+  .about-logo img {
     animation: none;
   }
   .reveal {

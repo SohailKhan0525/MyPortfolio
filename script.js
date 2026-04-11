@@ -54,7 +54,7 @@ const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
 scene.add(particlesMesh);
 
 // --- CONNECTING LINES (WIRE SPHERE) ---
-const geometry2 = new THREE.IcosahedronGeometry(1, 1);
+const geometry2 = new THREE.IcosahedronGeometry(1, 0); // detail=0: 20 faces (was 1: ~80 faces) — better perf
 const material2 = new THREE.MeshBasicMaterial({ 
   color: CONFIG.colors.connections, 
   wireframe: true, 
@@ -557,29 +557,27 @@ if (hoverPanel) {
   });
 }
 
-// Custom Cursor Logic (Desktop Only) - Optimized with RAF
+// Custom Cursor Logic (Desktop Only) - Optimized with RAF & transform (no layout reflow)
 const cursorDot = document.querySelector("[data-cursor-dot]");
 const cursorOutline = document.querySelector("[data-cursor-outline]");
 let cursorX = 0, cursorY = 0;
 let outlineX = 0, outlineY = 0;
 
 if (window.innerWidth > 900) {
-  // Smooth cursor outline following
+  // Smooth cursor outline following — uses transform (GPU-composited)
   function animateCursor() {
     outlineX += (cursorX - outlineX) * 0.2;
     outlineY += (cursorY - outlineY) * 0.2;
-    cursorOutline.style.left = `${outlineX}px`;
-    cursorOutline.style.top = `${outlineY}px`;
+    cursorOutline.style.transform = `translate(${outlineX}px, ${outlineY}px)`;
     requestAnimationFrame(animateCursor);
   }
   animateCursor();
   
-  // Optimized mousemove with cursor position update
+  // Optimized mousemove — transform avoids triggering layout
   let cursorMoveHandler = (e) => {
     cursorX = e.clientX;
     cursorY = e.clientY;
-    cursorDot.style.left = `${cursorX}px`;
-    cursorDot.style.top = `${cursorY}px`;
+    cursorDot.style.transform = `translate(${cursorX}px, ${cursorY}px)`;
   };
   
   document.addEventListener("mousemove", cursorMoveHandler);
@@ -763,7 +761,7 @@ function startHeroTyping() {
 }
 
 /* ============================================================
-   8. SKILLS PROGRESS HOVER LOGIC
+   8. SKILLS PROGRESS HOVER LOGIC — bars animated on scroll
 ============================================================ */
 document.querySelectorAll(".skill-block").forEach(skill => {
   const progress = skill.querySelector(".progress");
@@ -772,6 +770,9 @@ document.querySelectorAll(".skill-block").forEach(skill => {
   if (!progress || !percentText) return;
 
   const value = parseInt(progress.style.width);
+  // Store target width as a data attribute; CSS starts bar at 0
+  progress.dataset.targetWidth = progress.style.width;
+  progress.style.width = '0';
 
   percentText.textContent = `${value}%`;
 
@@ -781,3 +782,56 @@ document.querySelectorAll(".skill-block").forEach(skill => {
     percentText.classList.add("red");
   }
 });
+
+// Animate skill bars when skills section enters viewport
+const skillsGrid = document.querySelector('.skills-grid');
+if (skillsGrid) {
+  const skillsBarObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.querySelectorAll('.skill-block').forEach((block, i) => {
+          const progress = block.querySelector('.progress');
+          if (progress && progress.dataset.targetWidth) {
+            setTimeout(() => {
+              progress.style.width = progress.dataset.targetWidth;
+            }, i * 55); // Stagger each bar by 55ms
+          }
+        });
+        skillsBarObserver.unobserve(entry.target); // Only animate once
+      }
+    });
+  }, { threshold: 0.15 });
+  skillsBarObserver.observe(skillsGrid);
+}
+
+/* ============================================================
+   9. 3D CARD TILT EFFECT (Desktop only)
+============================================================ */
+if (window.innerWidth > 900) {
+  document.querySelectorAll('.project-card').forEach(card => {
+    const glow = card.querySelector('.card-glow');
+
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+      const rotX = (0.5 - y) * 12;
+      const rotY = (x - 0.5) * 12;
+      card.style.transform = `translateY(-10px) perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+      // Move glow spotlight to follow cursor (GPU-composited via CSS custom properties)
+      if (glow) {
+        glow.style.setProperty('--gx', `${(x - 0.5) * rect.width}px`);
+        glow.style.setProperty('--gy', `${(y - 0.5) * rect.height}px`);
+      }
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+      // Reset glow to center
+      if (glow) {
+        glow.style.setProperty('--gx', '0px');
+        glow.style.setProperty('--gy', '0px');
+      }
+    });
+  });
+}
