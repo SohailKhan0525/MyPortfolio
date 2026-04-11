@@ -818,10 +818,10 @@ if (window.innerWidth > 900) {
       const rotX = (0.5 - y) * 12;
       const rotY = (x - 0.5) * 12;
       card.style.transform = `translateY(-10px) perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
-      // Move glow spotlight to follow cursor
+      // Move glow spotlight to follow cursor (GPU-composited via CSS custom properties)
       if (glow) {
-        glow.style.left = `${x * 100}%`;
-        glow.style.top  = `${y * 100}%`;
+        glow.style.setProperty('--gx', `${(x - 0.5) * rect.width}px`);
+        glow.style.setProperty('--gy', `${(y - 0.5) * rect.height}px`);
       }
     });
 
@@ -829,8 +829,8 @@ if (window.innerWidth > 900) {
       card.style.transform = '';
       // Reset glow to center
       if (glow) {
-        glow.style.left = '50%';
-        glow.style.top  = '50%';
+        glow.style.setProperty('--gx', '0px');
+        glow.style.setProperty('--gy', '0px');
       }
     });
   });

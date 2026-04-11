@@ -144,7 +144,6 @@ html {
   margin-left: -20px; margin-top: -20px;
   border: 1px solid rgba(255, 255, 255, 0.5);
   transition: width 0.15s ease, height 0.15s ease,
-              margin 0.15s ease,
               background-color 0.15s ease, border-color 0.15s ease;
   will-change: transform;
 }
@@ -180,7 +179,6 @@ body.cursor-interactive .cursor-outline {
   background-color: rgba(0, 243, 255, 0.05);
   box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
 }
-
 /* ===================================================================
    GLOW SWEEP ANIMATION - On Hover (Improved - Smooth & Subtle)
 =================================================================== */
@@ -731,12 +729,15 @@ section::before {
   border-color: var(--glass-highlight);
 }
 .card-glow {
-  position: absolute; width: 200px; height: 200px;
+  position: absolute;
+  width: 200px; height: 200px;
   background: radial-gradient(circle, rgba(0,243,255,0.18), transparent 70%);
   border-radius: 50%; pointer-events: none; opacity: 0;
   transition: opacity 0.3s ease;
-  transform: translate(-50%, -50%); top: 50%; left: 50%;
-  will-change: left, top, opacity;
+  /* Positioned via CSS custom properties set by JS — GPU-composited */
+  left: 50%; top: 50%;
+  transform: translate(calc(-50% + var(--gx, 0px)), calc(-50% + var(--gy, 0px)));
+  will-change: transform, opacity;
 }
 .project-card:hover .card-glow { opacity: 1; }
 
