@@ -763,6 +763,7 @@ function startHeroTyping() {
 /* ============================================================
    8. SKILLS HOVER LOGIC — loader color by learning level
 ============================================================ */
+// Threshold per design request: green for 30 or above, red below 30.
 const SKILL_LEVEL_THRESHOLD = 30;
 
 document.querySelectorAll(".skill-block").forEach(skill => {
