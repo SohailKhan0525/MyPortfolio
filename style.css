@@ -892,13 +892,24 @@ section::before {
 .skill-block:hover .skill-icon { color: var(--neon-cyan); }
 .skill-block h4 { font-family: var(--font-header); margin-bottom: 15px; font-size: 0.9rem; }
 
-.progress-bar { width: 100%; height: 4px; background: #222; border-radius: 2px; overflow: hidden; }
-.progress {
-  height: 100%;
-  background: var(--neon-purple);
-  box-shadow: 0 0 10px var(--neon-purple);
-  width: 0; /* Start at 0; animated to target width by JS on scroll */
-  transition: width 1.4s cubic-bezier(0.23, 1, 0.32, 1);
+.skill-loader {
+  min-height: 16px;
+}
+
+.skill-loader i {
+  opacity: 0;
+  font-size: 0.95rem;
+  transition: opacity 0.25s ease;
+}
+
+@keyframes skill-loader-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.skill-block:hover .skill-loader i {
+  opacity: 1;
+  animation: skill-loader-spin 0.9s linear infinite;
 }
 /* Skill Percentage */
 .skill-percent {
@@ -924,6 +935,16 @@ section::before {
 }
 
 .skill-percent.red {
+  color: #ff4d4d;
+  text-shadow: 0 0 8px rgba(255, 77, 77, 0.6);
+}
+
+.skill-loader.green i {
+  color: #00ff7f;
+  text-shadow: 0 0 8px rgba(0, 255, 127, 0.6);
+}
+
+.skill-loader.red i {
   color: #ff4d4d;
   text-shadow: 0 0 8px rgba(255, 77, 77, 0.6);
 }

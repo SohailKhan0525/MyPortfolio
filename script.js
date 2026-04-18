@@ -761,48 +761,21 @@ function startHeroTyping() {
 }
 
 /* ============================================================
-   8. SKILLS PROGRESS HOVER LOGIC — bars animated on scroll
+   8. SKILLS HOVER LOGIC — loader color by learning level
 ============================================================ */
 document.querySelectorAll(".skill-block").forEach(skill => {
-  const progress = skill.querySelector(".progress");
   const percentText = skill.querySelector(".skill-percent");
+  const loader = skill.querySelector(".skill-loader");
 
-  if (!progress || !percentText) return;
+  if (!percentText || !loader) return;
 
-  const value = parseInt(progress.style.width);
-  // Store target width as a data attribute; CSS starts bar at 0
-  progress.dataset.targetWidth = progress.style.width;
-  progress.style.width = '0';
+  const value = Number(skill.dataset.level) || 0;
+  const levelClass = value >= 30 ? "green" : "red";
 
-  percentText.textContent = `${value}%`;
-
-  if (value >= 70) {
-    percentText.classList.add("green");
-  } else {
-    percentText.classList.add("red");
-  }
+  percentText.textContent = "Still learning";
+  percentText.classList.add(levelClass);
+  loader.classList.add(levelClass);
 });
-
-// Animate skill bars when skills section enters viewport
-const skillsGrid = document.querySelector('.skills-grid');
-if (skillsGrid) {
-  const skillsBarObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.querySelectorAll('.skill-block').forEach((block, i) => {
-          const progress = block.querySelector('.progress');
-          if (progress && progress.dataset.targetWidth) {
-            setTimeout(() => {
-              progress.style.width = progress.dataset.targetWidth;
-            }, i * 55); // Stagger each bar by 55ms
-          }
-        });
-        skillsBarObserver.unobserve(entry.target); // Only animate once
-      }
-    });
-  }, { threshold: 0.15 });
-  skillsBarObserver.observe(skillsGrid);
-}
 
 /* ============================================================
    9. 3D CARD TILT EFFECT (Desktop only)
