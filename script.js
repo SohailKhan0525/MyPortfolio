@@ -763,6 +763,8 @@ function startHeroTyping() {
 /* ============================================================
    8. SKILLS HOVER LOGIC — loader color by learning level
 ============================================================ */
+const SKILL_LEVEL_THRESHOLD = 30;
+
 document.querySelectorAll(".skill-block").forEach(skill => {
   const percentText = skill.querySelector(".skill-percent");
   const loader = skill.querySelector(".skill-loader");
@@ -770,7 +772,7 @@ document.querySelectorAll(".skill-block").forEach(skill => {
   if (!percentText || !loader) return;
 
   const value = Number(skill.dataset.level) || 0;
-  const levelClass = value >= 30 ? "green" : "red";
+  const levelClass = value >= SKILL_LEVEL_THRESHOLD ? "green" : "red";
 
   percentText.textContent = "Still learning";
   percentText.classList.add(levelClass);
