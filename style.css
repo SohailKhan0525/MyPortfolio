@@ -643,6 +643,7 @@ section {
 
 /* ===================================================================
    ANIMATION CLASSES (SCROLL REVEAL — CINEMATIC)
+   Optimized for smooth performance on desktop and mobile
 =================================================================== */
 .reveal {
   opacity: 0;
@@ -650,6 +651,8 @@ section {
   transition: opacity 0.8s cubic-bezier(0.23, 1, 0.32, 1),
               transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
   will-change: opacity, transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .reveal.active {
@@ -663,12 +666,16 @@ section {
   transform: translateX(-55px) scale(0.97);
   transition: opacity 0.9s var(--easing), transform 0.9s var(--easing);
   will-change: opacity, transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 .reveal-right {
   opacity: 0;
   transform: translateX(55px) scale(0.97);
   transition: opacity 0.9s var(--easing), transform 0.9s var(--easing);
   will-change: opacity, transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 .reveal-left.active,
 .reveal-right.active {
@@ -679,6 +686,46 @@ section {
 .delay-100 { transition-delay: 0.12s; }
 .delay-200 { transition-delay: 0.24s; }
 .delay-300 { transition-delay: 0.36s; }
+
+/* Mobile optimizations for reveal animations */
+@media (max-width: 768px) {
+  .reveal {
+    transform: translateY(30px) scale(0.98);
+    transition-duration: 0.6s;
+  }
+  
+  .reveal-left {
+    transform: translateX(-30px) scale(0.98);
+    transition-duration: 0.7s;
+  }
+  
+  .reveal-right {
+    transform: translateX(30px) scale(0.98);
+    transition-duration: 0.7s;
+  }
+  
+  .delay-100 { transition-delay: 0.08s; }
+  .delay-200 { transition-delay: 0.16s; }
+  .delay-300 { transition-delay: 0.24s; }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal-left,
+  .reveal-right {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    will-change: auto;
+  }
+  
+  .reveal.active,
+  .reveal-left.active,
+  .reveal-right.active {
+    transform: none;
+  }
+}
 
 /* Cinematic section-entry ambient line */
 section::before {

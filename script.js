@@ -9,7 +9,7 @@ const CONFIG = {
   },
   supabase: {
     url: "https://wggtykpaftszppjlplas.supabase.co",
-    anonKey: "eyJhbGciOiJIUzl1NilsInR5cCI6lkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJIZil6IndnZ3R5a3BhZnRzenBwamxwbGFzliwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3Nzc5MTYsImV4cCI6MjA5MjM1MzkxNn0.VfGwPPCqwgKevkFx26EwaUM6X3dBZxy9_y1YSBIHIWY",
+    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnZ3R5a3BhZnRzenBwamxwbGFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY3Nzc5MTYsImV4cCI6MjA2MjM1MzkxNn0.VfGwPPCqwgKevkFx26EwaUM6X3dBZxy9_y1YSBIHIWY",
     visitsTable: "portfolio_visits"
   },
   colors: {
@@ -326,13 +326,28 @@ window.addEventListener('resize', () => {
 
 /* ============================================================
    3. SCROLL REVEAL ANIMATIONS (Intersection Observer — with reverse)
+   Optimized for both desktop and mobile with reduced-motion support
 ============================================================ */
 const revealElements = document.querySelectorAll(".reveal");
 
+// Use smaller threshold on mobile for earlier triggering (improves perceived performance)
+const revealThreshold = isMobile ? 0.05 : 0.1;
+const revealRootMargin = isMobile ? '0px 0px -30px 0px' : '0px 0px -50px 0px';
+
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
-    if (entry.isIntersecting) {
+    // Skip animations entirely if user prefers reduced motion
+    if (prefersReducedMotion) {
       entry.target.classList.add("active");
+      entry.target.style.transition = 'none';
+      return;
+    }
+    
+    if (entry.isIntersecting) {
+      // Use requestAnimationFrame for smoother animation triggering
+      requestAnimationFrame(() => {
+        entry.target.classList.add("active");
+      });
       // Once hero-text has revealed, remove the CSS transition so
       // real-time scroll parallax updates run without CSS easing interference
       if (entry.target.classList.contains('hero-text')) {
@@ -342,14 +357,16 @@ const revealObserver = new IntersectionObserver((entries) => {
       }
     } else if (entry.boundingClientRect.top > 0) {
       // Element is below the viewport — user scrolled back up; reset for re-entry
-      entry.target.classList.remove("active");
+      requestAnimationFrame(() => {
+        entry.target.classList.remove("active");
+      });
       // Restore transition so the re-entry animation looks cinematic
       if (entry.target.classList.contains('hero-text')) {
         entry.target.style.transition = '';
       }
     }
   });
-}, { threshold: 0.1 });
+}, { threshold: revealThreshold, rootMargin: revealRootMargin });
 
 revealElements.forEach((el) => revealObserver.observe(el));
 
@@ -357,13 +374,24 @@ revealElements.forEach((el) => revealObserver.observe(el));
 const directionalRevealEls = document.querySelectorAll('.reveal-left, .reveal-right');
 const directionalRevealObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
-    if (entry.isIntersecting) {
+    // Skip animations if user prefers reduced motion
+    if (prefersReducedMotion) {
       entry.target.classList.add('active');
+      entry.target.style.transition = 'none';
+      return;
+    }
+    
+    if (entry.isIntersecting) {
+      requestAnimationFrame(() => {
+        entry.target.classList.add('active');
+      });
     } else if (entry.boundingClientRect.top > 0) {
-      entry.target.classList.remove('active');
+      requestAnimationFrame(() => {
+        entry.target.classList.remove('active');
+      });
     }
   });
-}, { threshold: 0.1 });
+}, { threshold: revealThreshold, rootMargin: revealRootMargin });
 directionalRevealEls.forEach(el => directionalRevealObserver.observe(el));
 
 
@@ -846,11 +874,30 @@ function dayFromNumber(dayNumber) {
 const VISIBLE_DAYS_COUNT = 15;
 let footerVisitAnalyticsData = null;
 
+// Cached Supabase client to avoid recreating on each call
+let supabaseClientInstance = null;
+
 function createSupabaseAnalyticsClient() {
-  if (!window.supabase || typeof window.supabase.createClient !== 'function') return null;
+  // Return cached instance if available
+  if (supabaseClientInstance) return supabaseClientInstance;
+  
+  if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+    console.warn('[v0] Supabase SDK not loaded');
+    return null;
+  }
   const { url, anonKey } = CONFIG.supabase;
-  if (!url || !anonKey || url === 'YOUR_SUPABASE_PROJECT_URL' || anonKey === 'YOUR_SUPABASE_ANON_KEY') return null;
-  return window.supabase.createClient(url, anonKey);
+  if (!url || !anonKey || url === 'YOUR_SUPABASE_PROJECT_URL' || anonKey === 'YOUR_SUPABASE_ANON_KEY') {
+    console.warn('[v0] Supabase not configured - using placeholder values');
+    return null;
+  }
+  
+  try {
+    supabaseClientInstance = window.supabase.createClient(url, anonKey);
+    return supabaseClientInstance;
+  } catch (err) {
+    console.error('[v0] Failed to create Supabase client:', err);
+    return null;
+  }
 }
 
 async function getVisitAnalyticsData() {
@@ -1036,13 +1083,46 @@ function drawFooterVisitChart(data) {
   });
 }
 
-async function initFooterVisitAnalytics() {
+// Helper to animate number counting up
+function animateNumber(element, targetValue, duration = 1000) {
+  if (!element) return;
+  const startValue = parseInt(element.textContent.replace(/,/g, ''), 10) || 0;
+  const startTime = performance.now();
+  const diff = targetValue - startValue;
+  
+  function updateNumber(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    // Ease out cubic for smooth deceleration
+    const easeProgress = 1 - Math.pow(1 - progress, 3);
+    const currentValue = Math.round(startValue + diff * easeProgress);
+    element.textContent = formatNumber(currentValue);
+    
+    if (progress < 1) {
+      requestAnimationFrame(updateNumber);
+    }
+  }
+  
+  requestAnimationFrame(updateNumber);
+}
+
+async function initFooterVisitAnalytics(retryCount = 0) {
+  const MAX_RETRIES = 2;
+  const RETRY_DELAY = 2000;
+  
   const overallEl = document.getElementById('overall-visits');
   const todayEl = document.getElementById('today-visits');
   const last15El = document.getElementById('last-15-visits');
   const chart = document.getElementById('visit-chart');
   const summaryEl = document.getElementById('visit-chart-summary');
   if (!overallEl || !todayEl || !last15El || !chart) return;
+
+  // Show loading state
+  if (retryCount === 0) {
+    overallEl.textContent = '...';
+    todayEl.textContent = '...';
+    last15El.textContent = 'Loading...';
+  }
 
   try {
     const data = await getVisitAnalyticsData();
@@ -1055,15 +1135,26 @@ async function initFooterVisitAnalytics() {
     }
 
     footerVisitAnalyticsData = data;
-    overallEl.textContent = formatNumber(data.totalVisits);
-    todayEl.textContent = formatNumber(data.todayVisits);
+    
+    // Animate numbers for dynamic feel
+    animateNumber(overallEl, data.totalVisits, 1200);
+    animateNumber(todayEl, data.todayVisits, 800);
     last15El.textContent = formatLastVisit(data.lastVisitAt);
+    
     if (summaryEl) {
       summaryEl.textContent = `The site has received ${formatNumber(data.totalVisits)} overall visits. Today there have been ${formatNumber(data.todayVisits)} visits. The last visit was ${formatLastVisit(data.lastVisitAt)}.`;
     }
     drawFooterVisitChart(data);
   } catch (error) {
-    console.error('Footer visit analytics failed:', error);
+    console.error('[v0] Footer visit analytics failed:', error);
+    
+    // Retry on failure
+    if (retryCount < MAX_RETRIES) {
+      console.log(`[v0] Retrying analytics in ${RETRY_DELAY}ms (attempt ${retryCount + 2}/${MAX_RETRIES + 1})`);
+      setTimeout(() => initFooterVisitAnalytics(retryCount + 1), RETRY_DELAY);
+      return;
+    }
+    
     overallEl.textContent = '0';
     todayEl.textContent = '0';
     last15El.textContent = 'Unavailable';
