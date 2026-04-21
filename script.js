@@ -504,8 +504,9 @@ function closePanel() {
   }
 }
 
-// Detect touch-primary devices (excludes hybrid laptops with touchscreens)
-const isTouchDevice = () => window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+// Pointer capability detection (more reliable than viewport width)
+const isTouchDevice = () => window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+const hasFinePointer = () => window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
 // Change hint text on touch devices
 if (isTouchDevice()) {
@@ -568,7 +569,7 @@ const cursorOutline = document.querySelector("[data-cursor-outline]");
 let cursorX = 0, cursorY = 0;
 let outlineX = 0, outlineY = 0;
 
-if (window.innerWidth > 900) {
+if (hasFinePointer()) {
   // Smooth cursor outline following — uses transform (GPU-composited)
   function animateCursor() {
     outlineX += (cursorX - outlineX) * 0.2;
@@ -788,7 +789,7 @@ document.querySelectorAll(".skill-block").forEach(skill => {
 /* ============================================================
    9. 3D CARD TILT EFFECT (Desktop only)
 ============================================================ */
-if (window.innerWidth > 900) {
+if (hasFinePointer()) {
   document.querySelectorAll('.project-card').forEach(card => {
     const glow = card.querySelector('.card-glow');
 

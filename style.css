@@ -1780,6 +1780,12 @@ footer {
   #contact-form { padding: 30px; }
 }
 
+/* Ensure touch/coarse-pointer devices get touch-friendly cursor behavior at all widths */
+@media (hover: none), (pointer: coarse) {
+  .cursor-dot, .cursor-outline { display: none; }
+  * { cursor: auto !important; }
+}
+
 /* ===================================================================
    RESPONSIVE: EXTRA SMALL SCREENS (≤480px)
    Must come after ≤768px block so these rules override it for small screens
