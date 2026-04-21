@@ -7,6 +7,11 @@ const CONFIG = {
     serviceID: "service_kmvnnax",
     templateID: "template_yadt1ng"
   },
+  supabase: {
+    url: "YOUR_SUPABASE_PROJECT_URL",
+    anonKey: "YOUR_SUPABASE_ANON_KEY",
+    visitsTable: "portfolio_visits"
+  },
   colors: {
     particles: 0x00f3ff,
     connections: 0xbc13fe
@@ -813,135 +818,137 @@ if (window.innerWidth > 900) {
 }
 
 /* ============================================================
-   10. FOOTER VISIT ANALYTICS (Real-feel local simulation)
+   10. FOOTER VISIT ANALYTICS (Supabase backend)
 ============================================================ */
 function formatNumber(num) {
   return Number(num || 0).toLocaleString('en-US');
+}
+
+function formatLastVisit(isoDate) {
+  if (!isoDate) return 'First visit';
+  const date = new Date(isoDate);
+  if (Number.isNaN(date.getTime())) return 'N/A';
+  return date.toLocaleString('en-US', {
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  });
 }
 
 function getDayStamp(date = new Date()) {
   return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())).toISOString().slice(0, 10);
 }
 
-function getDayNumber(dayStamp) {
-  const [y, m, d] = dayStamp.split('-').map(Number);
-  return Math.floor(Date.UTC(y, m - 1, d) / 86400000);
-}
-
 function dayFromNumber(dayNumber) {
   return new Date(dayNumber * 86400000).toISOString().slice(0, 10);
 }
 
-const SYNTHETIC_TRAFFIC_MODEL = {
-  waveADivisor: 5.7,
-  waveAAmplitude: 22,
-  waveBDivisor: 13.2,
-  waveBAmplitude: 16,
-  noiseMultiplier: 31,
-  noiseModulus: 17,
-  noiseOffset: 8,
-  floor: 45,
-  baseline: 135
-};
-const SYNTHETIC_TOTAL_BASE = 18000;
-const SYNTHETIC_TOTAL_DAY_MULTIPLIER = 13;
-const SYNTHETIC_TOTAL_VARIATION_RANGE = 7000;
 const VISIBLE_DAYS_COUNT = 15;
+let footerVisitAnalyticsData = null;
 
-function syntheticUniqueForDay(dayNumber) {
-  const waveA = Math.sin(dayNumber / SYNTHETIC_TRAFFIC_MODEL.waveADivisor) * SYNTHETIC_TRAFFIC_MODEL.waveAAmplitude;
-  const waveB = Math.cos(dayNumber / SYNTHETIC_TRAFFIC_MODEL.waveBDivisor) * SYNTHETIC_TRAFFIC_MODEL.waveBAmplitude;
-  const noise = ((dayNumber * SYNTHETIC_TRAFFIC_MODEL.noiseMultiplier) % SYNTHETIC_TRAFFIC_MODEL.noiseModulus) - SYNTHETIC_TRAFFIC_MODEL.noiseOffset;
-  return Math.max(SYNTHETIC_TRAFFIC_MODEL.floor, Math.round(SYNTHETIC_TRAFFIC_MODEL.baseline + waveA + waveB + noise));
+function createSupabaseAnalyticsClient() {
+  if (!window.supabase || typeof window.supabase.createClient !== 'function') return null;
+  const { url, anonKey } = CONFIG.supabase;
+  if (!url || !anonKey || url === 'YOUR_SUPABASE_PROJECT_URL' || anonKey === 'YOUR_SUPABASE_ANON_KEY') return null;
+  return window.supabase.createClient(url, anonKey);
 }
 
-function getVisitAnalyticsData() {
-  const storageKey = 'portfolio_visit_analytics_v1';
-  const seenKey = 'portfolio_last_seen_day_v1';
-  const today = getDayStamp();
-  const todayNumber = getDayNumber(today);
+async function getVisitAnalyticsData() {
+  const client = createSupabaseAnalyticsClient();
+  if (!client) return null;
 
-  let state;
-  try {
-    state = JSON.parse(localStorage.getItem(storageKey) || 'null');
-  } catch {
-    state = null;
+  const table = CONFIG.supabase.visitsTable || 'portfolio_visits';
+  const now = new Date();
+  const todayStamp = getDayStamp(now);
+  const todayStart = new Date(`${todayStamp}T00:00:00.000Z`);
+  const tomorrowStart = new Date(todayStart.getTime() + 86400000);
+  const visibleStart = new Date(todayStart.getTime() - (VISIBLE_DAYS_COUNT - 1) * 86400000);
+  const rollingStart = new Date(todayStart.getTime() - ((VISIBLE_DAYS_COUNT * 2) - 2) * 86400000);
+  const todayNumber = Math.floor(todayStart.getTime() / 86400000);
+
+  const { data: lastVisitRows, error: lastVisitError } = await client
+    .from(table)
+    .select('visited_at')
+    .order('visited_at', { ascending: false })
+    .limit(1);
+  if (lastVisitError) throw lastVisitError;
+  const lastVisitAt = lastVisitRows?.[0]?.visited_at || null;
+
+  const { error: insertError } = await client.from(table).insert([{}]);
+  if (insertError) throw new Error(`Failed to record current visit: ${insertError.message || 'Unknown error'}`);
+
+  const { count: totalVisits, error: totalError } = await client
+    .from(table)
+    .select('*', { count: 'exact', head: true });
+  if (totalError) throw totalError;
+
+  const { count: todayVisits, error: todayError } = await client
+    .from(table)
+    .select('*', { count: 'exact', head: true })
+    .gte('visited_at', todayStart.toISOString())
+    .lt('visited_at', tomorrowStart.toISOString());
+  if (todayError) throw todayError;
+
+  const { count: beforeWindowCount, error: beforeWindowError } = await client
+    .from(table)
+    .select('*', { count: 'exact', head: true })
+    .lt('visited_at', visibleStart.toISOString());
+  if (beforeWindowError) throw beforeWindowError;
+
+  const { data: recentRows, error: recentRowsError } = await client
+    .from(table)
+    .select('visited_at')
+    .gte('visited_at', rollingStart.toISOString())
+    .lt('visited_at', tomorrowStart.toISOString())
+    .order('visited_at', { ascending: true });
+  if (recentRowsError) throw recentRowsError;
+
+  const labels = [];
+  const visibleStamps = [];
+  const dailyCountsByStamp = {};
+  const rollingCountsByStamp = {};
+  const rollingStartNumber = Math.floor(rollingStart.getTime() / 86400000);
+  for (let i = 0; i < (VISIBLE_DAYS_COUNT * 2) - 1; i++) {
+    const stamp = dayFromNumber(rollingStartNumber + i);
+    rollingCountsByStamp[stamp] = 0;
   }
-
-  if (!state || !state.days || typeof state.totalVisits !== 'number') {
-    const baseTotal = SYNTHETIC_TOTAL_BASE + ((todayNumber * SYNTHETIC_TOTAL_DAY_MULTIPLIER) % SYNTHETIC_TOTAL_VARIATION_RANGE);
-    const days = {};
-    let windowTotal = 0;
-    for (let i = VISIBLE_DAYS_COUNT - 1; i >= 0; i--) {
-      const n = todayNumber - i;
-      const stamp = dayFromNumber(n);
-      const value = syntheticUniqueForDay(n);
-      days[stamp] = value;
-      windowTotal += value;
-    }
-    state = {
-      totalVisits: baseTotal + windowTotal,
-      lastUpdatedDay: today,
-      days
-    };
-  }
-
-  const lastUpdatedNumber = getDayNumber(state.lastUpdatedDay || today);
-  if (todayNumber > lastUpdatedNumber) {
-    for (let n = lastUpdatedNumber + 1; n <= todayNumber; n++) {
-      const stamp = dayFromNumber(n);
-      const generated = syntheticUniqueForDay(n);
-      state.days[stamp] = generated;
-      state.totalVisits += generated;
-    }
-    state.lastUpdatedDay = today;
-  }
-
-  const visibleDays = [];
   for (let i = VISIBLE_DAYS_COUNT - 1; i >= 0; i--) {
     const stamp = dayFromNumber(todayNumber - i);
-    if (typeof state.days[stamp] !== 'number') state.days[stamp] = syntheticUniqueForDay(todayNumber - i);
-    visibleDays.push(stamp);
+    visibleStamps.push(stamp);
+    labels.push(stamp.slice(5));
+    dailyCountsByStamp[stamp] = 0;
   }
-
-  try {
-    const lastSeenDay = localStorage.getItem(seenKey);
-    if (lastSeenDay !== today) {
-      state.days[today] = (state.days[today] || 0) + 1;
-      state.totalVisits += 1;
-      localStorage.setItem(seenKey, today);
+  (recentRows || []).forEach((row) => {
+    const stamp = getDayStamp(new Date(row.visited_at));
+    if (Object.prototype.hasOwnProperty.call(rollingCountsByStamp, stamp)) {
+      rollingCountsByStamp[stamp] += 1;
     }
-    localStorage.setItem(storageKey, JSON.stringify(state));
-  } catch {
-    // Ignore storage write failures
-  }
-
-  const dailySeries = visibleDays.map((d) => state.days[d] || 0);
-  const getDayValue = (dayNumber) => {
-    const stamp = dayFromNumber(dayNumber);
-    if (typeof state.days[stamp] !== 'number') state.days[stamp] = syntheticUniqueForDay(dayNumber);
-    return state.days[stamp];
-  };
-  const rolling15Series = visibleDays.map((_, idx) => {
-    const dayNumber = todayNumber - (VISIBLE_DAYS_COUNT - 1 - idx);
-    let total = 0;
-    for (let n = dayNumber - (VISIBLE_DAYS_COUNT - 1); n <= dayNumber; n++) {
-      total += getDayValue(n);
+    if (Object.prototype.hasOwnProperty.call(dailyCountsByStamp, stamp)) {
+      dailyCountsByStamp[stamp] += 1;
     }
-    return total;
   });
-  const windowSum = dailySeries.reduce((sum, v) => sum + v, 0);
-  let runningTotal = state.totalVisits - windowSum;
-  const totalSeries = dailySeries.map((v) => {
-    runningTotal += v;
+
+  const dailySeries = visibleStamps.map((stamp) => dailyCountsByStamp[stamp] || 0);
+  const rolling15Series = visibleStamps.map((stamp) => {
+    const dayNumber = Math.floor(new Date(`${stamp}T00:00:00.000Z`).getTime() / 86400000);
+    let sum = 0;
+    for (let n = dayNumber - (VISIBLE_DAYS_COUNT - 1); n <= dayNumber; n++) {
+      const dayStamp = dayFromNumber(n);
+      sum += rollingCountsByStamp[dayStamp] || 0;
+    }
+    return sum;
+  });
+
+  let runningTotal = Number(beforeWindowCount || 0);
+  const totalSeries = dailySeries.map((value) => {
+    runningTotal += value;
     return runningTotal;
   });
 
   return {
-    labels: visibleDays.map((d) => d.slice(5)),
-    totalVisits: state.totalVisits,
-    todayVisits: state.days[today] || 0,
-    last15Visits: windowSum,
+    labels,
+    totalVisits: Number(totalVisits || 0),
+    todayVisits: Number(todayVisits || 0),
+    lastVisitAt,
     dailySeries,
     rolling15Series,
     totalSeries
@@ -974,7 +981,7 @@ function drawFooterVisitChart(data) {
 
   const series = [
     { name: 'Overall', values: data.totalSeries, color: '#00f3ff' },
-    { name: 'Daily Unique Visitors', values: data.dailySeries, color: '#bc13fe' },
+    { name: 'Visits per Day', values: data.dailySeries, color: '#bc13fe' },
     { name: 'Last 15 Days', values: data.rolling15Series, color: '#44ff99' }
   ];
 
@@ -1028,7 +1035,7 @@ function drawFooterVisitChart(data) {
   });
 }
 
-function initFooterVisitAnalytics() {
+async function initFooterVisitAnalytics() {
   const overallEl = document.getElementById('overall-visits');
   const todayEl = document.getElementById('today-visits');
   const last15El = document.getElementById('last-15-visits');
@@ -1036,18 +1043,37 @@ function initFooterVisitAnalytics() {
   const summaryEl = document.getElementById('visit-chart-summary');
   if (!overallEl || !todayEl || !last15El || !chart) return;
 
-  const data = getVisitAnalyticsData();
-  overallEl.textContent = formatNumber(data.totalVisits);
-  todayEl.textContent = formatNumber(data.todayVisits);
-  last15El.textContent = formatNumber(data.last15Visits);
-  if (summaryEl) {
-    summaryEl.textContent = `Overall Visits ${formatNumber(data.totalVisits)}, Today Unique Visitors ${formatNumber(data.todayVisits)}, and Last 15 Days Visitors ${formatNumber(data.last15Visits)}.`;
+  try {
+    const data = await getVisitAnalyticsData();
+    if (!data) {
+      overallEl.textContent = '0';
+      todayEl.textContent = '0';
+      last15El.textContent = 'N/A';
+      if (summaryEl) summaryEl.textContent = 'Configure Supabase URL and anon key to enable visit analytics.';
+      return;
+    }
+
+    footerVisitAnalyticsData = data;
+    overallEl.textContent = formatNumber(data.totalVisits);
+    todayEl.textContent = formatNumber(data.todayVisits);
+    last15El.textContent = formatLastVisit(data.lastVisitAt);
+    if (summaryEl) {
+      summaryEl.textContent = `The site has received ${formatNumber(data.totalVisits)} overall visits. Today there have been ${formatNumber(data.todayVisits)} visits. The last visit was ${formatLastVisit(data.lastVisitAt)}.`;
+    }
+    drawFooterVisitChart(data);
+  } catch (error) {
+    console.error('Footer visit analytics failed:', error);
+    overallEl.textContent = '0';
+    todayEl.textContent = '0';
+    last15El.textContent = 'Unavailable';
+    if (summaryEl) summaryEl.textContent = 'Visit analytics are currently unavailable.';
   }
-  drawFooterVisitChart(data);
 }
 
-window.addEventListener('load', initFooterVisitAnalytics);
-window.addEventListener('resize', () => {
-  if (!document.getElementById('visit-chart')) return;
+window.addEventListener('load', () => {
   initFooterVisitAnalytics();
+});
+window.addEventListener('resize', () => {
+  if (!document.getElementById('visit-chart') || !footerVisitAnalyticsData) return;
+  drawFooterVisitChart(footerVisitAnalyticsData);
 });
