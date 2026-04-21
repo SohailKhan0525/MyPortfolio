@@ -8,8 +8,8 @@ const CONFIG = {
     templateID: "template_yadt1ng"
   },
   supabase: {
-    url: "YOUR_SUPABASE_PROJECT_URL",
-    anonKey: "YOUR_SUPABASE_ANON_KEY",
+    url: "https://wggtykpaftszppjlplas.supabase.co",
+    anonKey: "eyJhbGciOiJIUzl1NilsInR5cCI6lkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJIZil6IndnZ3R5a3BhZnRzenBwamxwbGFzliwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3Nzc5MTYsImV4cCI6MjA5MjM1MzkxNn0.VfGwPPCqwgKevkFx26EwaUM6X3dBZxy9_y1YSBIHIWY",
     visitsTable: "portfolio_visits"
   },
   colors: {
