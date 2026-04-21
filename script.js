@@ -902,9 +902,11 @@ async function getVisitAnalyticsData() {
   if (recentRowsError) throw recentRowsError;
 
   const labels = [];
+  const visibleStamps = [];
   const dailyCountsByStamp = {};
   for (let i = VISIBLE_DAYS_COUNT - 1; i >= 0; i--) {
     const stamp = dayFromNumber(todayNumber - i);
+    visibleStamps.push(stamp);
     labels.push(stamp.slice(5));
     dailyCountsByStamp[stamp] = 0;
   }
@@ -915,7 +917,7 @@ async function getVisitAnalyticsData() {
     }
   });
 
-  const dailySeries = Object.values(dailyCountsByStamp);
+  const dailySeries = visibleStamps.map((stamp) => dailyCountsByStamp[stamp] || 0);
   const rolling15Series = dailySeries.map((_, idx) => {
     let sum = 0;
     for (let i = Math.max(0, idx - (VISIBLE_DAYS_COUNT - 1)); i <= idx; i++) {
@@ -1044,10 +1046,11 @@ async function initFooterVisitAnalytics() {
     todayEl.textContent = formatNumber(data.todayVisits);
     last15El.textContent = formatLastVisit(data.lastVisitAt);
     if (summaryEl) {
-      summaryEl.textContent = `Overall Visits ${formatNumber(data.totalVisits)}, Today Visits ${formatNumber(data.todayVisits)}, Last Visit ${formatLastVisit(data.lastVisitAt)}.`;
+      summaryEl.textContent = `Overall visits: ${formatNumber(data.totalVisits)}. Today's visits: ${formatNumber(data.todayVisits)}. Last visit: ${formatLastVisit(data.lastVisitAt)}.`;
     }
     drawFooterVisitChart(data);
-  } catch {
+  } catch (error) {
+    console.error('Footer visit analytics failed:', error);
     overallEl.textContent = '0';
     todayEl.textContent = '0';
     last15El.textContent = 'Unavailable';
