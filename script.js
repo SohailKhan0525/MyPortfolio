@@ -832,11 +832,27 @@ function dayFromNumber(dayNumber) {
   return new Date(dayNumber * 86400000).toISOString().slice(0, 10);
 }
 
+const SYNTHETIC_TRAFFIC_MODEL = {
+  waveADivisor: 5.7,
+  waveAAmplitude: 22,
+  waveBDivisor: 13.2,
+  waveBAmplitude: 16,
+  noiseMultiplier: 31,
+  noiseModulus: 17,
+  noiseOffset: 8,
+  floor: 45,
+  baseline: 135
+};
+const SYNTHETIC_TOTAL_BASE = 18000;
+const SYNTHETIC_TOTAL_DAY_MULTIPLIER = 13;
+const SYNTHETIC_TOTAL_VARIATION_RANGE = 7000;
+const VISIBLE_DAYS_COUNT = 15;
+
 function syntheticUniqueForDay(dayNumber) {
-  const waveA = Math.sin(dayNumber / 5.7) * 22;
-  const waveB = Math.cos(dayNumber / 13.2) * 16;
-  const noise = ((dayNumber * 31) % 17) - 8;
-  return Math.max(45, Math.round(135 + waveA + waveB + noise));
+  const waveA = Math.sin(dayNumber / SYNTHETIC_TRAFFIC_MODEL.waveADivisor) * SYNTHETIC_TRAFFIC_MODEL.waveAAmplitude;
+  const waveB = Math.cos(dayNumber / SYNTHETIC_TRAFFIC_MODEL.waveBDivisor) * SYNTHETIC_TRAFFIC_MODEL.waveBAmplitude;
+  const noise = ((dayNumber * SYNTHETIC_TRAFFIC_MODEL.noiseMultiplier) % SYNTHETIC_TRAFFIC_MODEL.noiseModulus) - SYNTHETIC_TRAFFIC_MODEL.noiseOffset;
+  return Math.max(SYNTHETIC_TRAFFIC_MODEL.floor, Math.round(SYNTHETIC_TRAFFIC_MODEL.baseline + waveA + waveB + noise));
 }
 
 function getVisitAnalyticsData() {
@@ -853,10 +869,10 @@ function getVisitAnalyticsData() {
   }
 
   if (!state || !state.days || typeof state.totalVisits !== 'number') {
-    const baseTotal = 18000 + ((todayNumber * 13) % 7000);
+    const baseTotal = SYNTHETIC_TOTAL_BASE + ((todayNumber * SYNTHETIC_TOTAL_DAY_MULTIPLIER) % SYNTHETIC_TOTAL_VARIATION_RANGE);
     const days = {};
     let windowTotal = 0;
-    for (let i = 14; i >= 0; i--) {
+    for (let i = VISIBLE_DAYS_COUNT - 1; i >= 0; i--) {
       const n = todayNumber - i;
       const stamp = dayFromNumber(n);
       const value = syntheticUniqueForDay(n);
@@ -882,7 +898,7 @@ function getVisitAnalyticsData() {
   }
 
   const visibleDays = [];
-  for (let i = 14; i >= 0; i--) {
+  for (let i = VISIBLE_DAYS_COUNT - 1; i >= 0; i--) {
     const stamp = dayFromNumber(todayNumber - i);
     if (typeof state.days[stamp] !== 'number') state.days[stamp] = syntheticUniqueForDay(todayNumber - i);
     visibleDays.push(stamp);
@@ -901,9 +917,11 @@ function getVisitAnalyticsData() {
   }
 
   const dailySeries = visibleDays.map((d) => state.days[d] || 0);
-  const rolling15Series = dailySeries.map((_, idx) => {
-    const start = Math.max(0, idx - 14);
-    return dailySeries.slice(start, idx + 1).reduce((sum, v) => sum + v, 0);
+  let rollingWindowTotal = 0;
+  const rolling15Series = dailySeries.map((value, idx) => {
+    rollingWindowTotal += value;
+    if (idx >= VISIBLE_DAYS_COUNT) rollingWindowTotal -= dailySeries[idx - VISIBLE_DAYS_COUNT];
+    return rollingWindowTotal;
   });
   const windowSum = dailySeries.reduce((sum, v) => sum + v, 0);
   let runningTotal = state.totalVisits - windowSum;
@@ -1008,12 +1026,16 @@ function initFooterVisitAnalytics() {
   const todayEl = document.getElementById('today-visits');
   const last15El = document.getElementById('last-15-visits');
   const chart = document.getElementById('visit-chart');
+  const summaryEl = document.getElementById('visit-chart-summary');
   if (!overallEl || !todayEl || !last15El || !chart) return;
 
   const data = getVisitAnalyticsData();
   overallEl.textContent = formatNumber(data.totalVisits);
   todayEl.textContent = formatNumber(data.todayVisits);
   last15El.textContent = formatNumber(data.last15Visits);
+  if (summaryEl) {
+    summaryEl.textContent = `Overall visits ${formatNumber(data.totalVisits)}, today unique visitors ${formatNumber(data.todayVisits)}, and last fifteen days visitors ${formatNumber(data.last15Visits)}.`;
+  }
   drawFooterVisitChart(data);
 }
 
