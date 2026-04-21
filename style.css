@@ -519,7 +519,13 @@ section {
 }
 
 .hero-container { display: flex; align-items: center; width: 100%; }
-.hero-text { max-width: 650px; z-index: 10; }
+.hero-text { 
+  max-width: 650px; 
+  z-index: 10; 
+  /* Hero displays immediately without reveal animation */
+  opacity: 1;
+  transform: none;
+}
 
 .pre-title {
   font-family: var(--font-header);

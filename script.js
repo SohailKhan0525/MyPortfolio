@@ -8,8 +8,8 @@ const CONFIG = {
     templateID: "template_yadt1ng"
   },
   supabase: {
-    url: "https://wggtykpaftszppjlplas.supabase.co",
-    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnZ3R5a3BhZnRzenBwamxwbGFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY3Nzc5MTYsImV4cCI6MjA2MjM1MzkxNn0.VfGwPPCqwgKevkFx26EwaUM6X3dBZxy9_y1YSBIHIWY",
+    url: "https://foartgvotobzrgcllgin.supabase.co",
+    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvYXJ0Z3ZvdG9ienJnY2xsZ2luIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3NTkwODcsImV4cCI6MjA5MjMzNTA4N30.GtWMKIGHTmn73zokYNE51TXpx2lSxP0LhU_jVOQ2zGM",
     visitsTable: "portfolio_visits"
   },
   colors: {
@@ -348,22 +348,11 @@ const revealObserver = new IntersectionObserver((entries) => {
       requestAnimationFrame(() => {
         entry.target.classList.add("active");
       });
-      // Once hero-text has revealed, remove the CSS transition so
-      // real-time scroll parallax updates run without CSS easing interference
-      if (entry.target.classList.contains('hero-text')) {
-        setTimeout(() => {
-          entry.target.style.transition = 'none';
-        }, HERO_REVEAL_TRANSITION_MS);
-      }
     } else if (entry.boundingClientRect.top > 0) {
       // Element is below the viewport — user scrolled back up; reset for re-entry
       requestAnimationFrame(() => {
         entry.target.classList.remove("active");
       });
-      // Restore transition so the re-entry animation looks cinematic
-      if (entry.target.classList.contains('hero-text')) {
-        entry.target.style.transition = '';
-      }
     }
   });
 }, { threshold: revealThreshold, rootMargin: revealRootMargin });
