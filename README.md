@@ -108,6 +108,7 @@ Open [index.html](index.html) in any modern browser — no build step required.
 - **Colors & styling:** Update CSS variables at the top of [style.css](style.css).
 - **Typewriter roles:** Edit the `roles` array in [script.js](script.js).
 - **EmailJS:** Replace `publicKey`, `serviceID`, and `templateID` in the `CONFIG` object at the top of [script.js](script.js) with your own EmailJS values.
+- **Supabase analytics:** Replace `CONFIG.supabase.url` and `CONFIG.supabase.anonKey` in [script.js](script.js), then create a `portfolio_visits` table with a `visited_at TIMESTAMPTZ DEFAULT now()` column.
 
 ---
 
