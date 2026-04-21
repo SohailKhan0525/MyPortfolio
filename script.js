@@ -929,19 +929,23 @@ function drawFooterVisitChart(data) {
   const ctx = chart.getContext('2d');
   if (!ctx) return;
 
+  const MIN_CHART_WIDTH = 320;
+  const MIN_CHART_HEIGHT = 160;
+  const CHART_PADDING = { top: 20, right: 16, bottom: 24, left: 12 };
+  const MAX_X_AXIS_LABELS = 5;
+
   const dpr = window.devicePixelRatio || 1;
   const rect = chart.getBoundingClientRect();
-  const width = Math.max(320, Math.floor(rect.width));
-  const height = Math.max(160, Math.floor(rect.height));
+  const width = Math.max(MIN_CHART_WIDTH, Math.floor(rect.width));
+  const height = Math.max(MIN_CHART_HEIGHT, Math.floor(rect.height));
   chart.width = Math.floor(width * dpr);
   chart.height = Math.floor(height * dpr);
   ctx.scale(dpr, dpr);
 
   ctx.clearRect(0, 0, width, height);
 
-  const padding = { top: 20, right: 16, bottom: 24, left: 12 };
-  const plotW = width - padding.left - padding.right;
-  const plotH = height - padding.top - padding.bottom;
+  const plotW = width - CHART_PADDING.left - CHART_PADDING.right;
+  const plotH = height - CHART_PADDING.top - CHART_PADDING.bottom;
 
   const series = [
     { name: 'Overall', values: data.totalSeries, color: '#00f3ff' },
@@ -950,16 +954,16 @@ function drawFooterVisitChart(data) {
   ];
 
   const maxValue = Math.max(...series.flatMap((s) => s.values), 1);
-  const toX = (i) => padding.left + (plotW * i) / (data.labels.length - 1 || 1);
-  const toY = (v) => padding.top + plotH - (v / maxValue) * plotH;
+  const toX = (i) => CHART_PADDING.left + (plotW * i) / (data.labels.length - 1 || 1);
+  const toY = (v) => CHART_PADDING.top + plotH - (v / maxValue) * plotH;
 
   ctx.strokeStyle = 'rgba(255,255,255,0.12)';
   ctx.lineWidth = 1;
   for (let i = 0; i <= 4; i++) {
-    const y = padding.top + (plotH / 4) * i;
+    const y = CHART_PADDING.top + (plotH / 4) * i;
     ctx.beginPath();
-    ctx.moveTo(padding.left, y);
-    ctx.lineTo(width - padding.right, y);
+    ctx.moveTo(CHART_PADDING.left, y);
+    ctx.lineTo(width - CHART_PADDING.right, y);
     ctx.stroke();
   }
 
@@ -981,14 +985,14 @@ function drawFooterVisitChart(data) {
 
   ctx.fillStyle = 'rgba(220,220,220,0.72)';
   ctx.font = '10px Inter, sans-serif';
-  const labelStride = Math.max(1, Math.ceil(data.labels.length / 5));
+  const labelStride = Math.max(1, Math.ceil(data.labels.length / MAX_X_AXIS_LABELS));
   data.labels.forEach((label, i) => {
     if (i % labelStride !== 0 && i !== data.labels.length - 1) return;
     const x = toX(i);
     ctx.fillText(label, x - 14, height - 6);
   });
 
-  let legendX = padding.left;
+  let legendX = CHART_PADDING.left;
   series.forEach((line) => {
     ctx.fillStyle = line.color;
     ctx.fillRect(legendX, 4, 10, 10);
