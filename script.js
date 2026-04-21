@@ -1048,7 +1048,7 @@ async function initFooterVisitAnalytics() {
     if (!data) {
       overallEl.textContent = '0';
       todayEl.textContent = '0';
-      last15El.textContent = 'Not configured';
+      last15El.textContent = 'N/A';
       if (summaryEl) summaryEl.textContent = 'Configure Supabase URL and anon key to enable visit analytics.';
       return;
     }
