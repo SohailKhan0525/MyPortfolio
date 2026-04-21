@@ -862,6 +862,7 @@ async function getVisitAnalyticsData() {
   const todayStart = new Date(`${todayStamp}T00:00:00.000Z`);
   const tomorrowStart = new Date(todayStart.getTime() + 86400000);
   const visibleStart = new Date(todayStart.getTime() - (VISIBLE_DAYS_COUNT - 1) * 86400000);
+  const rollingStart = new Date(todayStart.getTime() - ((VISIBLE_DAYS_COUNT * 2) - 2) * 86400000);
   const todayNumber = Math.floor(todayStart.getTime() / 86400000);
 
   const { data: lastVisitRows, error: lastVisitError } = await client
@@ -896,7 +897,7 @@ async function getVisitAnalyticsData() {
   const { data: recentRows, error: recentRowsError } = await client
     .from(table)
     .select('visited_at')
-    .gte('visited_at', visibleStart.toISOString())
+    .gte('visited_at', rollingStart.toISOString())
     .lt('visited_at', tomorrowStart.toISOString())
     .order('visited_at', { ascending: true });
   if (recentRowsError) throw recentRowsError;
@@ -904,6 +905,12 @@ async function getVisitAnalyticsData() {
   const labels = [];
   const visibleStamps = [];
   const dailyCountsByStamp = {};
+  const rollingCountsByStamp = {};
+  const rollingStartNumber = Math.floor(rollingStart.getTime() / 86400000);
+  for (let i = 0; i < (VISIBLE_DAYS_COUNT * 2) - 1; i++) {
+    const stamp = dayFromNumber(rollingStartNumber + i);
+    rollingCountsByStamp[stamp] = 0;
+  }
   for (let i = VISIBLE_DAYS_COUNT - 1; i >= 0; i--) {
     const stamp = dayFromNumber(todayNumber - i);
     visibleStamps.push(stamp);
@@ -912,16 +919,21 @@ async function getVisitAnalyticsData() {
   }
   (recentRows || []).forEach((row) => {
     const stamp = getDayStamp(new Date(row.visited_at));
+    if (Object.prototype.hasOwnProperty.call(rollingCountsByStamp, stamp)) {
+      rollingCountsByStamp[stamp] += 1;
+    }
     if (Object.prototype.hasOwnProperty.call(dailyCountsByStamp, stamp)) {
       dailyCountsByStamp[stamp] += 1;
     }
   });
 
   const dailySeries = visibleStamps.map((stamp) => dailyCountsByStamp[stamp] || 0);
-  const rolling15Series = dailySeries.map((_, idx) => {
+  const rolling15Series = visibleStamps.map((stamp) => {
+    const dayNumber = Math.floor(new Date(`${stamp}T00:00:00.000Z`).getTime() / 86400000);
     let sum = 0;
-    for (let i = Math.max(0, idx - (VISIBLE_DAYS_COUNT - 1)); i <= idx; i++) {
-      sum += dailySeries[i];
+    for (let n = dayNumber - (VISIBLE_DAYS_COUNT - 1); n <= dayNumber; n++) {
+      const dayStamp = dayFromNumber(n);
+      sum += rollingCountsByStamp[dayStamp] || 0;
     }
     return sum;
   });
@@ -1036,7 +1048,7 @@ async function initFooterVisitAnalytics() {
     if (!data) {
       overallEl.textContent = '0';
       todayEl.textContent = '0';
-      last15El.textContent = 'Set Supabase';
+      last15El.textContent = 'Not configured';
       if (summaryEl) summaryEl.textContent = 'Configure Supabase URL and anon key to enable visit analytics.';
       return;
     }
