@@ -981,7 +981,7 @@ function drawFooterVisitChart(data) {
 
   const series = [
     { name: 'Overall', values: data.totalSeries, color: '#00f3ff' },
-    { name: 'Daily Visits', values: data.dailySeries, color: '#bc13fe' },
+    { name: 'Visits per Day', values: data.dailySeries, color: '#bc13fe' },
     { name: 'Last 15 Days', values: data.rolling15Series, color: '#44ff99' }
   ];
 
@@ -1058,7 +1058,7 @@ async function initFooterVisitAnalytics() {
     todayEl.textContent = formatNumber(data.todayVisits);
     last15El.textContent = formatLastVisit(data.lastVisitAt);
     if (summaryEl) {
-      summaryEl.textContent = `Overall visits: ${formatNumber(data.totalVisits)}. Today's visits: ${formatNumber(data.todayVisits)}. Last visit: ${formatLastVisit(data.lastVisitAt)}.`;
+      summaryEl.textContent = `The site has received ${formatNumber(data.totalVisits)} overall visits. Today there have been ${formatNumber(data.todayVisits)} visits. The last visit was ${formatLastVisit(data.lastVisitAt)}.`;
     }
     drawFooterVisitChart(data);
   } catch (error) {
