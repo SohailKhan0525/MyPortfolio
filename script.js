@@ -1041,7 +1041,7 @@ function initFooterVisitAnalytics() {
   todayEl.textContent = formatNumber(data.todayVisits);
   last15El.textContent = formatNumber(data.last15Visits);
   if (summaryEl) {
-    summaryEl.textContent = `Overall visits ${formatNumber(data.totalVisits)}, today's unique visitors ${formatNumber(data.todayVisits)}, and last 15 days visitors ${formatNumber(data.last15Visits)}.`;
+    summaryEl.textContent = `Overall Visits ${formatNumber(data.totalVisits)}, Today Unique Visitors ${formatNumber(data.todayVisits)}, and Last 15 Days Visitors ${formatNumber(data.last15Visits)}.`;
   }
   drawFooterVisitChart(data);
 }
