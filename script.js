@@ -811,3 +811,210 @@ if (window.innerWidth > 900) {
     });
   });
 }
+
+/* ============================================================
+   10. FOOTER VISIT ANALYTICS (Real-feel local simulation)
+============================================================ */
+function formatNumber(num) {
+  return Number(num || 0).toLocaleString('en-US');
+}
+
+function getDayStamp(date = new Date()) {
+  return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())).toISOString().slice(0, 10);
+}
+
+function getDayNumber(dayStamp) {
+  const [y, m, d] = dayStamp.split('-').map(Number);
+  return Math.floor(Date.UTC(y, m - 1, d) / 86400000);
+}
+
+function dayFromNumber(dayNumber) {
+  return new Date(dayNumber * 86400000).toISOString().slice(0, 10);
+}
+
+function syntheticUniqueForDay(dayNumber) {
+  const waveA = Math.sin(dayNumber / 5.7) * 22;
+  const waveB = Math.cos(dayNumber / 13.2) * 16;
+  const noise = ((dayNumber * 31) % 17) - 8;
+  return Math.max(45, Math.round(135 + waveA + waveB + noise));
+}
+
+function getVisitAnalyticsData() {
+  const storageKey = 'portfolio_visit_analytics_v1';
+  const seenKey = 'portfolio_last_seen_day_v1';
+  const today = getDayStamp();
+  const todayNumber = getDayNumber(today);
+
+  let state;
+  try {
+    state = JSON.parse(localStorage.getItem(storageKey) || 'null');
+  } catch {
+    state = null;
+  }
+
+  if (!state || !state.days || typeof state.totalVisits !== 'number') {
+    const baseTotal = 18000 + ((todayNumber * 13) % 7000);
+    const days = {};
+    let windowTotal = 0;
+    for (let i = 14; i >= 0; i--) {
+      const n = todayNumber - i;
+      const stamp = dayFromNumber(n);
+      const value = syntheticUniqueForDay(n);
+      days[stamp] = value;
+      windowTotal += value;
+    }
+    state = {
+      totalVisits: baseTotal + windowTotal,
+      lastUpdatedDay: today,
+      days
+    };
+  }
+
+  const lastUpdatedNumber = getDayNumber(state.lastUpdatedDay || today);
+  if (todayNumber > lastUpdatedNumber) {
+    for (let n = lastUpdatedNumber + 1; n <= todayNumber; n++) {
+      const stamp = dayFromNumber(n);
+      const generated = syntheticUniqueForDay(n);
+      state.days[stamp] = generated;
+      state.totalVisits += generated;
+    }
+    state.lastUpdatedDay = today;
+  }
+
+  const visibleDays = [];
+  for (let i = 14; i >= 0; i--) {
+    const stamp = dayFromNumber(todayNumber - i);
+    if (typeof state.days[stamp] !== 'number') state.days[stamp] = syntheticUniqueForDay(todayNumber - i);
+    visibleDays.push(stamp);
+  }
+
+  try {
+    const lastSeenDay = localStorage.getItem(seenKey);
+    if (lastSeenDay !== today) {
+      state.days[today] = (state.days[today] || 0) + 1;
+      state.totalVisits += 1;
+      localStorage.setItem(seenKey, today);
+    }
+    localStorage.setItem(storageKey, JSON.stringify(state));
+  } catch {
+    // Ignore storage write failures
+  }
+
+  const dailySeries = visibleDays.map((d) => state.days[d] || 0);
+  const rolling15Series = dailySeries.map((_, idx) => {
+    const start = Math.max(0, idx - 14);
+    return dailySeries.slice(start, idx + 1).reduce((sum, v) => sum + v, 0);
+  });
+  const windowSum = dailySeries.reduce((sum, v) => sum + v, 0);
+  let runningTotal = state.totalVisits - windowSum;
+  const totalSeries = dailySeries.map((v) => {
+    runningTotal += v;
+    return runningTotal;
+  });
+
+  return {
+    labels: visibleDays.map((d) => d.slice(5)),
+    totalVisits: state.totalVisits,
+    todayVisits: state.days[today] || 0,
+    last15Visits: windowSum,
+    dailySeries,
+    rolling15Series,
+    totalSeries
+  };
+}
+
+function drawFooterVisitChart(data) {
+  const chart = document.getElementById('visit-chart');
+  if (!chart) return;
+  const ctx = chart.getContext('2d');
+  if (!ctx) return;
+
+  const dpr = window.devicePixelRatio || 1;
+  const rect = chart.getBoundingClientRect();
+  const width = Math.max(320, Math.floor(rect.width));
+  const height = Math.max(160, Math.floor(rect.height));
+  chart.width = Math.floor(width * dpr);
+  chart.height = Math.floor(height * dpr);
+  ctx.scale(dpr, dpr);
+
+  ctx.clearRect(0, 0, width, height);
+
+  const padding = { top: 20, right: 16, bottom: 24, left: 12 };
+  const plotW = width - padding.left - padding.right;
+  const plotH = height - padding.top - padding.bottom;
+
+  const series = [
+    { name: 'Overall', values: data.totalSeries, color: '#00f3ff' },
+    { name: 'Today Unique', values: data.dailySeries, color: '#bc13fe' },
+    { name: 'Last 15 Days', values: data.rolling15Series, color: '#44ff99' }
+  ];
+
+  const maxValue = Math.max(...series.flatMap((s) => s.values), 1);
+  const toX = (i) => padding.left + (plotW * i) / (data.labels.length - 1 || 1);
+  const toY = (v) => padding.top + plotH - (v / maxValue) * plotH;
+
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = padding.top + (plotH / 4) * i;
+    ctx.beginPath();
+    ctx.moveTo(padding.left, y);
+    ctx.lineTo(width - padding.right, y);
+    ctx.stroke();
+  }
+
+  series.forEach((line) => {
+    ctx.beginPath();
+    line.values.forEach((v, i) => {
+      const x = toX(i);
+      const y = toY(v);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = line.color;
+    ctx.lineWidth = 2.2;
+    ctx.shadowColor = line.color;
+    ctx.shadowBlur = 6;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  });
+
+  ctx.fillStyle = 'rgba(220,220,220,0.72)';
+  ctx.font = '10px Inter, sans-serif';
+  const labelStride = Math.max(1, Math.ceil(data.labels.length / 5));
+  data.labels.forEach((label, i) => {
+    if (i % labelStride !== 0 && i !== data.labels.length - 1) return;
+    const x = toX(i);
+    ctx.fillText(label, x - 14, height - 6);
+  });
+
+  let legendX = padding.left;
+  series.forEach((line) => {
+    ctx.fillStyle = line.color;
+    ctx.fillRect(legendX, 4, 10, 10);
+    legendX += 14;
+    ctx.fillStyle = 'rgba(235,235,235,0.8)';
+    ctx.fillText(line.name, legendX, 13);
+    legendX += ctx.measureText(line.name).width + 14;
+  });
+}
+
+function initFooterVisitAnalytics() {
+  const overallEl = document.getElementById('overall-visits');
+  const todayEl = document.getElementById('today-visits');
+  const last15El = document.getElementById('last-15-visits');
+  const chart = document.getElementById('visit-chart');
+  if (!overallEl || !todayEl || !last15El || !chart) return;
+
+  const data = getVisitAnalyticsData();
+  overallEl.textContent = formatNumber(data.totalVisits);
+  todayEl.textContent = formatNumber(data.todayVisits);
+  last15El.textContent = formatNumber(data.last15Visits);
+  drawFooterVisitChart(data);
+}
+
+window.addEventListener('load', initFooterVisitAnalytics);
+window.addEventListener('resize', () => {
+  if (!document.getElementById('visit-chart')) return;
+  initFooterVisitAnalytics();
+});
