@@ -917,11 +917,18 @@ function getVisitAnalyticsData() {
   }
 
   const dailySeries = visibleDays.map((d) => state.days[d] || 0);
-  let rollingWindowTotal = 0;
-  const rolling15Series = dailySeries.map((value, idx) => {
-    rollingWindowTotal += value;
-    if (idx >= VISIBLE_DAYS_COUNT) rollingWindowTotal -= dailySeries[idx - VISIBLE_DAYS_COUNT];
-    return rollingWindowTotal;
+  const getDayValue = (dayNumber) => {
+    const stamp = dayFromNumber(dayNumber);
+    if (typeof state.days[stamp] !== 'number') state.days[stamp] = syntheticUniqueForDay(dayNumber);
+    return state.days[stamp];
+  };
+  const rolling15Series = visibleDays.map((_, idx) => {
+    const dayNumber = todayNumber - (VISIBLE_DAYS_COUNT - 1 - idx);
+    let total = 0;
+    for (let n = dayNumber - (VISIBLE_DAYS_COUNT - 1); n <= dayNumber; n++) {
+      total += getDayValue(n);
+    }
+    return total;
   });
   const windowSum = dailySeries.reduce((sum, v) => sum + v, 0);
   let runningTotal = state.totalVisits - windowSum;
@@ -967,7 +974,7 @@ function drawFooterVisitChart(data) {
 
   const series = [
     { name: 'Overall', values: data.totalSeries, color: '#00f3ff' },
-    { name: 'Today Unique Visitors', values: data.dailySeries, color: '#bc13fe' },
+    { name: 'Daily Unique Visitors', values: data.dailySeries, color: '#bc13fe' },
     { name: 'Last 15 Days', values: data.rolling15Series, color: '#44ff99' }
   ];
 
@@ -1034,7 +1041,7 @@ function initFooterVisitAnalytics() {
   todayEl.textContent = formatNumber(data.todayVisits);
   last15El.textContent = formatNumber(data.last15Visits);
   if (summaryEl) {
-    summaryEl.textContent = `Overall visits ${formatNumber(data.totalVisits)}, today unique visitors ${formatNumber(data.todayVisits)}, and last 15 days visitors ${formatNumber(data.last15Visits)}.`;
+    summaryEl.textContent = `Overall visits ${formatNumber(data.totalVisits)}, today's unique visitors ${formatNumber(data.todayVisits)}, and last 15 days visitors ${formatNumber(data.last15Visits)}.`;
   }
   drawFooterVisitChart(data);
 }
