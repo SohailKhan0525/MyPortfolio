@@ -365,7 +365,7 @@ directionalRevealEls.forEach(el => directionalRevealObserver.observe(el));
 /* ============================================================
    4. TYPEWRITER EFFECT (role — started after name typing finishes)
 ============================================================ */
-const roles = ["ML ENGINEER IN BEGINNER"];
+const roles = ["BEGINNER ML ENGINEER"];
 let roleIndex = 0;
 let charIndex = 0;
 let isDeleting = false;
@@ -692,7 +692,7 @@ if (modal && closeModal) {
 window.addEventListener("load", () => {
   const preloader = document.getElementById("preloader");
   const loaderText = preloader.querySelector(".loader-text");
-  const stages = ["LOADING CORE...", "CONNECTING NEURAL NETWORK", "SYSTEM READY"];
+  const stages = ["LOADING CORE...", "CONNECTING TO NEURAL NETWORK...", "SYSTEM READY"];
   let step = 0;
 
   const interval = setInterval(() => {
