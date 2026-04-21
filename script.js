@@ -848,7 +848,7 @@ let footerVisitAnalyticsData = null;
 function createSupabaseAnalyticsClient() {
   if (!window.supabase || typeof window.supabase.createClient !== 'function') return null;
   const { url, anonKey } = CONFIG.supabase;
-  if (!url || !anonKey || url.includes('YOUR_SUPABASE') || anonKey.includes('YOUR_SUPABASE')) return null;
+  if (!url || !anonKey || url === 'YOUR_SUPABASE_PROJECT_URL' || anonKey === 'YOUR_SUPABASE_ANON_KEY') return null;
   return window.supabase.createClient(url, anonKey);
 }
 
@@ -874,7 +874,7 @@ async function getVisitAnalyticsData() {
   const lastVisitAt = lastVisitRows?.[0]?.visited_at || null;
 
   const { error: insertError } = await client.from(table).insert([{}]);
-  if (insertError) throw insertError;
+  if (insertError) throw new Error(`Failed to record current visit: ${insertError.message || 'Unknown error'}`);
 
   const { count: totalVisits, error: totalError } = await client
     .from(table)
