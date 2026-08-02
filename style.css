@@ -511,7 +511,7 @@ body.cursor-interactive .cursor-outline {
 =================================================================== */
 section {
   min-height: 100vh;
-  padding: 120px 10%;
+  padding: clamp(90px, 10vw, 120px) clamp(16px, 6vw, 10%);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -538,7 +538,7 @@ section {
 /* Glitch Header */
 .glitch-header {
   font-family: var(--font-header);
-  font-size: 4.5rem;
+  font-size: clamp(2.2rem, 8vw, 4.5rem);
   line-height: 1.1;
   font-weight: 700;
   color: #fff;
@@ -570,7 +570,7 @@ section {
 
 .role-container {
   font-family: var(--font-header);
-  font-size: 1.5rem;
+  font-size: clamp(1rem, 3.2vw, 1.5rem);
   margin: 20px 0;
   color: var(--text-muted);
 }
@@ -581,14 +581,14 @@ section {
 .hero-bio {
   color: var(--text-muted);
   line-height: 1.7;
-  font-size: 1.1rem;
+  font-size: clamp(0.98rem, 2.4vw, 1.1rem);
   margin-bottom: 40px;
   max-width: 500px;
 }
 .hero-bio strong { color: var(--text-main); font-weight: 400; }
 
 /* 3D Buttons */
-.cta-group { display: flex; gap: 20px; }
+.cta-group { display: flex; gap: clamp(12px, 2vw, 20px); flex-wrap: wrap; }
 
 .btn-3d {
   position: relative;
@@ -761,8 +761,8 @@ section::before {
 
 .project-gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: clamp(20px, 3vw, 40px);
 }
 
 .project-card {
@@ -770,7 +770,7 @@ section::before {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   border-radius: 16px;
-  padding: 30px;
+  padding: clamp(20px, 3vw, 30px);
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   overflow: hidden;
   will-change: transform;
@@ -1014,10 +1014,10 @@ section::before {
   border: 1px solid var(--glass-border);
   border-radius: 20px;
   overflow: hidden;
-  max-width: 900px; margin: 0 auto;
+  max-width: 900px; margin: 0 auto; width: 100%;
 }
 .contact-left {
-  background: rgba(0,0,0,0.3); padding: 50px; flex: 1;
+  background: rgba(0,0,0,0.3); padding: clamp(24px, 4vw, 50px); flex: 1;
   display: flex; flex-direction: column; justify-content: center;
 }
 .contact-left h2 { font-family: var(--font-header); font-size: 2.5rem; margin-bottom: 20px; }
@@ -1025,7 +1025,7 @@ section::before {
 .social-links a { color: var(--text-muted); text-decoration: none; letter-spacing: 2px; font-size: 0.9rem; transition: 0.2s; cursor: none; }
 .social-links a:hover { color: var(--neon-cyan); padding-left: 10px; }
 
-#contact-form { flex: 1.5; padding: 50px; }
+#contact-form { flex: 1.5; padding: clamp(24px, 4vw, 50px); }
 .form-group { position: relative; margin-bottom: 30px; }
 .form-group input, .form-group textarea {
   width: 100%; background: transparent; border: none;
@@ -1075,6 +1075,7 @@ footer {
 
 .github-contribution-link {
   display: block;
+  width: 100%;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.02);
@@ -1084,6 +1085,7 @@ footer {
 .github-contribution-graph {
   width: 100%;
   height: auto;
+  min-height: 110px;
   display: block;
 }
 
@@ -1698,7 +1700,8 @@ footer {
   }
   .nav-links {
     position: fixed; top: 0; right: 0;
-    height: 100vh; width: 70%;
+    height: 100vh; width: min(80%, 320px);
+    padding: 90px 24px 24px;
     background: rgba(5, 5, 5, 0.97);
     backdrop-filter: blur(8px);
     flex-direction: column;
@@ -1812,6 +1815,16 @@ footer {
   .section-title { font-size: 1.7rem; }
   .about-title { font-size: 2.2rem; }
   .contact-left h2 { font-size: 2rem; }
+
+  .btn-3d {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .cta-group {
+    width: 100%;
+  }
 }
 
 /* ===================================================================
