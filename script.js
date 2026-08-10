@@ -3,8 +3,8 @@
 ============================================================ */
 const CONFIG = {
   colors: {
-    particles: 0x00f3ff,
-    connections: 0xbc13fe
+    particles: 0xd4af37,   // gold
+    connections: 0x9a7b2f  // deep bronze gold
   }
 };
 
