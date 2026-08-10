@@ -2,21 +2,11 @@
    1. CONFIGURATION
 ============================================================ */
 const CONFIG = {
-  emailJS: {
-    publicKey: "YITu4swbGHXKFsR0q",
-    serviceID: "service_kmvnnax",
-    templateID: "template_yadt1ng"
-  },
   colors: {
     particles: 0x00f3ff,
     connections: 0xbc13fe
   }
 };
-
-// Init EmailJS
-document.addEventListener("DOMContentLoaded", () => {
-  if (typeof emailjs !== "undefined") emailjs.init(CONFIG.emailJS.publicKey);
-});
 
 /* ============================================================
    2. THREE.JS 3D BACKGROUND (Responsive & Gyroscope)
@@ -616,35 +606,8 @@ if (hasFinePointer()) {
 
 
 /* ============================================================
-   6. FORMS & POPUPS
+   6. POPUPS
 ============================================================ */
-// Contact Form
-const contactForm = document.getElementById('contact-form');
-if (contactForm) {
-  contactForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = contactForm.querySelector('.submit-btn span');
-    const originalText = btn.textContent;
-    btn.textContent = "TRANSMITTING...";
-    
-    try {
-      await emailjs.send(CONFIG.emailJS.serviceID, CONFIG.emailJS.templateID, {
-        from_name: document.getElementById("name").value,
-        email: document.getElementById("email").value,
-        reply_to: document.getElementById("email").value,
-        message: document.getElementById("message").value
-      });
-      btn.textContent = "SUCCESS";
-      contactForm.reset();
-      setTimeout(() => btn.textContent = originalText, 3000);
-    } catch (err) {
-      console.error(err);
-      btn.textContent = "FAILED";
-      setTimeout(() => btn.textContent = originalText, 3000);
-    }
-  });
-}
-
 // Model Popup
 const modelBtn = document.getElementById('model-only-btn');
 const noLiveDemoBtn = document.getElementById('no-live-demo-btn');

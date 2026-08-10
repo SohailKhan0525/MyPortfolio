@@ -26,7 +26,7 @@ I am **Mohd Zaheer Uddin** — a Computer Science (CSIT) undergraduate with a fo
 |------|-------------|
 | `index.html` | Single-page layout with sections: Home, About, Projects, Skills, Resume, Certifications, and Contact |
 | `style.css` | Complete styling system: neon glassmorphism, custom cursor, scroll reveal, layout grids, and responsive design |
-| `script.js` | Frontend behaviour: Three.js particle background, Lenis smooth scroll, typewriter roles, preloader, mobile menu, gyroscope support, contact form (EmailJS), project hover-panels, modal popup, and skill progress bars |
+| `script.js` | Frontend behaviour: Three.js particle background, Lenis smooth scroll, typewriter roles, preloader, mobile menu, gyroscope support, project hover-panels, modal popup, and skill progress bars |
 | `favicon.ico` | Browser tab icon |
 | `main.png` | Logo/hero image displayed in the About section |
 | `MohdZaheerUddinResume.pdf` | Resume document, viewable and downloadable directly from the site |
@@ -63,7 +63,7 @@ I am **Mohd Zaheer Uddin** — a Computer Science (CSIT) undergraduate with a fo
 - **Skills & Tools** — 22 skill blocks with animated progress bars
 - **Resume** — Embedded PDF viewer with fullscreen and download options
 - **Certifications** — Placeholder section (achievements coming soon)
-- **Contact** — EmailJS-powered contact form and social links (LinkedIn, GitHub, Instagram)
+- **Contact** — Mailto-based email button and social links (LinkedIn, GitHub, Instagram)
 
 ### 🃏 Projects Showcase
 
@@ -88,7 +88,7 @@ I am **Mohd Zaheer Uddin** — a Computer Science (CSIT) undergraduate with a fo
 | Scripting | JavaScript (Vanilla ES6+) |
 | 3D / WebGL | [Three.js r128](https://threejs.org/) |
 | Smooth Scroll | [Lenis v1.0.42](https://github.com/studio-freight/lenis) |
-| Email | [EmailJS v3](https://www.emailjs.com/) |
+| Contact | `mailto:` link (opens visitor’s default email client) |
 | Icons | [Font Awesome 6.5.2](https://fontawesome.com/) |
 | Fonts | Inter & Space Grotesk (Google Fonts) |
 
@@ -107,14 +107,14 @@ Open [index.html](index.html) in any modern browser — no build step required.
 - **Skills:** Modify skill blocks and percentages in [index.html](index.html).
 - **Colors & styling:** Update CSS variables at the top of [style.css](style.css).
 - **Typewriter roles:** Edit the `roles` array in [script.js](script.js).
-- **EmailJS:** Replace `publicKey`, `serviceID`, and `templateID` in the `CONFIG` object at the top of [script.js](script.js) with your own EmailJS values.
+- **Contact email:** Update the `mailto:` link in the Contact section in [index.html](index.html) to use your preferred address and subject.
 - **GitHub contribution profile:** Update the username in the footer graph URL in [index.html](index.html) (`username=...`) to show your own contributions.
 
 ---
 
 ## 📌 Notes
 
-- The contact form relies on EmailJS and requires your own API keys to function.
+- The contact section uses a standard `mailto:` link and opens the visitor’s default email client.
 - Several project demos are hosted on Streamlit Community Cloud — they may take a moment to wake up if inactive.
 - The Global Earthquake Prediction and File Handling projects do not have live demos deployed.
 
