@@ -1,14 +1,5 @@
-/* ============================================================
-   1. CONFIGURATION
-============================================================ */
 const isMobile = window.innerWidth < 768;
 
-/* ============================================================
-   2. SCROLL SYSTEM (Lenis smooth scroll + progress bar + hero parallax)
-   Note: the old Three.js particle background has been removed —
-   this section keeps only the scroll-driven behaviour that doesn't
-   depend on WebGL.
-============================================================ */
 const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 let prefersReducedMotion = reducedMotionQuery.matches;
 reducedMotionQuery.addEventListener('change', (e) => {
@@ -16,7 +7,6 @@ reducedMotionQuery.addEventListener('change', (e) => {
   smoothScrollY = rawScrollY;
 });
 
-// --- SCROLL PROGRESS BAR ---
 const scrollProgressEl = document.getElementById('scroll-progress');
 function updateScrollProgress(progress) {
   if (scrollProgressEl) scrollProgressEl.style.width = (progress * 100) + '%';
@@ -26,7 +16,6 @@ let rawScrollY = 0;
 let smoothScrollY = 0;
 const SCROLL_LERP = 0.08;
 
-// --- LENIS SMOOTH SCROLLING ---
 let lenis;
 if (!prefersReducedMotion && typeof Lenis !== 'undefined') {
   lenis = new Lenis({
@@ -41,7 +30,6 @@ if (!prefersReducedMotion && typeof Lenis !== 'undefined') {
     updateScrollProgress(progress);
   });
 } else {
-  // Fallback: native scroll tracking
   window.addEventListener('scroll', () => {
     rawScrollY = window.scrollY;
     const limit = document.documentElement.scrollHeight - window.innerHeight;
@@ -50,7 +38,6 @@ if (!prefersReducedMotion && typeof Lenis !== 'undefined') {
   }, { passive: true });
 }
 
-// --- HERO PARALLAX ZOOM ON SCROLL ---
 const heroTextEl = document.querySelector('.hero-text');
 const HERO_PARALLAX_SPEED = 0.25;
 const HERO_FADE_MULTIPLIER = 1.4;
@@ -67,7 +54,6 @@ function updateHeroParallax(scrollY) {
   heroTextEl.style.opacity = Math.max(0, opacity);
 }
 
-// --- LIGHTWEIGHT RAF LOOP (drives Lenis + hero parallax only, no WebGL) ---
 let animationId;
 function animate(time = 0) {
   animationId = requestAnimationFrame(animate);
@@ -82,7 +68,6 @@ function animate(time = 0) {
 }
 animate();
 
-// Pause the loop when the tab is hidden to save CPU
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     cancelAnimationFrame(animationId);
@@ -92,19 +77,13 @@ document.addEventListener('visibilitychange', () => {
 });
 
 
-/* ============================================================
-   3. SCROLL REVEAL ANIMATIONS (Intersection Observer — with reverse)
-   Optimized for both desktop and mobile with reduced-motion support
-============================================================ */
 const revealElements = document.querySelectorAll(".reveal");
 
-// Use smaller threshold on mobile for earlier triggering (improves perceived performance)
 const revealThreshold = isMobile ? 0.05 : 0.1;
 const revealRootMargin = isMobile ? '0px 0px -30px 0px' : '0px 0px -50px 0px';
 
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
-    // Skip animations entirely if user prefers reduced motion
     if (prefersReducedMotion) {
       entry.target.classList.add("active");
       entry.target.style.transition = 'none';
@@ -112,12 +91,10 @@ const revealObserver = new IntersectionObserver((entries) => {
     }
     
     if (entry.isIntersecting) {
-      // Use requestAnimationFrame for smoother animation triggering
       requestAnimationFrame(() => {
         entry.target.classList.add("active");
       });
     } else if (entry.boundingClientRect.top > 0) {
-      // Element is below the viewport — user scrolled back up; reset for re-entry
       requestAnimationFrame(() => {
         entry.target.classList.remove("active");
       });
@@ -127,11 +104,9 @@ const revealObserver = new IntersectionObserver((entries) => {
 
 revealElements.forEach((el) => revealObserver.observe(el));
 
-// Directional reveal elements (reveal-left / reveal-right)
 const directionalRevealEls = document.querySelectorAll('.reveal-left, .reveal-right');
 const directionalRevealObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
-    // Skip animations if user prefers reduced motion
     if (prefersReducedMotion) {
       entry.target.classList.add('active');
       entry.target.style.transition = 'none';
@@ -152,9 +127,6 @@ const directionalRevealObserver = new IntersectionObserver((entries) => {
 directionalRevealEls.forEach(el => directionalRevealObserver.observe(el));
 
 
-/* ============================================================
-   4. TYPEWRITER EFFECT (role — started after name typing finishes)
-============================================================ */
 const roles = ["BEGINNER ML ENGINEER"];
 let roleIndex = 0;
 let charIndex = 0;
@@ -173,7 +145,6 @@ function type() {
   }
 
   if (!isDeleting && charIndex === currentRole.length) {
-    // Don't delete if only one role, just stay at the end
     if (roles.length === 1) {
       return;
     }
@@ -186,12 +157,8 @@ function type() {
   const speed = isDeleting ? 50 : 100;
   setTimeout(type, speed);
 }
-// Role typing is started by startHeroTyping() after name is done
 
 
-/* ============================================================
-   5. MOBILE MENU & CURSOR
-============================================================ */
 const mobileToggle = document.getElementById('mobile-toggle');
 const navLinks = document.querySelector('.nav-links');
 const navBackdrop = document.getElementById('nav-backdrop');
@@ -217,26 +184,20 @@ if (mobileToggle) {
     }
   });
   
-  // Close menu when a link is clicked
   document.querySelectorAll('.nav-links a').forEach(link => {
     link.addEventListener('click', closeMobileNav);
   });
 }
 
-// Close mobile nav when clicking the backdrop
 if (navBackdrop) {
   navBackdrop.addEventListener('click', closeMobileNav);
 }
 
-/* ============================================================
-   HOVER PANEL - Show/Hide on Project Card Click
-============================================================ */
 const hoverPanel = document.getElementById('hover-panel');
 const panelTitle = document.getElementById('panel-title');
 const panelDescription = document.getElementById('panel-description');
 const closePanelBtn = document.querySelector('.close-panel-btn');
 
-// Project data for hover panel
 const projectData = {
   'house-price': {
     title: 'HOUSE PRICE PREDICTION',
@@ -268,60 +229,49 @@ const projectData = {
   }
 };
 
-// Smooth panel open function
 function openPanel(projectKey) {
   if (projectKey && projectData[projectKey]) {
     const data = projectData[projectKey];
     panelTitle.textContent = data.title;
     panelDescription.innerHTML = data.description;
     
-    // Trigger animation
     requestAnimationFrame(() => {
       if (hoverPanel) hoverPanel.classList.add('active');
     });
   }
 }
 
-// Smooth panel close function
 function closePanel() {
   if (hoverPanel) {
     hoverPanel.classList.remove('active');
   }
 }
 
-// Pointer capability detection (more reliable than viewport width)
 const isTouchDevice = () => window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 const hasFinePointer = () => window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-// Change hint text on touch devices
 if (isTouchDevice()) {
   document.querySelectorAll('.card-hint span').forEach(span => {
     span.textContent = 'Tap to learn more';
   });
 }
 
-// Track the currently tapped card for efficient class management
 let tappedCard = null;
 
-// Click behavior for all devices
 document.querySelectorAll('.project-card').forEach(card => {
   card.addEventListener('click', (e) => {
-    // Don't trigger if clicking on links
     if (e.target.closest('.link-btn')) {
       return;
     }
     const projectKey = card.getAttribute('data-project');
 
-    // Two-tap behavior on touch devices
     if (isTouchDevice() && card !== tappedCard) {
-      // First tap: highlight the card and show the hint
       if (tappedCard) tappedCard.classList.remove('card-tapped');
       tappedCard = card;
       card.classList.add('card-tapped');
       return;
     }
 
-    // Second tap (or desktop click): open panel
     if (tappedCard) {
       tappedCard.classList.remove('card-tapped');
       tappedCard = null;
@@ -330,12 +280,10 @@ document.querySelectorAll('.project-card').forEach(card => {
   });
 });
 
-// Close panel button
 if (closePanelBtn) {
   closePanelBtn.addEventListener('click', closePanel);
 }
 
-// Close panel when clicking outside
 if (hoverPanel) {
   document.addEventListener('click', (e) => {
     if (!hoverPanel.contains(e.target) && !e.target.closest('.project-card')) {
@@ -348,14 +296,12 @@ if (hoverPanel) {
   });
 }
 
-// Custom Cursor Logic (Desktop Only) - Optimized with RAF & transform (no layout reflow)
 const cursorDot = document.querySelector("[data-cursor-dot]");
 const cursorOutline = document.querySelector("[data-cursor-outline]");
 let cursorX = 0, cursorY = 0;
 let outlineX = 0, outlineY = 0;
 
 if (hasFinePointer()) {
-  // Smooth cursor outline following — uses transform (GPU-composited)
   function animateCursor() {
     outlineX += (cursorX - outlineX) * 0.2;
     outlineY += (cursorY - outlineY) * 0.2;
@@ -364,7 +310,6 @@ if (hasFinePointer()) {
   }
   animateCursor();
   
-  // Optimized mousemove — transform avoids triggering layout
   let cursorMoveHandler = (e) => {
     cursorX = e.clientX;
     cursorY = e.clientY;
@@ -373,7 +318,6 @@ if (hasFinePointer()) {
   
   document.addEventListener("mousemove", cursorMoveHandler);
   
-  // Event delegation for interactive elements - OPTIMIZED
   const selectiveSelectors = 'a, button, input, textarea, select, .link-btn, .btn-3d, .submit-btn, .nav-links a, .magnetic-link, .resume-btn, .hire-me-btn, .social-links a, .project-card, .skill-block, .card-links a';
   
   document.addEventListener('mouseenter', (e) => {
@@ -388,10 +332,6 @@ if (hasFinePointer()) {
 }
 
 
-/* ============================================================
-   6. POPUPS
-============================================================ */
-// Model Popup
 const modelBtn = document.getElementById('model-only-btn');
 const noLiveDemoBtn = document.getElementById('no-live-demo-btn');
 const modal = document.getElementById('custom-modal');
@@ -450,9 +390,6 @@ if (modal && closeModal) {
 }
 
 
-/* ============================================================
-   7. PRELOADER — fake "model training" progress
-============================================================ */
 window.addEventListener("load", () => {
   const preloader = document.getElementById("preloader");
   const loaderText = document.getElementById("loader-text");
@@ -460,7 +397,6 @@ window.addEventListener("load", () => {
   const totalEpochs = 10;
   let epoch = 0;
 
-  // Loss curve: starts near 1.0, decays smoothly toward ~0.02, with tiny jitter
   function lossFor(ep) {
     const base = Math.exp(-ep / 3.2) * 0.98 + 0.02;
     const jitter = (Math.sin(ep * 12.9) * 0.015);
@@ -480,7 +416,6 @@ window.addEventListener("load", () => {
         preloader.style.opacity = "0";
         setTimeout(() => {
           preloader.style.display = "none";
-          // Open cinematic letterbox bars (black edges animate out)
           document.querySelectorAll('.letterbox-bar').forEach(bar => {
             requestAnimationFrame(() => bar.classList.add('open'));
           });
@@ -491,9 +426,6 @@ window.addEventListener("load", () => {
   }, 220);
 });
 
-/* ============================================================
-   HERO NAME TYPING EFFECT
-============================================================ */
 function startHeroTyping() {
   const nameEl = document.querySelector('.glitch-header');
   if (!nameEl) {
@@ -504,7 +436,6 @@ function startHeroTyping() {
   const fullName = nameEl.getAttribute('data-text') || 'MOHD ZAHEER UDDIN';
 
   if (prefersReducedMotion) {
-    // Skip typing animation; show immediately and enable glitch
     nameEl.textContent = fullName;
     nameEl.setAttribute('data-text', fullName);
     nameEl.classList.add('typing-done');
@@ -512,7 +443,6 @@ function startHeroTyping() {
     return;
   }
 
-  // Clear visible text for typing effect
   nameEl.textContent = '';
   let idx = 0;
 
@@ -525,10 +455,8 @@ function startHeroTyping() {
       idx++;
       setTimeout(typeNameChar, 75);
     } else {
-      // Full name displayed — restore data-text and enable glitch effect
       nameEl.setAttribute('data-text', fullName);
       nameEl.classList.add('typing-done');
-      // Small pause, then start role typewriter
       setTimeout(() => {
         if (typeTarget) type();
       }, 300);
@@ -537,10 +465,6 @@ function startHeroTyping() {
   typeNameChar();
 }
 
-/* ============================================================
-   8. SKILLS HOVER LOGIC — loader color by learning level
-============================================================ */
-// Threshold per design request: green for 30 or above, red below 30.
 const SKILL_LEVEL_THRESHOLD = 30;
 
 document.querySelectorAll(".skill-block").forEach(skill => {
@@ -557,9 +481,6 @@ document.querySelectorAll(".skill-block").forEach(skill => {
   loader.classList.add(levelClass);
 });
 
-/* ============================================================
-   9. 3D CARD TILT EFFECT (Desktop only)
-============================================================ */
 if (hasFinePointer()) {
   document.querySelectorAll('.project-card').forEach(card => {
     const glow = card.querySelector('.card-glow');
@@ -571,7 +492,6 @@ if (hasFinePointer()) {
       const rotX = (0.5 - y) * 12;
       const rotY = (x - 0.5) * 12;
       card.style.transform = `translateY(-10px) perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
-      // Move glow spotlight to follow cursor (GPU-composited via CSS custom properties)
       if (glow) {
         glow.style.setProperty('--gx', `${(x - 0.5) * rect.width}px`);
         glow.style.setProperty('--gy', `${(y - 0.5) * rect.height}px`);
@@ -580,7 +500,6 @@ if (hasFinePointer()) {
 
     card.addEventListener('mouseleave', () => {
       card.style.transform = '';
-      // Reset glow to center
       if (glow) {
         glow.style.setProperty('--gx', '0px');
         glow.style.setProperty('--gy', '0px');
@@ -589,15 +508,8 @@ if (hasFinePointer()) {
   });
 }
 
-/* ============================================================
-   10. LIVE GITHUB PROJECT DATES
-   Fetches each repo's last-updated (pushed_at) date directly from
-   the GitHub REST API in the visitor's browser, so badges are always
-   current. Cached in localStorage for 6 hours to stay well under
-   GitHub's unauthenticated rate limit for repeat visits.
-============================================================ */
 (function initProjectDates() {
-  const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+  const CACHE_TTL_MS = 6 * 60 * 60 * 1000; 
 
   function formatMonthYear(isoDate) {
     const d = new Date(isoDate);
@@ -619,7 +531,7 @@ if (hasFinePointer()) {
   function setCached(key, value) {
     try {
       localStorage.setItem(key, JSON.stringify({ value, ts: Date.now() }));
-    } catch (e) { /* localStorage unavailable — fail silently */ }
+    } catch (e) {  }
   }
 
   async function fetchRepoDate(owner, repo) {
@@ -653,7 +565,6 @@ if (hasFinePointer()) {
         dateEl.classList.add('loaded');
       })
       .catch(() => {
-        // Rate-limited or offline — hide the badge rather than show a broken state
         dateEl.style.display = 'none';
       });
   });

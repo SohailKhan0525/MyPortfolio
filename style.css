@@ -1,20 +1,17 @@
-/* ===================================================================
-   VARIABLES & RESET
-=================================================================== */
 :root {
-  --bg-dark: #000000;          /* pure black */
-  --bg-panel: #111318;         /* code-editor panel bg (like VS Code sidebar) */
+  --bg-dark: #000000;
+  --bg-panel: #111318;
   --bg-panel-alt: #16181d;
-  --text-main: #d4d4d4;        /* VS Code default text */
-  --text-muted: #6a737d;       /* comment grey */
-  /* Syntax-highlight accent palette (VS Code Dark+ inspired) */
-  --neon-cyan: #569cd6;        /* keyword blue — primary accent */
-  --neon-purple: #4ec9b0;      /* type/class teal — secondary accent */
-  --gold-deep: #4a7ab5;        /* deeper blue, gradient/border anchor */
-  --syntax-string: #ce9178;    /* orange-ish string */
-  --syntax-comment: #6a9955;   /* green comment */
-  --syntax-function: #dcdcaa;  /* yellow function name */
-  --syntax-const: #4fc1ff;     /* light blue constant */
+  --text-main: #d4d4d4;
+  --text-muted: #6a737d;
+
+  --neon-cyan: #569cd6;
+  --neon-purple: #4ec9b0;
+  --gold-deep: #4a7ab5;
+  --syntax-string: #ce9178;
+  --syntax-comment: #6a9955;
+  --syntax-function: #dcdcaa;
+  --syntax-const: #4fc1ff;
   --glass-bg: rgba(86, 156, 214, 0.05);
   --glass-border: rgba(86, 156, 214, 0.18);
   --glass-highlight: rgba(86, 156, 214, 0.35);
@@ -27,19 +24,17 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  cursor: none; /* Hide default cursor */
+  cursor: none;
 }
 
 body {
-  background: var(--bg-dark); /* pure black, no gradient wash */
+  background: var(--bg-dark);
   color: var(--text-main);
   font-family: var(--font-body);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Section/heading text — solid syntax-blue, code-comment style handled
-   via ::before "# " markers on .section-title / .about-title elsewhere */
 .gold-text,
 .hero-title,
 .section-title,
@@ -53,15 +48,11 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Custom Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-dark); }
 ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; will-change: auto; }
 ::-webkit-scrollbar-thumb:hover { background: var(--neon-cyan); }
 
-/* ===================================================================
-   SCROLL PROGRESS INDICATOR
-=================================================================== */
 #scroll-progress {
   position: fixed;
   top: 0;
@@ -76,10 +67,6 @@ html {
   pointer-events: none;
 }
 
-/* ===================================================================
-   CINEMATIC LETTERBOX BARS
-   Present during preloader; animate away (.open) after site loads.
-=================================================================== */
 .letterbox-bar {
   position: fixed;
   left: 0;
@@ -104,10 +91,6 @@ html {
   .letterbox-bar { height: 28px; }
 }
 
-/* ===================================================================
-   CORE LAYOUT & BACKGROUNDS
-=================================================================== */
-/* Cinematic Grain (kept — subtle texture works fine on flat black) */
 .noise-overlay {
   position: fixed;
   top: 0; left: 0;
@@ -118,7 +101,6 @@ html {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-/* Background overlay — pure black, no color tint (particle bg removed) */
 .gradient-bg-overlay {
   position: fixed;
   inset: 0;
@@ -127,11 +109,6 @@ html {
   background: radial-gradient(ellipse 100% 100% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.6) 100%);
 }
 
-/* ===================================================================
-   CUSTOM CURSOR
-   (Hidden on touch devices via media query below)
-   Uses transform for positioning (GPU-composited, no layout reflow)
-=================================================================== */
 .cursor-dot, .cursor-outline {
   position: fixed;
   top: 0; left: 0;
@@ -143,7 +120,7 @@ html {
 .cursor-dot {
   width: 8px; height: 8px;
   background-color: var(--neon-cyan);
-  /* Centered via negative margin instead of transform so JS can use transform freely */
+
   margin-left: -4px; margin-top: -4px;
 }
 .cursor-outline {
@@ -161,7 +138,6 @@ body.hovering .cursor-outline {
   border-color: transparent;
 }
 
-/* Interactive Elements - Custom Cursor on Hover */
 a, button, [role="button"],
 .link-btn, .btn-3d, .submit-btn,
 .nav-links a, .magnetic-link,
@@ -186,9 +162,7 @@ body.cursor-interactive .cursor-outline {
   background-color: rgba(86, 156, 214, 0.05);
   box-shadow: 0 0 20px rgba(86, 156, 214, 0.3);
 }
-/* ===================================================================
-   GLOW SWEEP ANIMATION - On Hover (Improved - Smooth & Subtle)
-=================================================================== */
+
 @keyframes glow-sweep {
   0% {
     box-shadow: 0 0 0px rgba(86, 156, 214, 0);
@@ -201,7 +175,6 @@ body.cursor-interactive .cursor-outline {
   }
 }
 
-/* Glow sweep effect for all interactive elements - Improved */
 .project-card::before,
 .skill-block::before,
 .contact-panel::before {
@@ -229,9 +202,6 @@ body.cursor-interactive .cursor-outline {
   left: 100%;
 }
 
-/* ===================================================================
-   HOVER PANEL - Right Side Panel
-=================================================================== */
 .hover-panel {
   position: fixed;
   top: 0;
@@ -323,9 +293,6 @@ body.cursor-interactive .cursor-outline {
   overflow-wrap: break-word;
 }
 
-/* ===================================================================
-   HOVER PANEL - Mobile Responsive
-=================================================================== */
 @media (max-width: 1024px) {
   .hover-panel {
     width: 50%;
@@ -333,20 +300,19 @@ body.cursor-interactive .cursor-outline {
     padding: 40px 30px;
     transform: translateX(505px);
   }
-  
+
   .hover-panel.active {
     transform: translateX(0);
   }
-  
+
   .panel-content h3 {
     font-size: 1.4rem;
   }
-  
+
   .panel-content p {
     font-size: 0.9rem;
   }
 
-  /* About Buttons - Tablet */
   .about-buttons {
     gap: 15px;
   }
@@ -378,12 +344,12 @@ body.cursor-interactive .cursor-outline {
     overflow-y: auto;
     box-shadow: inset 0 -1px 20px rgba(0, 0, 0, 0.3);
   }
-  
+
   .hover-panel.active {
     transform: translateY(0);
     box-shadow: 0 -15px 50px rgba(86, 156, 214, 0.2), inset 0 -1px 20px rgba(0, 0, 0, 0.3);
   }
-  
+
   .close-panel-btn {
     position: absolute;
     top: 15px;
@@ -392,21 +358,20 @@ body.cursor-interactive .cursor-outline {
     height: 40px;
     font-size: 22px;
   }
-  
+
   .panel-content {
     margin-top: 10px;
   }
-  
+
   .panel-content h3 {
     font-size: 1.3rem;
     margin-bottom: 15px;
   }
-  
+
   .panel-content p {
     font-size: 0.85rem;
   }
 
-  /* Card Hint - Mobile Responsive */
   .card-hint {
     top: 30px;
     right: 20px;
@@ -444,18 +409,17 @@ body.cursor-interactive .cursor-outline {
     max-height: 55vh;
     padding: 25px 15px;
   }
-  
+
   .panel-content h3 {
     font-size: 1.1rem;
     letter-spacing: 0.5px;
   }
-  
+
   .panel-content p {
     font-size: 0.8rem;
     line-height: 1.6;
   }
 
-  /* Card Hint - Extra Small Screens */
   .card-hint {
     top: 30px;
     right: 15px;
@@ -471,9 +435,6 @@ body.cursor-interactive .cursor-outline {
   }
 }
 
-/* ===================================================================
-   NAVBAR
-=================================================================== */
 .glass-nav {
   position: fixed;
   top: 20px; left: 50%;
@@ -532,9 +493,6 @@ body.cursor-interactive .cursor-outline {
 
 #mobile-toggle { display: none; }
 
-/* ===================================================================
-   HERO SECTION
-=================================================================== */
 section {
   min-height: 100vh;
   padding: clamp(90px, 10vw, 120px) clamp(16px, 6vw, 10%);
@@ -545,10 +503,10 @@ section {
 }
 
 .hero-container { display: flex; align-items: center; width: 100%; }
-.hero-text { 
-  max-width: 650px; 
-  z-index: 10; 
-  /* Hero displays immediately without reveal animation */
+.hero-text {
+  max-width: 650px;
+  z-index: 10;
+
   opacity: 1;
   transform: none;
 }
@@ -560,10 +518,9 @@ section {
   letter-spacing: 0.5px;
   margin-bottom: 20px;
 }
-.pre-title i { display: none; } /* drop the icon flourish, comments don't have icons */
+.pre-title i { display: none; }
 .pre-title::before { content: '# '; }
 
-/* Hero name — styled as a Python variable assignment, no glitch/RGB split */
 .glitch-header {
   font-family: var(--font-header);
   font-size: clamp(1.8rem, 6.5vw, 3.2rem);
@@ -607,15 +564,8 @@ section {
 }
 .hero-bio strong { color: var(--text-main); font-weight: 400; }
 
-/* 3D Buttons */
 .cta-group { display: flex; gap: clamp(12px, 2vw, 20px); flex-wrap: wrap; }
 
-/* ===================================================================
-   UNIFIED BUTTON SYSTEM
-   All CTAs (hero, about, resume, contact) share one consistent
-   language: 6px radius (matches panel radius), monospace font,
-   0.25s transitions, translateY(-2px) + blue glow on hover.
-=================================================================== */
 .btn-3d,
 .resume-btn,
 .hire-me-btn,
@@ -638,8 +588,6 @@ section {
               background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
-/* Primary: solid blue fill, black text — the one CTA per section that
-   should draw the eye first */
 .btn-3d.primary,
 .resume-action-btn.primary-action {
   background: var(--neon-cyan);
@@ -654,7 +602,6 @@ section {
   transform: translateY(-2px);
 }
 
-/* Secondary: outlined, transparent — everything else */
 .btn-3d.secondary,
 .resume-btn,
 .hire-me-btn,
@@ -676,10 +623,8 @@ section {
   color: var(--neon-cyan);
 }
 
-/* Modal "small" variant stays compact */
 .btn-3d.small { padding: 9px 20px; font-size: 0.78rem; }
 
-/* Icon micro-interaction, shared across all button types */
 .btn-3d i, .resume-btn i, .hire-me-btn i, .resume-action-btn i {
   font-size: 0.9rem;
   transition: transform 0.25s ease;
@@ -688,7 +633,6 @@ section {
 .resume-action-btn.primary-action:hover i { transform: scale(1.15); }
 .resume-action-btn.secondary-action:hover i { transform: translateY(2px); }
 
-/* Glow-sweep on hover for the outlined buttons — subtle, matches cards */
 .resume-btn::before,
 .hire-me-btn::before {
   content: "";
@@ -700,7 +644,6 @@ section {
 }
 .resume-btn:hover::before, .hire-me-btn:hover::before { left: 100%; }
 
-/* Scroll Indicator */
 .scroll-indicator {
   position: absolute;
   bottom: 40px; left: 10%;
@@ -708,7 +651,6 @@ section {
   font-size: 0.8rem; letter-spacing: 0.6px; color: var(--text-muted);
 }
 
-/* Hero scroll-out parallax */
 .hero-text {
   will-change: transform, opacity;
   transform-origin: center top;
@@ -733,10 +675,6 @@ section {
   100% { opacity: 0; top: 18px; }
 }
 
-/* ===================================================================
-   ANIMATION CLASSES (SCROLL REVEAL — CINEMATIC)
-   Optimized for smooth performance on desktop and mobile
-=================================================================== */
 .reveal {
   opacity: 0;
   transform: translateY(50px) scale(0.97);
@@ -752,7 +690,6 @@ section {
   transform: translateY(0) scale(1);
 }
 
-/* Directional reveal variants for cinematic stagger */
 .reveal-left {
   opacity: 0;
   transform: translateX(-55px) scale(0.97);
@@ -779,29 +716,27 @@ section {
 .delay-200 { transition-delay: 0.24s; }
 .delay-300 { transition-delay: 0.36s; }
 
-/* Mobile optimizations for reveal animations */
 @media (max-width: 768px) {
   .reveal {
     transform: translateY(30px) scale(0.98);
     transition-duration: 0.6s;
   }
-  
+
   .reveal-left {
     transform: translateX(-30px) scale(0.98);
     transition-duration: 0.7s;
   }
-  
+
   .reveal-right {
     transform: translateX(30px) scale(0.98);
     transition-duration: 0.7s;
   }
-  
+
   .delay-100 { transition-delay: 0.08s; }
   .delay-200 { transition-delay: 0.16s; }
   .delay-300 { transition-delay: 0.24s; }
 }
 
-/* Respect reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
   .reveal,
   .reveal-left,
@@ -811,7 +746,7 @@ section {
     transition: none;
     will-change: auto;
   }
-  
+
   .reveal.active,
   .reveal-left.active,
   .reveal-right.active {
@@ -819,7 +754,6 @@ section {
   }
 }
 
-/* Cinematic section-entry ambient line */
 section::before {
   content: '';
   position: absolute;
@@ -836,21 +770,13 @@ section::before {
   pointer-events: none;
   z-index: 0;
 }
-#home::before { display: none; } /* No line above hero */
+#home::before { display: none; }
 
-/* ===================================================================
-   PROJECTS
-=================================================================== */
 .section-header { margin-bottom: 60px; display: flex; align-items: center; gap: 20px; }
 .section-title { font-family: var(--font-header); font-size: clamp(1.6rem, 4vw, 2.3rem); color: var(--text-main); font-weight: 600; }
 .section-title::before { content: '# '; color: var(--syntax-comment); }
 .line { height: 1px; background: rgba(255,255,255,0.2); flex: 1; }
 
-/* ===================================================================
-   LEARNING JOURNEY (git-log style timeline)
-=================================================================== */
-/* Journey's content is naturally shorter than other sections —
-   don't force a full 100vh and create awkward dead space */
 #journey { padding-top: 40px; min-height: auto; }
 .section-subtitle {
   font-family: var(--font-header);
@@ -947,7 +873,7 @@ section::before {
   cursor: pointer;
   counter-increment: cell;
 }
-/* Jupyter-style "In [n]:" cell marker */
+
 .project-card::after {
   content: 'In [' counter(cell) ']:';
   position: absolute;
@@ -970,14 +896,13 @@ section::before {
   background: radial-gradient(circle, rgba(86,156,214,0.18), transparent 70%);
   border-radius: 50%; pointer-events: none; opacity: 0;
   transition: opacity 0.3s ease;
-  /* Positioned via CSS custom properties set by JS — GPU-composited */
+
   left: 50%; top: 50%;
   transform: translate(calc(-50% + var(--gx, 0px)), calc(-50% + var(--gy, 0px)));
   will-change: transform, opacity;
 }
 .project-card:hover .card-glow { opacity: 1; }
 
-/* Card Click Hint - Top Right Position */
 .card-hint {
   position: absolute;
   top: 30px;
@@ -1044,7 +969,6 @@ section::before {
 }
 .link-btn:hover { color: var(--neon-cyan); }
 
-/* Model-only button improvements */
 .model-only {
   background: transparent;
   border: 1px dashed rgba(86, 156, 214, 0.35);
@@ -1062,9 +986,6 @@ section::before {
   outline-offset: 3px;
 }
 
-/* ===================================================================
-   PROJECT CARD — STATS & TECH CHIPS
-=================================================================== */
 .card-stats {
   display: flex;
   gap: 8px;
@@ -1117,9 +1038,6 @@ section::before {
   color: rgba(220, 100, 255, 0.95);
 }
 
-/* ===================================================================
-   SKILLS
-=================================================================== */
 .skills-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -1133,7 +1051,7 @@ section::before {
   transition: 0.3s;
   overflow: hidden;
 }
-.skill-block:hover { 
+.skill-block:hover {
   background: var(--bg-panel-alt);
   box-shadow: 0 0 16px rgba(86, 156, 214, 0.25);
   border-color: var(--glass-highlight);
@@ -1161,7 +1079,7 @@ section::before {
   opacity: 1;
   animation: skill-loader-spin 0.9s linear infinite;
 }
-/* Skill Percentage */
+
 .skill-percent {
   display: block;
   margin-bottom: 8px;
@@ -1172,13 +1090,11 @@ section::before {
   transition: all 0.3s ease;
 }
 
-/* Show on hover */
 .skill-block:hover .skill-percent {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* Color states */
 .skill-percent.green {
   color: #00ff7f;
   text-shadow: 0 0 8px rgba(0, 255, 127, 0.6);
@@ -1199,10 +1115,6 @@ section::before {
   text-shadow: 0 0 8px rgba(255, 77, 77, 0.6);
 }
 
-
-/* ===================================================================
-   CONTACT
-=================================================================== */
 .contact-panel {
   position: relative;
   display: flex;
@@ -1320,9 +1232,6 @@ footer p {
   }
 }
 
-/* ===================================================================
-   ABOUT SECTION
-=================================================================== */
 .about-container {
   display: grid; grid-template-columns: 1.2fr 1fr; gap: 80px;
   align-items: center; width: 100%;
@@ -1347,11 +1256,9 @@ footer p {
   0%, 100% { transform: translateY(0px); }
   50%       { transform: translateY(-18px); }
 }
-/* Resume & Hire-Me buttons: visual styles now unified above; these
-   just add the about-section-specific top margin */
+
 .resume-btn, .hire-me-btn { margin-top: 30px; }
 
-/* About Buttons Container */
 .about-buttons {
   display: flex;
   gap: 15px;
@@ -1359,10 +1266,6 @@ footer p {
   margin-top: 30px;
 }
 
-
-/* ===================================================================
-   MODAL
-=================================================================== */
 .modal-overlay {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px);
@@ -1422,9 +1325,6 @@ footer p {
   outline-offset: 3px;
 }
 
-/* ===================================================================
-   PRELOADER
-=================================================================== */
 #preloader {
   position: fixed; inset: 0; background: #000; z-index: 10000;
   display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -1468,19 +1368,9 @@ footer p {
   letter-spacing: 0.5px;
   font-size: 0.85rem;
 }
-/* Legacy spinner kept (unused) in case referenced elsewhere */
+
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
-
-/* ===================================================================
-   RESPONSIVE DESIGN & MOBILE OPTIMIZATIONS
-=================================================================== */
-/* ===================================================================
-   RESUME SECTION
-=================================================================== */
-/* ===================================================================
-   RESUME & CERT ANIMATIONS
-=================================================================== */
 @keyframes resume-scan {
   0% { top: -2%; opacity: 0; }
   5% { opacity: 1; }
@@ -1526,9 +1416,6 @@ footer p {
   flex-wrap: wrap;
   justify-content: center;
 }
-
-/* .resume-action-btn visual styles are unified in the shared button
-   system above; nothing extra needed here */
 
 .resume-frame-container {
   border-radius: 6px;
@@ -1576,7 +1463,6 @@ footer p {
   text-decoration: underline;
 }
 
-/* Mobile-only resume card (shown on touch devices when iframe can't display PDF) */
 .resume-mobile-card {
   display: none;
   flex-direction: column;
@@ -1617,9 +1503,6 @@ footer p {
   justify-content: center;
 }
 
-/* ===================================================================
-   CERTIFICATIONS SECTION
-=================================================================== */
 .cert-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -1627,7 +1510,6 @@ footer p {
   width: 100%;
 }
 
-/* Future certificate card style (for easy addition later) */
 .cert-card {
   position: relative;
   background: var(--glass-bg);
@@ -1673,7 +1555,6 @@ footer p {
   line-height: 1.5;
 }
 
-/* Placeholder state */
 .cert-placeholder {
   grid-column: 1 / -1;
   display: flex;
@@ -1744,11 +1625,8 @@ footer p {
   font-weight: 600;
 }
 
-/* ===================================================================
-   RESPONSIVE: RESUME & CERTIFICATIONS
-=================================================================== */
 @media (max-width: 768px) {
-  /* On mobile, hide the embed and show the mobile card */
+
   .resume-frame-container {
     display: none;
   }
@@ -1773,7 +1651,7 @@ footer p {
 }
 
 @media (max-width: 480px) {
-  /* Compact certificate placeholder on very small screens */
+
   .cert-placeholder {
     padding: 50px 20px;
   }
@@ -1789,11 +1667,10 @@ footer p {
 }
 
 @media (max-width: 768px) {
-  /* Cursor: Hide custom cursor on touch devices */
+
   .cursor-dot, .cursor-outline { display: none; }
   * { cursor: auto !important; }
 
-  /* Navbar */
   .glass-nav {
     width: 95%; top: 10px; padding: 15px 20px;
     backdrop-filter: blur(6px);
@@ -1816,7 +1693,6 @@ footer p {
   .nav-links a { font-size: 0.95rem; }
   .nav-links.active { transform: translateX(0); }
 
-  /* Mobile nav backdrop */
   #nav-backdrop {
     display: none;
     position: fixed;
@@ -1826,8 +1702,7 @@ footer p {
     backdrop-filter: blur(2px);
   }
   #nav-backdrop.active { display: block; }
-  
-  /* Hamburger */
+
   #mobile-toggle {
     display: flex; flex-direction: column; gap: 6px;
     background: transparent; border: none; cursor: auto; z-index: 1001;
@@ -1836,24 +1711,20 @@ footer p {
     width: 30px; height: 2px; background: #fff;
     transition: 0.3s;
   }
-  /* Hamburger to X animation */
+
   #mobile-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
   #mobile-toggle.active span:nth-child(2) { opacity: 0; }
   #mobile-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
 
-  /* Section padding on mobile */
   section { padding: 80px 5%; }
 
-  /* Section title on mobile */
   .section-title { font-size: 2rem; }
 
-  /* Hero */
   .hero-container { flex-direction: column; text-align: center; padding-top: 60px; }
   .glitch-header { font-size: 2.8rem; }
   .hero-text { margin-bottom: 40px; }
   .cta-group { justify-content: center; }
 
-  /* Disable expensive glitch animation on mobile */
   .glitch-header::before,
   .glitch-header::after,
   .glitch-header.typing-done::before,
@@ -1861,18 +1732,15 @@ footer p {
     animation: none;
   }
 
-  /* Reduce hover-panel backdrop-filter on mobile */
   .hover-panel {
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
   }
 
-  /* About */
   .about-container { grid-template-columns: 1fr; gap: 40px; text-align: center; }
-  .about-logo { order: -1; } /* Logo on top for mobile */
+  .about-logo { order: -1; }
   .about-logo img { max-width: 250px; }
-  
-  /* About Buttons - Responsive */
+
   .about-buttons {
     justify-content: center;
     gap: 10px;
@@ -1889,33 +1757,22 @@ footer p {
     justify-content: center;
   }
 
-  /* Projects & Skills */
   .project-gallery { grid-template-columns: 1fr; }
   .skills-grid { grid-template-columns: repeat(2, 1fr); }
 
-  /* Contact */
   .contact-panel { flex-direction: column; }
   .contact-left { padding: 30px; text-align: center; }
   #contact-form { padding: 30px; }
 }
 
-/* Ensure touch/coarse-pointer devices get touch-friendly cursor behavior at all widths */
 @media (hover: none), (pointer: coarse) {
   .cursor-dot, .cursor-outline { display: none; }
   * { cursor: auto !important; }
 }
 
-/* ===================================================================
-   RESPONSIVE: EXTRA SMALL SCREENS (≤480px)
-   Must come after ≤768px block so these rules override it for small screens
-=================================================================== */
 @media (max-width: 480px) {
-  /* Small screen section padding */
-  section { padding: 60px 4%; }
 
-  /* Note: glitch-header, section-title, about-title, and contact-left h2
-     already use clamp() for fluid sizing — no fixed override needed here,
-     and a fixed override would fight the clamp minimum on very small screens */
+  section { padding: 60px 4%; }
 
   .btn-3d, .resume-btn, .hire-me-btn, .resume-action-btn, .submit-btn {
     width: 100%;
@@ -1928,10 +1785,6 @@ footer p {
   }
 }
 
-/* ===================================================================
-   ACCESSIBILITY: REDUCED MOTION
-   Disable non-essential animations for users who prefer less motion.
-=================================================================== */
 @media (prefers-reduced-motion: reduce) {
   .glitch-header::before,
   .glitch-header::after {
