@@ -588,3 +588,73 @@ if (hasFinePointer()) {
     });
   });
 }
+
+/* ============================================================
+   10. LIVE GITHUB PROJECT DATES
+   Fetches each repo's last-updated (pushed_at) date directly from
+   the GitHub REST API in the visitor's browser, so badges are always
+   current. Cached in localStorage for 6 hours to stay well under
+   GitHub's unauthenticated rate limit for repeat visits.
+============================================================ */
+(function initProjectDates() {
+  const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+
+  function formatMonthYear(isoDate) {
+    const d = new Date(isoDate);
+    return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  }
+
+  function getCached(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (Date.now() - parsed.ts > CACHE_TTL_MS) return null;
+      return parsed.value;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function setCached(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify({ value, ts: Date.now() }));
+    } catch (e) { /* localStorage unavailable — fail silently */ }
+  }
+
+  async function fetchRepoDate(owner, repo) {
+    const cacheKey = `gh-repo-date:${owner}/${repo}`;
+    const cached = getCached(cacheKey);
+    if (cached) return cached;
+
+    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+      headers: { Accept: 'application/vnd.github+json' }
+    });
+    if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+    const data = await res.json();
+    const formatted = formatMonthYear(data.pushed_at || data.created_at);
+    setCached(cacheKey, formatted);
+    return formatted;
+  }
+
+  document.querySelectorAll('.project-card').forEach((card) => {
+    const dateEl = card.querySelector('.project-date');
+    const dateTextEl = card.querySelector('.project-date-text');
+    const githubLink = card.querySelector('.card-links a[href*="github.com"]');
+    if (!dateEl || !dateTextEl || !githubLink) return;
+
+    const match = githubLink.getAttribute('href').match(/github\.com\/([^/]+)\/([^/?#]+)/);
+    if (!match) { dateEl.style.display = 'none'; return; }
+    const [, owner, repo] = match;
+
+    fetchRepoDate(owner, repo)
+      .then((formatted) => {
+        dateTextEl.textContent = formatted;
+        dateEl.classList.add('loaded');
+      })
+      .catch(() => {
+        // Rate-limited or offline — hide the badge rather than show a broken state
+        dateEl.style.display = 'none';
+      });
+  });
+})();

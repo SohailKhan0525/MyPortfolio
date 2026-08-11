@@ -4,7 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MOHD ZAHEER UDDIN | AI Engineer</title>
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/android-chrome-512x512.png">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,11 +41,12 @@
   <div id="nav-backdrop"></div>
 
   <nav class="glass-nav">
-    <div class="logo">MOHD ZAHEER<span class="highlight"> UDDIN</span></div>
+    <div class="logo"><img src="assets/q_logo_white.png" alt="Q logo" class="logo-mark">MOHD ZAHEER<span class="highlight"> UDDIN</span></div>
     <div class="nav-links">
       <a href="#home" class="magnetic-link">Home</a>
       <a href="#projects" class="magnetic-link">Projects</a>
       <a href="#about" class="magnetic-link">About Me</a>
+      <a href="#journey" class="magnetic-link">Journey</a>
       <a href="#skills" class="magnetic-link">Skills</a>
       <a href="#resume" class="magnetic-link">Resume</a>
       <a href="#certifications" class="magnetic-link">Certifications</a>
@@ -107,8 +113,50 @@
         </div>
 
         <div class="about-logo reveal reveal-right delay-200">
-          <img src="main.png" alt="QOFENO Labs Logo">
+          <img src="assets/q_logo_white.png" alt="Qofeno Labs Q logo" class="about-logo-mark">
         </div>
+      </div>
+    </section>
+
+    <section id="journey">
+      <div class="section-header reveal">
+        <h2 class="section-title">LEARNING JOURNEY</h2>
+        <p class="section-subtitle">$ git log --oneline --graph --reverse</p>
+      </div>
+      <div class="journey-console reveal delay-100">
+        <div class="journey-line">
+          <span class="journey-marker">*</span>
+          <span class="journey-hash">a1b2c3d</span>
+          <span class="journey-msg">Started 3rd Year, 1st Semester — CSIT undergrad</span>
+        </div>
+        <div class="journey-line">
+          <span class="journey-marker">*</span>
+          <span class="journey-hash">e4f5g6h</span>
+          <span class="journey-msg">Learned Python fundamentals — OOP, file handling, JSON, pathlib</span>
+        </div>
+        <div class="journey-line">
+          <span class="journey-marker">*</span>
+          <span class="journey-hash">i7j8k9l</span>
+          <span class="journey-msg">Picked up scikit-learn, pandas, NumPy for ML &amp; data science</span>
+        </div>
+        <div class="journey-line">
+          <span class="journey-marker">*</span>
+          <span class="journey-hash">m1n2o3p</span>
+          <span class="journey-msg">Shipped first ML models — regression &amp; classification projects</span>
+        </div>
+        <div class="journey-line journey-current">
+          <span class="journey-marker">*</span>
+          <span class="journey-hash">HEAD -&gt;</span>
+          <span class="journey-msg journey-msg-current">main — currently learning, actively building, open to internships</span>
+        </div>
+      </div>
+      <div class="journey-goals reveal delay-200">
+        <p class="journey-goals-title"><span class="comment-tag"># </span>goals.txt</p>
+        <ul>
+          <li><span class="journey-check">[ ]</span> Keep improving ML fundamentals</li>
+          <li><span class="journey-check">[ ]</span> Build more beginner-friendly Python &amp; ML projects</li>
+          <li><span class="journey-check">[ ]</span> Land my first internship</li>
+        </ul>
       </div>
     </section>
 
@@ -127,6 +175,7 @@
           </div>
           <div class="card-content">
             <div class="tech-badge">ML MODEL</div>
+            <span class="project-date" aria-label="Last updated"><i class="fa-regular fa-clock"></i> <span class="project-date-text">loading…</span></span>
             <h3>House Price Prediction</h3>
             <p>Advanced regression model utilizing Scikit-Learn to predict real estate values with high accuracy.</p>
             <div class="card-stats">
@@ -154,6 +203,7 @@
           </div>
           <div class="card-content">
             <div class="tech-badge">ML MODEL</div>
+            <span class="project-date" aria-label="Last updated"><i class="fa-regular fa-clock"></i> <span class="project-date-text">loading…</span></span>
             <h3>Global Earthquake Prediction</h3>
             <p>Seismic activity forecasting tool analyzing decades of geological data to assess risk factors.</p>
             <div class="card-stats">
@@ -183,6 +233,7 @@
           </div>
           <div class="card-content">
             <div class="tech-badge">ML MODEL</div>
+            <span class="project-date" aria-label="Last updated"><i class="fa-regular fa-clock"></i> <span class="project-date-text">loading…</span></span>
             <h3>Heart Disease Prediction</h3>
             <p>Diagnostic support tool using logistic regression to identify potential cardiac health risks.</p>
             <div class="card-stats">
@@ -210,6 +261,7 @@
           </div>
           <div class="card-content">
             <div class="tech-badge">PYTHON</div>
+            <span class="project-date" aria-label="Last updated"><i class="fa-regular fa-clock"></i> <span class="project-date-text">loading…</span></span>
             <h3>Student Management</h3>
             <p>Backend architecture for academic record keeping and student data processing.</p>
             <div class="card-stats">
@@ -237,6 +289,7 @@
           </div>
           <div class="card-content">
             <div class="tech-badge">ML MODEL</div>
+            <span class="project-date" aria-label="Last updated"><i class="fa-regular fa-clock"></i> <span class="project-date-text">loading…</span></span>
             <h3>Student Pass/Fail Predictor</h3>
             <p>Classification model to predict student pass or fail outcomes based on academic features.</p>
             <div class="card-stats">
@@ -264,6 +317,7 @@
           </div>
           <div class="card-content">
             <div class="tech-badge">PYTHON</div>
+            <span class="project-date" aria-label="Last updated"><i class="fa-regular fa-clock"></i> <span class="project-date-text">loading…</span></span>
             <h3>Bank Management</h3>
             <p>A Python-based bank system for account creation, deposits, withdrawals, and inquiries.</p>
             <div class="card-stats">
@@ -291,6 +345,7 @@
           </div>
           <div class="card-content">
             <div class="tech-badge">PYTHON</div>
+            <span class="project-date" aria-label="Last updated"><i class="fa-regular fa-clock"></i> <span class="project-date-text">loading…</span></span>
             <h3>File Handling</h3>
             <p>A menu-driven CLI app using <code>pathlib</code> and <code>os</code> to create, read, and delete files with error handling.</p>
             <div class="card-stats">
@@ -437,12 +492,12 @@
 
     <footer>
       <div class="footer-analytics">
-        <h3>GitHub Contributions</h3>
+        <h3><span class="comment-tag"># </span>GitHub Contributions</h3>
         <a href="https://github.com/SohailKhan0525" target="_blank" rel="noopener noreferrer" class="github-contribution-link" aria-label="View SohailKhan0525 GitHub profile">
-          <img src="https://github.com/users/SohailKhan0525/contributions" alt="SohailKhan0525 contribution activity graph" loading="lazy" class="github-contribution-graph" />
+          <img src="https://ghchart.rshah.org/569cd6/SohailKhan0525" alt="SohailKhan0525 GitHub contribution heatmap" loading="lazy" class="github-contribution-graph" />
         </a>
       </div>
-      <p>© 2025 QOFENO LABS. Made with ♥️ by MOHD ZAHEER UDDIN</p>
+      <p><img src="assets/q_logo_white.png" alt="Q logo" class="footer-logo-mark"> © 2025 QOFENO LABS. Made with ♥️ by MOHD ZAHEER UDDIN</p>
     </footer>
 
   </main>

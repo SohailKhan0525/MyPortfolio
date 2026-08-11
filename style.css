@@ -218,7 +218,7 @@ body.cursor-interactive .cursor-outline {
     rgba(86, 156, 214, 0.04),
     transparent
   );
-  transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: left 0.45s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
   border-radius: inherit;
 }
@@ -239,8 +239,8 @@ body.cursor-interactive .cursor-outline {
   width: 40%;
   max-width: 500px;
   height: 100vh;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.98) 0%, rgba(5, 5, 30, 0.98) 100%);
-  backdrop-filter: blur(6px);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.98) 0%, rgba(10, 12, 16, 0.98) 100%);
+  backdrop-filter: blur(4px);
   border-left: 2px solid rgba(86, 156, 214, 0.4);
   z-index: 999;
   padding: 50px 40px;
@@ -498,6 +498,20 @@ body.cursor-interactive .cursor-outline {
   font-size: 1rem;
   letter-spacing: 0.5px;
   color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.logo-mark {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 3px rgba(86, 156, 214, 0.35));
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+.logo:hover .logo-mark {
+  filter: drop-shadow(0 0 8px rgba(86, 156, 214, 0.7));
+  transform: rotate(-6deg);
 }
 .logo::before { content: '~/'; color: var(--syntax-comment); }
 .logo::after { content: '.py'; color: var(--syntax-string); }
@@ -557,6 +571,7 @@ section {
   font-weight: 600;
   color: var(--text-main);
   position: relative;
+  overflow-wrap: break-word;
 }
 .glitch-header::before {
   content: 'name = "';
@@ -765,6 +780,85 @@ section::before {
 .section-title::before { content: '# '; color: var(--syntax-comment); }
 .line { height: 1px; background: rgba(255,255,255,0.2); flex: 1; }
 
+/* ===================================================================
+   LEARNING JOURNEY (git-log style timeline)
+=================================================================== */
+#journey { padding-top: 40px; }
+.section-subtitle {
+  font-family: var(--font-header);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: -40px;
+  margin-bottom: 50px;
+}
+.journey-console {
+  background: var(--bg-panel);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  padding: clamp(20px, 4vw, 36px);
+  margin-bottom: 30px;
+  overflow-x: auto;
+}
+.journey-line {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  padding: 10px 0;
+  font-size: clamp(0.78rem, 1.6vw, 0.92rem);
+  white-space: nowrap;
+  border-left: 2px solid var(--glass-border);
+  padding-left: 20px;
+  margin-left: 6px;
+  position: relative;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+.journey-line:hover { border-color: var(--neon-cyan); transform: translateX(4px); }
+.journey-line:last-child { border-left-color: transparent; }
+.journey-marker {
+  color: var(--syntax-comment);
+  font-weight: 700;
+  position: absolute;
+  left: -7px;
+  background: var(--bg-panel);
+}
+.journey-hash {
+  color: var(--syntax-const);
+  font-weight: 500;
+  min-width: 78px;
+}
+.journey-msg { color: var(--text-muted); white-space: normal; }
+.journey-current .journey-hash { color: var(--neon-cyan); }
+.journey-current .journey-marker { color: var(--neon-cyan); animation: blink 1.4s infinite; }
+.journey-msg-current { color: var(--text-main); }
+
+.journey-goals {
+  background: var(--bg-panel);
+  border: 1px dashed var(--glass-border);
+  border-radius: 6px;
+  padding: clamp(20px, 4vw, 30px);
+}
+.journey-goals-title {
+  font-family: var(--font-header);
+  font-size: 0.85rem;
+  color: var(--syntax-comment);
+  margin-bottom: 16px;
+}
+.journey-goals ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.journey-goals li {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.journey-check { color: var(--syntax-function); font-weight: 600; }
+
+@media (max-width: 768px) {
+  .journey-line { white-space: normal; }
+  .journey-hash { min-width: 66px; }
+  .section-subtitle { margin-top: -30px; }
+}
+
 .project-gallery {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
@@ -859,6 +953,19 @@ section::before {
   display: inline-block; padding: 4px 10px;
   border-radius: 20px; margin-bottom: 15px;
 }
+.project-date {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-family: var(--font-header);
+  margin-left: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  opacity: 0.75;
+}
+.project-date i { font-size: 0.68rem; color: var(--syntax-comment); }
+.project-date.loaded { animation: fade-in-date 0.4s ease; }
+@keyframes fade-in-date { from { opacity: 0; transform: translateY(-2px); } to { opacity: 0.75; transform: translateY(0); } }
 .card-content h3 { font-family: var(--font-header); font-size: 1.5rem; margin-bottom: 10px; }
 .card-content p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 25px; }
 
@@ -1077,32 +1184,54 @@ footer {
   font-size: 0.8rem;
   font-family: var(--font-header);
 }
+footer p {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.footer-logo-mark {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  opacity: 0.5;
+}
+.comment-tag { color: var(--syntax-comment); }
 
 .footer-analytics {
   max-width: 980px;
   margin: 0 auto 24px;
   padding: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 18px;
-  background: rgba(8, 10, 18, 0.5);
-  backdrop-filter: blur(4px);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  background: var(--bg-panel);
+  backdrop-filter: blur(3px);
 }
 
 .footer-analytics h3 {
   font-family: var(--font-header);
-  font-size: 1rem;
-  letter-spacing: 1.2px;
-  margin-bottom: 12px;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
   color: var(--text-main);
+  font-weight: 600;
+  text-align: left;
 }
 
 .github-contribution-link {
   display: block;
   width: 100%;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  border: 1px solid var(--glass-border);
+  background: #0a0a0a;
   overflow: hidden;
+  padding: 16px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.github-contribution-link:hover {
+  border-color: var(--glass-highlight);
+  box-shadow: 0 0 16px rgba(86, 156, 214, 0.15);
 }
 
 .github-contribution-graph {
@@ -1135,6 +1264,10 @@ footer {
   max-width: 380px;
   filter: drop-shadow(0 30px 60px rgba(86, 156, 214, 0.25));
   animation: float-logo 6s ease-in-out infinite;
+}
+.about-logo-mark {
+  max-width: 220px !important;
+  filter: drop-shadow(0 20px 50px rgba(86, 156, 214, 0.3)) drop-shadow(0 0 30px rgba(86, 156, 214, 0.15)) !important;
 }
 
 @keyframes float-logo {
@@ -1175,7 +1308,7 @@ footer {
     rgba(86, 156, 214, 0.04),
     transparent
   );
-  transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: left 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .resume-btn:hover::before {
@@ -1238,7 +1371,7 @@ footer {
     rgba(86, 156, 214, 0.04),
     transparent
   );
-  transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: left 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .hire-me-btn:hover::before {
@@ -1762,10 +1895,13 @@ footer {
     backdrop-filter: blur(3px);
     flex-direction: column;
     justify-content: center; align-items: center;
+    gap: 22px;
+    overflow-y: auto;
     transform: translateX(100%);
     transition: transform 0.4s ease;
     z-index: 999;
   }
+  .nav-links a { font-size: 0.95rem; }
   .nav-links.active { transform: translateX(0); }
 
   /* Mobile nav backdrop */
