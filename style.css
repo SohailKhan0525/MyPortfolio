@@ -475,7 +475,7 @@ body.cursor-interactive .cursor-outline {
   transform: rotate(-6deg);
 }
 .logo::before { content: '~/'; color: var(--syntax-comment); }
-.logo::after { content: '.py'; color: var(--syntax-string); }
+.logo-text::after { content: '.py'; color: var(--syntax-string); }
 .highlight { color: var(--neon-cyan); }
 
 .nav-links { display: flex; gap: 40px; }
@@ -1897,6 +1897,7 @@ footer p {
   .section-title { font-size: 2rem; }
 
   .hero-container { flex-direction: column; text-align: center; padding-top: 60px; }
+  .hero-text, .hero-stats { flex: none; max-width: 100%; height: auto; }
   .glitch-header { font-size: 2.8rem; }
   .hero-text { margin-bottom: 40px; }
   .cta-group { justify-content: center; }
