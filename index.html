@@ -33,6 +33,8 @@
   <div class="letterbox-bar letterbox-top" aria-hidden="true"></div>
   <div class="letterbox-bar letterbox-bottom" aria-hidden="true"></div>
 
+  <div class="bg-glow-layer" aria-hidden="true"></div>
+  <div class="bg-grid-layer" aria-hidden="true"></div>
   <div class="gradient-bg-overlay" aria-hidden="true"></div>
   <div class="noise-overlay"></div>
   <div class="cursor-dot" data-cursor-dot></div>
@@ -700,13 +702,13 @@
     </section>
 
     <footer>
-      <div class="footer-analytics">
+      <div class="footer-analytics reveal">
         <h3><span class="comment-tag"># </span>GitHub Contributions</h3>
         <a href="https://github.com/SohailKhan0525" target="_blank" rel="noopener noreferrer" class="github-contribution-link" aria-label="View SohailKhan0525 GitHub profile">
           <img src="https://ghchart.rshah.org/569cd6/SohailKhan0525" alt="SohailKhan0525 GitHub contribution heatmap" loading="lazy" class="github-contribution-graph" />
         </a>
       </div>
-      <p>
+      <p class="reveal delay-100">
         <img src="q_logo_white.png" alt="Q logo" class="footer-logo-mark">
         © 2025 <a href="https://qofeno-labs.pages.dev/" target="_blank" rel="noopener noreferrer" class="qofeno-link">QOFENO LABS</a>
         <span class="qofeno-badge">building</span>. Made with ♥️ by MOHD ZAHEER UDDIN
@@ -716,7 +718,11 @@
   </main>
 
   <div id="hover-panel" class="hover-panel">
-    <button type="button" class="close-panel-btn" aria-label="Close panel">&times;</button>
+    <div class="panel-titlebar">
+      <div class="editor-dots"><span></span><span></span><span></span></div>
+      <span class="editor-filename" id="panel-filename">details.md</span>
+      <button type="button" class="close-panel-btn" aria-label="Close panel">&times;</button>
+    </div>
     <div class="panel-content">
       <h3 id="panel-title">Coming Soon</h3>
       <p id="panel-description">This project is being updated with more details.</p>

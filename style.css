@@ -35,6 +35,48 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ===================================================================
+   BACKGROUND SYSTEM
+   Layered: deep base -> soft corner glows -> dot grid (graph-paper /
+   notebook feel) -> fine grain. All fixed + very low opacity so it
+   reads as texture, not decoration.
+=================================================================== */
+.bg-glow-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 45% at 12% 8%, rgba(86, 156, 214, 0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 40% at 90% 15%, rgba(78, 201, 176, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 92%, rgba(86, 156, 214, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 5% 85%, rgba(78, 201, 176, 0.06) 0%, transparent 60%);
+  animation: bg-glow-drift 24s ease-in-out infinite alternate;
+}
+@keyframes bg-glow-drift {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-1.5%, 1.5%) scale(1.04); }
+}
+
+.bg-grid-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  opacity: 0.6;
+  background-image:
+    linear-gradient(rgba(86, 156, 214, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(86, 156, 214, 0.07) 1px, transparent 1px);
+  background-size: 42px 42px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-glow-layer { animation: none; }
+}
+@media (max-width: 768px) {
+  .bg-grid-layer { background-size: 32px 32px; }
+}
+
 .gold-text,
 .hero-title,
 .section-title,
@@ -204,16 +246,17 @@ body.cursor-interactive .cursor-outline {
 
 .hover-panel {
   position: fixed;
-  top: 0;
+  top: 96px;
   right: 0;
   width: 40%;
   max-width: 500px;
-  height: 100vh;
+  height: calc(100vh - 96px);
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.98) 0%, rgba(10, 12, 16, 0.98) 100%);
   backdrop-filter: blur(4px);
-  border-left: 2px solid rgba(86, 156, 214, 0.4);
-  z-index: 999;
-  padding: 50px 40px;
+  border-left: 1px solid var(--glass-border);
+  border-top: 1px solid var(--glass-border);
+  border-radius: 10px 0 0 0;
+  z-index: 900;
   overflow-y: auto;
   overflow-x: hidden;
   transform: translateX(520px);
@@ -221,45 +264,56 @@ body.cursor-interactive .cursor-outline {
   pointer-events: none;
   will-change: transform;
   box-shadow: inset 1px 0 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
 }
 
 .hover-panel.active {
   transform: translateX(0);
   pointer-events: all;
-  box-shadow: -15px 0 50px rgba(86, 156, 214, 0.2), inset 1px 0 20px rgba(0, 0, 0, 0.3);
+  box-shadow: -15px 0 50px rgba(86, 156, 214, 0.15), inset 1px 0 20px rgba(0, 0, 0, 0.3);
 }
 
-.close-panel-btn {
+.panel-titlebar {
   position: sticky;
-  top: 20px;
-  right: 20px;
-  width: 45px;
-  height: 45px;
-  background: linear-gradient(135deg, rgba(86, 156, 214, 0.1), rgba(78, 201, 176, 0.1));
-  border: 1.5px solid rgba(86, 156, 214, 0.5);
-  color: var(--neon-cyan);
-  font-size: 26px;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 18px;
+  background: #0a0b0d;
+  border-bottom: 1px solid var(--glass-border);
+  border-radius: 10px 0 0 0;
+  z-index: 2;
+}
+.panel-titlebar .editor-filename { flex: 1; }
+
+.close-panel-btn {
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  color: var(--text-muted);
+  font-size: 18px;
+  line-height: 1;
   cursor: pointer;
-  border-radius: 50%;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-  float: right;
-  margin-bottom: 20px;
+  transition: all 0.25s ease;
 }
 
 .close-panel-btn:hover {
-  color: #fff;
-  border-color: rgba(86, 156, 214, 0.9);
-  background: linear-gradient(135deg, rgba(86, 156, 214, 0.2), rgba(78, 201, 176, 0.2));
-  box-shadow: 0 0 20px rgba(86, 156, 214, 0.4), inset 0 0 10px rgba(86, 156, 214, 0.1);
-  transform: scale(1.05);
+  color: var(--neon-cyan);
+  border-color: var(--glass-highlight);
+  background: rgba(86, 156, 214, 0.08);
 }
 
 .panel-content {
   clear: both;
   animation: panelSlideIn 0.5s ease-out;
+  padding: 32px 36px 50px;
 }
 
 @keyframes panelSlideIn {
@@ -275,29 +329,39 @@ body.cursor-interactive .cursor-outline {
 
 .panel-content h3 {
   font-family: var(--font-header);
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   color: var(--neon-cyan);
   margin-bottom: 20px;
   margin-top: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.4px;
   line-height: 1.4;
-  text-shadow: 0 0 10px rgba(86, 156, 214, 0.3);
 }
+.panel-content h3::before { content: '# '; color: var(--syntax-comment); }
 
 .panel-content p {
   color: var(--text-muted);
   line-height: 1.9;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   word-wrap: break-word;
   overflow-wrap: break-word;
+}
+.panel-content p b {
+  color: var(--syntax-function);
+  font-weight: 600;
+}
+.panel-content p code {
+  background: var(--bg-panel-alt);
+  border: 1px solid var(--glass-border);
+  color: var(--syntax-string);
+  font-size: 0.85em;
+  padding: 1px 6px;
+  border-radius: 4px;
 }
 
 @media (max-width: 1024px) {
   .hover-panel {
     width: 50%;
     max-width: 450px;
-    padding: 40px 30px;
     transform: translateX(505px);
   }
 
@@ -305,12 +369,14 @@ body.cursor-interactive .cursor-outline {
     transform: translateX(0);
   }
 
+  .panel-content { padding: 26px 28px 40px; }
+
   .panel-content h3 {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
   }
 
   .panel-content p {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
   }
 
   .about-buttons {
@@ -334,11 +400,10 @@ body.cursor-interactive .cursor-outline {
     width: 100%;
     max-width: none;
     height: auto;
-    max-height: 60vh;
+    max-height: 70vh;
     border-left: none;
-    border-top: 2px solid rgba(86, 156, 214, 0.4);
-    border-radius: 20px 20px 0 0;
-    padding: 30px 20px;
+    border-top: 1px solid var(--glass-border);
+    border-radius: 14px 14px 0 0;
     transform: translateY(100%);
     transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     overflow-y: auto;
@@ -347,24 +412,15 @@ body.cursor-interactive .cursor-outline {
 
   .hover-panel.active {
     transform: translateY(0);
-    box-shadow: 0 -15px 50px rgba(86, 156, 214, 0.2), inset 0 -1px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 -15px 50px rgba(86, 156, 214, 0.15), inset 0 -1px 20px rgba(0, 0, 0, 0.3);
   }
 
-  .close-panel-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    width: 40px;
-    height: 40px;
-    font-size: 22px;
-  }
+  .panel-titlebar { border-radius: 14px 14px 0 0; }
 
-  .panel-content {
-    margin-top: 10px;
-  }
+  .panel-content { padding: 22px 20px 40px; }
 
   .panel-content h3 {
-    font-size: 1.3rem;
+    font-size: 1.15rem;
     margin-bottom: 15px;
   }
 
@@ -373,13 +429,10 @@ body.cursor-interactive .cursor-outline {
   }
 
   .card-hint {
-    top: 30px;
-    right: 20px;
+    padding: 16px 16px 10px;
     font-size: 0.65rem;
-    padding: 6px 10px;
-    background: rgba(86, 156, 214, 0.07);
-    border: 1px solid rgba(86, 156, 214, 0.3);
-    opacity: 0.85;
+    opacity: 0.9;
+    transform: translateY(0);
   }
 
   .card-hint i {
@@ -392,7 +445,6 @@ body.cursor-interactive .cursor-outline {
 
   .project-card.card-tapped .card-hint {
     opacity: 1;
-    transform: translateY(-5px);
   }
 
   .project-card.card-tapped {
@@ -406,13 +458,14 @@ body.cursor-interactive .cursor-outline {
 
 @media (max-width: 480px) {
   .hover-panel {
-    max-height: 55vh;
-    padding: 25px 15px;
+    max-height: 65vh;
   }
 
+  .panel-content { padding: 18px 16px 36px; }
+
   .panel-content h3 {
-    font-size: 1.1rem;
-    letter-spacing: 0.5px;
+    font-size: 1.05rem;
+    letter-spacing: 0.3px;
   }
 
   .panel-content p {
@@ -421,13 +474,9 @@ body.cursor-interactive .cursor-outline {
   }
 
   .card-hint {
-    top: 30px;
-    right: 15px;
+    padding: 14px 14px 8px;
     font-size: 0.6rem;
-    padding: 5px 9px;
     gap: 5px;
-    background: rgba(86, 156, 214, 0.06);
-    border: 1px solid rgba(86, 156, 214, 0.25);
   }
 
   .card-hint i {
@@ -492,6 +541,66 @@ body.cursor-interactive .cursor-outline {
 .nav-links a:hover::before { color: var(--neon-cyan); }
 
 #mobile-toggle { display: none; }
+
+/* Nav switches to the mobile hamburger menu earlier than the general
+   mobile breakpoint (1050px vs 768px) — the full desktop nav with 8
+   links + the "MOHD ZAHEER UDDIN.py" logo genuinely needs more room
+   than a 768-1050px tablet viewport provides, and was overflowing. */
+@media (max-width: 1050px) and (min-width: 769px) {
+  .nav-links {
+    position: fixed; top: 0; right: 0;
+    height: 100dvh; width: 100%;
+    padding: 100px 24px 40px;
+    background: rgba(3, 4, 6, 0.99);
+    backdrop-filter: blur(6px);
+    flex-direction: column;
+    justify-content: center; align-items: center;
+    gap: 22px;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 999;
+    display: flex;
+  }
+  .nav-links a {
+    font-size: 1.1rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .nav-links.active a { opacity: 1; transform: translateY(0); }
+  .nav-links.active a:nth-child(1) { transition-delay: 0.08s; }
+  .nav-links.active a:nth-child(2) { transition-delay: 0.12s; }
+  .nav-links.active a:nth-child(3) { transition-delay: 0.16s; }
+  .nav-links.active a:nth-child(4) { transition-delay: 0.20s; }
+  .nav-links.active a:nth-child(5) { transition-delay: 0.24s; }
+  .nav-links.active a:nth-child(6) { transition-delay: 0.28s; }
+  .nav-links.active a:nth-child(7) { transition-delay: 0.32s; }
+  .nav-links.active a:nth-child(8) { transition-delay: 0.36s; }
+  .nav-links.active { transform: translateX(0); }
+
+  #nav-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    backdrop-filter: blur(2px);
+  }
+  #nav-backdrop.active { display: block; }
+
+  #mobile-toggle {
+    display: flex; flex-direction: column; gap: 6px;
+    background: transparent; border: none; cursor: auto; z-index: 1001;
+  }
+  #mobile-toggle span {
+    width: 30px; height: 2px; background: #fff;
+    transition: 0.3s;
+  }
+  #mobile-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
+  #mobile-toggle.active span:nth-child(2) { opacity: 0; }
+  #mobile-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
+}
 
 section {
   min-height: 100vh;
@@ -891,8 +1000,17 @@ section::before {
   padding-left: 20px;
   margin-left: 6px;
   position: relative;
-  transition: border-color 0.3s ease, transform 0.3s ease;
+  transition: border-color 0.3s ease, transform 0.3s ease,
+              opacity 0.5s ease, filter 0.5s ease;
+  opacity: 0;
+  filter: blur(2px);
 }
+.journey-console.active .journey-line { opacity: 1; filter: blur(0); }
+.journey-console.active .journey-line:nth-child(1) { transition-delay: 0.1s; }
+.journey-console.active .journey-line:nth-child(2) { transition-delay: 0.22s; }
+.journey-console.active .journey-line:nth-child(3) { transition-delay: 0.34s; }
+.journey-console.active .journey-line:nth-child(4) { transition-delay: 0.46s; }
+.journey-console.active .journey-line:nth-child(5) { transition-delay: 0.58s; }
 .journey-line:hover { border-color: var(--neon-cyan); transform: translateX(4px); }
 .journey-line:last-child { border-left-color: transparent; }
 .journey-marker {
@@ -1037,23 +1155,23 @@ section::before {
 
 .card-hint {
   position: absolute;
-  top: 50px;
-  right: 20px;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  background: rgba(86, 156, 214, 0.08);
-  border: 1px solid rgba(86, 156, 214, 0.35);
-  padding: 7px 12px;
-  border-radius: 18px;
-  font-size: 0.7rem;
+  background: linear-gradient(0deg, rgba(10, 11, 13, 0.97) 0%, rgba(10, 11, 13, 0.85) 70%, transparent 100%);
+  padding: 22px 16px 12px;
+  font-size: 0.72rem;
   color: var(--neon-cyan);
   opacity: 0;
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transform: translateY(8px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
   pointer-events: none;
   white-space: nowrap;
   z-index: 10;
-  backdrop-filter: blur(3px);
   letter-spacing: 0.5px;
 }
 
@@ -1233,6 +1351,32 @@ section::before {
   transition: width 1.1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .requirements-window.active .skill-bar-fill { width: var(--target-width, 0%); }
+/* Staggered "installing" cascade for the pip-install visual */
+.skills-grid .skill-block:nth-child(1) .skill-bar-fill { transition-delay: 0.035s; }
+.skills-grid .skill-block:nth-child(2) .skill-bar-fill { transition-delay: 0.07s; }
+.skills-grid .skill-block:nth-child(3) .skill-bar-fill { transition-delay: 0.105s; }
+.skills-grid .skill-block:nth-child(4) .skill-bar-fill { transition-delay: 0.14s; }
+.skills-grid .skill-block:nth-child(5) .skill-bar-fill { transition-delay: 0.175s; }
+.skills-grid .skill-block:nth-child(6) .skill-bar-fill { transition-delay: 0.21s; }
+.skills-grid .skill-block:nth-child(7) .skill-bar-fill { transition-delay: 0.245s; }
+.skills-grid .skill-block:nth-child(8) .skill-bar-fill { transition-delay: 0.28s; }
+.skills-grid .skill-block:nth-child(9) .skill-bar-fill { transition-delay: 0.315s; }
+.skills-grid .skill-block:nth-child(10) .skill-bar-fill { transition-delay: 0.35s; }
+.skills-grid .skill-block:nth-child(11) .skill-bar-fill { transition-delay: 0.385s; }
+.skills-grid .skill-block:nth-child(12) .skill-bar-fill { transition-delay: 0.42s; }
+.skills-grid .skill-block:nth-child(13) .skill-bar-fill { transition-delay: 0.455s; }
+.skills-grid .skill-block:nth-child(14) .skill-bar-fill { transition-delay: 0.49s; }
+.skills-grid .skill-block:nth-child(15) .skill-bar-fill { transition-delay: 0.525s; }
+.skills-grid .skill-block:nth-child(16) .skill-bar-fill { transition-delay: 0.56s; }
+.skills-grid .skill-block:nth-child(17) .skill-bar-fill { transition-delay: 0.595s; }
+.skills-grid .skill-block:nth-child(18) .skill-bar-fill { transition-delay: 0.63s; }
+.skills-grid .skill-block:nth-child(19) .skill-bar-fill { transition-delay: 0.665s; }
+.skills-grid .skill-block:nth-child(20) .skill-bar-fill { transition-delay: 0.7s; }
+.skills-grid .skill-block:nth-child(21) .skill-bar-fill { transition-delay: 0.735s; }
+.skills-grid .skill-block:nth-child(22) .skill-bar-fill { transition-delay: 0.77s; }
+.skills-grid .skill-block:nth-child(23) .skill-bar-fill { transition-delay: 0.805s; }
+.skills-grid .skill-block:nth-child(24) .skill-bar-fill { transition-delay: 0.84s; }
+.skills-grid .skill-block:nth-child(25) .skill-bar-fill { transition-delay: 0.875s; }
 .skill-status {
   flex: 0 0 auto;
   font-size: 0.72rem;
@@ -1854,19 +1998,33 @@ footer p {
   }
   .nav-links {
     position: fixed; top: 0; right: 0;
-    height: 100vh; width: min(80%, 320px);
-    padding: 90px 24px 24px;
-    background: rgba(5, 5, 5, 0.97);
-    backdrop-filter: blur(3px);
+    height: 100dvh; width: 100%;
+    padding: 100px 24px 40px;
+    background: rgba(3, 4, 6, 0.99);
+    backdrop-filter: blur(6px);
     flex-direction: column;
     justify-content: center; align-items: center;
-    gap: 22px;
+    gap: 20px;
     overflow-y: auto;
     transform: translateX(100%);
-    transition: transform 0.4s ease;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 999;
   }
-  .nav-links a { font-size: 0.95rem; }
+  .nav-links a {
+    font-size: 1.05rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .nav-links.active a { opacity: 1; transform: translateY(0); }
+  .nav-links.active a:nth-child(1) { transition-delay: 0.08s; }
+  .nav-links.active a:nth-child(2) { transition-delay: 0.12s; }
+  .nav-links.active a:nth-child(3) { transition-delay: 0.16s; }
+  .nav-links.active a:nth-child(4) { transition-delay: 0.20s; }
+  .nav-links.active a:nth-child(5) { transition-delay: 0.24s; }
+  .nav-links.active a:nth-child(6) { transition-delay: 0.28s; }
+  .nav-links.active a:nth-child(7) { transition-delay: 0.32s; }
+  .nav-links.active a:nth-child(8) { transition-delay: 0.36s; }
   .nav-links.active { transform: translateX(0); }
 
   #nav-backdrop {
@@ -1966,6 +2124,11 @@ footer p {
 @media (hover: none), (pointer: coarse) {
   .cursor-dot, .cursor-outline { display: none; }
   * { cursor: auto !important; }
+
+  /* The "click to learn more" hint bar is permanently visible on touch
+     devices (no hover state), so reserve space for it instead of
+     letting it overlap the LIVE DEMO / CODE links */
+  .card-content { padding-bottom: 46px; }
 }
 
 @media (max-width: 480px) {

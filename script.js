@@ -196,6 +196,7 @@ if (navBackdrop) {
 const hoverPanel = document.getElementById('hover-panel');
 const panelTitle = document.getElementById('panel-title');
 const panelDescription = document.getElementById('panel-description');
+const panelFilename = document.getElementById('panel-filename');
 const closePanelBtn = document.querySelector('.close-panel-btn');
 
 const projectData = {
@@ -234,7 +235,11 @@ function openPanel(projectKey) {
     const data = projectData[projectKey];
     panelTitle.textContent = data.title;
     panelDescription.innerHTML = data.description;
-    
+    if (panelFilename) {
+      const slug = data.title.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+      panelFilename.textContent = slug + '.md';
+    }
+
     requestAnimationFrame(() => {
       if (hoverPanel) hoverPanel.classList.add('active');
     });
