@@ -26,13 +26,16 @@ Single-page portfolio of **Mohd Zaheer Uddin**, a Computer Science (CSIT) underg
 | `q_logo_white.png` | Site logo (nav, footer, About) |
 | `favicon.ico`, `favicon-16x16.png`, `favicon-32x32.png`, `apple-touch-icon.png`, `android-chrome-192x192.png`, `android-chrome-512x512.png` | Favicon set for all browsers/devices |
 | `MohdZaheerUddinResume.pdf` | Resume — viewable and downloadable from the site |
-| `main.png` | Unused legacy asset, kept for reference |
+| `main.png` | Social preview image for Open Graph metadata |
+| `privacy.html` | Privacy policy page |
+| `terms.html` | Terms page |
+| `404.html` | Custom not-found page |
 
 ---
 
 ## Key Features
 
-- **Code-editor aesthetic** — JetBrains Mono / Fira Code, syntax-highlight colour palette, Jupyter-style `In [n]:` markers on project cards, git-log-styled Learning Journey timeline
+- **Code-editor aesthetic** — Geist / Manrope, syntax-highlight colour palette, Jupyter-style `In [n]:` markers on project cards, git-log-styled Learning Journey timeline
 - **Live GitHub project dates** — each project card fetches its repo's last-updated date directly from the GitHub API in the visitor's browser, cached locally for 6 hours
 - **Themed GitHub contribution graph** in the footer
 - **Typewriter role animation**, scroll-reveal sections, hero parallax on scroll
@@ -76,8 +79,8 @@ Single-page portfolio of **Mohd Zaheer Uddin**, a Computer Science (CSIT) underg
 | Styling | CSS3 (custom properties, grid, flexbox) |
 | Scripting | Vanilla JavaScript (ES6+) |
 | Smooth scroll | [Lenis](https://github.com/studio-freight/lenis) |
-| Icons | [Font Awesome 6.5.2](https://fontawesome.com/) |
-| Fonts | JetBrains Mono & Fira Code (Google Fonts) |
+| Icons | [Font Awesome 6.5.2](https://fontawesome.com/) (with redesigned interaction styling) |
+| Fonts | Geist, Geist Mono, and Manrope (Google Fonts) |
 | Contact | `mailto:` link |
 
 ---

@@ -566,3 +566,31 @@ if (hasFinePointer()) {
       });
   });
 })();
+
+
+(function initActiveNavState() {
+  const sections = Array.from(document.querySelectorAll('main section[id]'));
+  const links = Array.from(document.querySelectorAll('.nav-links a[href^="#"]'));
+  if (!sections.length || !links.length) return;
+
+  const byId = new Map(links.map((link) => [link.getAttribute('href').slice(1), link]));
+  const observer = new IntersectionObserver((entries) => {
+    const visible = entries
+      .filter((entry) => entry.isIntersecting)
+      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+    if (!visible) return;
+    const id = visible.target.id;
+    links.forEach((link) => {
+      const active = link === byId.get(id);
+      link.classList.toggle('is-current', active);
+      if (active) {
+        link.setAttribute('aria-current', 'page');
+      } else {
+        link.removeAttribute('aria-current');
+      }
+    });
+  }, { threshold: [0.25, 0.5, 0.75], rootMargin: '-20% 0px -40% 0px' });
+
+  sections.forEach((section) => observer.observe(section));
+})();
