@@ -1,5 +1,6 @@
+"use client";
+
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, Printer } from "@phosphor-icons/react";
 
 const projects = [
   ["House Price Prediction", "Regression", "Python, pandas, NumPy, scikit learn"],
@@ -16,14 +17,14 @@ export default function ResumePage() {
     <main className="resume-shell">
       <div className="resume-top">
         <div>
-          <Link href="/" className="text-button"><ArrowLeft size={16} /> Back to portfolio</Link>
+          <Link href="/" className="text-button"><span aria-hidden="true">←</span> Back to portfolio</Link>
           <p className="eyebrow resume-eyebrow">Resume</p>
           <h1>Mohd Zaheer Uddin</h1>
           <p>Computer Science (CSIT) undergraduate · Machine Learning · Data Science</p>
         </div>
         <div className="resume-actions">
-          <button className="button button-secondary" onClick={() => window.print()}><Printer size={17} /> Print</button>
-          <Link className="button button-primary" href="https://github.com/SohailKhan0525" target="_blank"><ArrowUpRight size={17} /> GitHub</Link>
+          <button className="button button-secondary" onClick={() => window.print()}><span aria-hidden="true">⎙</span> Print</button>
+          <Link className="button button-primary" href="https://github.com/SohailKhan0525" target="_blank"><span aria-hidden="true">↗</span> GitHub</Link>
         </div>
       </div>
       <div className="resume-sheet">
