@@ -17,7 +17,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
       - name: Upgrade hero terminal once
         if: "!contains(github.event.head_commit.message, '[hero-terminal]')"
         run: |
@@ -43,7 +42,7 @@ function HeroTerminal({ soundEnabled }: { soundEnabled: boolean }) {
     if (command === "projects") return ["01  House Price Prediction", "02  Global Earthquake Prediction", "03  Heart Disease Prediction", "04  Student Management", "05  Student Pass / Fail Predictor", "06  Bank Management", "07  File Handling"];
     if (command === "skills") return ["Python / scikit learn / pandas / NumPy", "Streamlit / Git / GitHub / Next.js"];
     if (command === "contact") return ["Opening the contact section…"];
-    return [`command not found: ${command}`, `try "help" for available commands`];
+    return [`command not found: ${command}`, `try \"help\" for available commands`];
   };
   const submit = (event: React.FormEvent) => {
     event.preventDefault(); const command = input.trim().toLowerCase(); if (!command) return;
@@ -80,5 +79,7 @@ function HeroTerminal({ soundEnabled }: { soundEnabled: boolean }) {
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add app/page.tsx
           if ! git diff --cached --quiet; then git commit -m "feat: add real interactive hero terminal [hero-terminal]" && git push; fi
-      - run: npm install
-      - run: npm run build
+      - name: Install dependencies
+        run: npm install
+      - name: Build Next.js
+        run: npm run build
