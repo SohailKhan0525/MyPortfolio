@@ -1,13 +1,13 @@
 :root {
   --bg-dark: #000000;
-  --bg-panel: #111318;
-  --bg-panel-alt: #16181d;
-  --text-main: #d4d4d4;
-  --text-muted: #6a737d;
+  --bg-panel: #181818;
+  --bg-panel-alt: #1F1F1F;
+  --text-main: #f5f5f5;
+  --text-muted: #9B9B9B;
 
-  --neon-cyan: #569cd6;
-  --neon-purple: #4ec9b0;
-  --gold-deep: #4a7ab5;
+  --neon-cyan: #8ab4d8;
+  --neon-purple: #8ab4d8;
+  --gold-deep: #6f8fa9;
   --syntax-string: #ce9178;
   --syntax-comment: #6a9955;
   --syntax-function: #dcdcaa;
@@ -15,9 +15,9 @@
   --glass-bg: rgba(86, 156, 214, 0.05);
   --glass-border: rgba(86, 156, 214, 0.18);
   --glass-highlight: rgba(86, 156, 214, 0.35);
-  --font-header: 'JetBrains Mono', 'Fira Code', monospace;
-  --font-body: 'JetBrains Mono', 'Fira Code', monospace;
-  --easing: cubic-bezier(0.23, 1, 0.32, 1);
+  --font-header: 'Geist', 'Manrope', sans-serif;
+  --font-body: 'Manrope', 'Geist', sans-serif;
+  --easing: cubic-bezier(0.32,0.72,0,1);
 }
 
 * {
@@ -603,7 +603,7 @@ body.cursor-interactive .cursor-outline {
 }
 
 section {
-  min-height: 100vh;
+  min-height: 100dvh;
   padding: clamp(90px, 10vw, 120px) clamp(16px, 6vw, 10%);
   display: flex;
   flex-direction: column;
@@ -2217,4 +2217,109 @@ footer p {
   .hero-container {
     will-change: auto;
   }
+}
+
+
+/* redesign skill overrides */
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  transform: translateY(-140%);
+  background: #181818;
+  color: #f5f5f5;
+  border: 1px solid rgba(138, 180, 216, 0.45);
+  padding: 8px 12px;
+  border-radius: 8px;
+  z-index: 10050;
+  transition: transform 0.7s cubic-bezier(0.32,0.72,0,1);
+}
+.skip-link:focus-visible { transform: translateY(0); }
+
+:focus-visible {
+  outline: 2px solid var(--neon-cyan);
+  outline-offset: 3px;
+}
+
+section { min-height: 100dvh; }
+p { max-width: 65ch; text-wrap: pretty; }
+h1, h2, h3 { text-wrap: balance; }
+
+.bg-glow-layer,
+.gradient-bg-overlay {
+  background: none !important;
+  animation: none !important;
+}
+
+#scroll-progress,
+.project-card::before,
+.skill-block::before,
+.contact-panel::before,
+.resume-btn::before,
+.hire-me-btn::before,
+.card-hint,
+.resume-frame-container::after,
+.train-bar-fill,
+.skill-bar-fill,
+.line,
+section::before {
+  background: rgba(138, 180, 216, 0.2) !important;
+}
+
+.glitch-header {
+  background: linear-gradient(90deg, #FFFFFF 0%, #9B9B9B 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.glass-nav {
+  margin-top: 24px;
+  border-radius: 999px;
+  background: rgba(24, 24, 24, 0.92);
+}
+
+a, button, .link-btn, .btn-3d, .submit-btn, .resume-btn, .hire-me-btn, .social-links a, .project-card, .skill-block {
+  transition: all 0.7s cubic-bezier(0.32,0.72,0,1) !important;
+}
+
+button:active,
+a:active,
+.btn-3d:active,
+.resume-btn:active,
+.hire-me-btn:active,
+.submit-btn:active { transform: scale(0.98); }
+
+.reveal {
+  transform: translateY(64px);
+  filter: blur(8px);
+}
+.reveal.active {
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+.footer-legal {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.footer-legal a {
+  color: var(--text-muted);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.footer-legal a:hover {
+  color: var(--neon-cyan);
+  border-bottom-color: var(--neon-cyan);
+}
+
+
+.nav-links a.is-current {
+  color: var(--text-main);
+}
+.nav-links a.is-current::before {
+  color: var(--neon-cyan);
 }
