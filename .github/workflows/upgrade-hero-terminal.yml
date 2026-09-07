@@ -2,7 +2,8 @@ name: Upgrade hero terminal
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
       - '.github/workflows/upgrade-hero-terminal.yml'
 
@@ -11,52 +12,41 @@ permissions:
 
 jobs:
   upgrade:
-    if: "!contains(github.event.head_commit.message, '[hero-terminal]')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Replace hero with interactive terminal
-        shell: python
+      - name: Patch hero
         run: |
+          python - <<'PY'
           from pathlib import Path
           import re
 
           path = Path('app/page.tsx')
           text = path.read_text()
-
           if 'hero-terminal-real' in text:
-              raise SystemExit('Hero terminal already upgraded')
+              raise SystemExit('already upgraded')
 
-          component = r'''
+          component = '''
 function HeroTerminal({ soundEnabled }: { soundEnabled: boolean }) {
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [booted, setBooted] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const commands = ["help", "about", "projects", "skills", "contact", "clear"];
 
   useEffect(() => {
     const timer = window.setTimeout(() => setBooted(true), 650);
     return () => window.clearTimeout(timer);
   }, []);
 
-  const run = (raw: string) => {
-    const command = raw.trim().toLowerCase();
-    if (!command) return;
-    setHistory((current) => [...current, `$ ${raw}`, ...command === 'clear' ? [] : []]);
-    setHistoryIndex(-1);
-    setInput("");
-    if (soundEnabled) playTone(command === "clear" ? "tap" : "success");
-  };
-
-  const commandOutput = (command: string) => {
+  const outputFor = (command: string) => {
     if (command === "help") return ["help     show commands", "about    whoami + focus", "projects list selected work", "skills   current stack", "contact  open contact section", "clear    clear terminal"];
     if (command === "about") return ["Mohd Zaheer Uddin", "CSIT undergraduate · ML & Data Science", "Python · scikit learn · pandas · NumPy · Streamlit"];
     if (command === "projects") return ["01  House Price Prediction", "02  Global Earthquake Prediction", "03  Heart Disease Prediction", "04  Student Management", "05  Student Pass / Fail Predictor", "06  Bank Management", "07  File Handling"];
     if (command === "skills") return ["Python / scikit learn / pandas / NumPy", "Streamlit / Git / GitHub / Next.js"];
     if (command === "contact") return ["Opening the contact section…"];
-    if (command === "clear") return [];
     return [`command not found: ${command}`, `try "help" for available commands`];
   };
 
@@ -64,82 +54,40 @@ function HeroTerminal({ soundEnabled }: { soundEnabled: boolean }) {
     event.preventDefault();
     const command = input.trim().toLowerCase();
     if (!command) return;
-    if (command === "clear") {
-      setHistory([]);
-      setInput("");
-      setHistoryIndex(-1);
-      if (soundEnabled) playTone("tap");
-      return;
-    }
-    const output = commandOutput(command);
-    setHistory((current) => [...current, `$ ${input}`, ...output]);
-    setInput("");
-    setHistoryIndex(-1);
+    if (command === "clear") { setHistory([]); setInput(""); setHistoryIndex(-1); if (soundEnabled) playTone("tap"); return; }
+    setHistory((current) => [...current, `$ ${input}`, ...outputFor(command)]);
+    setInput(""); setHistoryIndex(-1);
     if (command === "contact") window.setTimeout(() => document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" }), 120);
     if (soundEnabled) playTone("success");
   };
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-      const commands = history.filter((line) => line.startsWith("$ ")).map((line) => line.slice(2));
-      if (!commands.length) return;
-      const next = Math.min(historyIndex + 1, commands.length - 1);
-      setHistoryIndex(next);
-      setInput(commands[commands.length - 1 - next] ?? "");
-    }
-    if (event.key === "ArrowDown") {
-      event.preventDefault();
-      if (historyIndex <= 0) { setHistoryIndex(-1); setInput(""); return; }
-      const commands = history.filter((line) => line.startsWith("$ ")).map((line) => line.slice(2));
-      const next = historyIndex - 1;
-      setHistoryIndex(next);
-      setInput(commands[commands.length - 1 - next] ?? "");
-    }
-    if (event.key === "Tab") {
-      event.preventDefault();
-      const match = ["help", "about", "projects", "skills", "contact", "clear"].find((item) => item.startsWith(input.toLowerCase()));
-      if (match) setInput(match);
-    }
+    if (event.key === "Tab") { event.preventDefault(); const match = commands.find((item) => item.startsWith(input.toLowerCase())); if (match) setInput(match); }
+    if (event.key === "ArrowUp") { event.preventDefault(); const items = history.filter((line) => line.startsWith("$ ")).map((line) => line.slice(2)); if (!items.length) return; const next = Math.min(historyIndex + 1, items.length - 1); setHistoryIndex(next); setInput(items[items.length - 1 - next] ?? ""); }
+    if (event.key === "ArrowDown") { event.preventDefault(); if (historyIndex <= 0) { setHistoryIndex(-1); setInput(""); return; } const items = history.filter((line) => line.startsWith("$ ")).map((line) => line.slice(2)); const next = historyIndex - 1; setHistoryIndex(next); setInput(items[items.length - 1 - next] ?? ""); }
   };
 
   return <div className="hero-terminal-real" onClick={() => inputRef.current?.focus()}>
-    <style>{`\
-      .hero-terminal-real{position:relative;overflow:hidden;border:1px solid var(--line-strong);border-radius:24px;background:radial-gradient(circle at 80% 0%,rgba(255,255,255,.09),transparent 38%),#090909;box-shadow:0 28px 90px var(--shadow),inset 0 1px 0 rgba(255,255,255,.08);transform:perspective(1200px) rotateY(-2deg) rotateX(1deg);transition:transform .7s cubic-bezier(.32,.72,0,1),box-shadow .7s cubic-bezier(.32,.72,0,1)}\
-      .hero-terminal-real:hover{transform:perspective(1200px) rotateY(0) rotateX(0) translateY(-5px);box-shadow:0 34px 100px var(--shadow),inset 0 1px 0 rgba(255,255,255,.1)}\
-      .hero-terminal-real:before{content:"";position:absolute;inset:48px 0 0;pointer-events:none;background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(255,255,255,.018) 4px);mask-image:linear-gradient(to bottom,black,transparent 95%)}\
-      .terminal-top{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.045);font:500 11px/1 "Geist Mono",monospace;color:var(--muted)}\
-      .terminal-top-left{display:flex;align-items:center;gap:12px}.terminal-dots{display:flex;gap:6px}.terminal-dots i{width:8px;height:8px;border-radius:50%;background:var(--muted);opacity:.55}.terminal-tab{padding:8px 12px;border:1px solid var(--line);border-radius:9px;background:rgba(255,255,255,.035);color:var(--text)}.terminal-status{display:flex;align-items:center;gap:7px}.terminal-status i{width:6px;height:6px;border-radius:50%;background:var(--text);box-shadow:0 0 12px var(--text)}\
-      .terminal-screen{position:relative;min-height:410px;padding:24px 24px 18px;font:500 13px/21px "Geist Mono",monospace;color:#bcbcbc}.terminal-boot{margin-bottom:18px;color:#777}.terminal-boot b{color:#fff;font-weight:600}.terminal-history{display:grid;gap:2px;min-height:188px}.terminal-line{white-space:pre-wrap}.terminal-command{color:#fff}.terminal-command:before{content:"› ";color:#8f8f8f}.terminal-output-line{color:#8e8e8e}.terminal-output-line.accent{color:#d8d8d8}.terminal-form{display:flex;align-items:center;gap:9px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}.terminal-prompt{color:#fff}.terminal-input{min-width:0;flex:1;border:0;outline:0;background:transparent;color:#fff;font:inherit;caret-color:#fff}.terminal-input::placeholder{color:#5f5f5f}.terminal-cursor{width:7px;height:16px;background:#fff;opacity:.85;animation:terminalBlink 1s steps(1) infinite}@keyframes terminalBlink{50%{opacity:0}}\
-      .terminal-help{display:flex;justify-content:space-between;gap:12px;margin-top:12px;color:#555;font-size:10px}.terminal-quick{display:flex;gap:6px;flex-wrap:wrap}.terminal-chip{padding:5px 8px;border:1px solid var(--line);border-radius:7px;background:transparent;color:#777;font:500 10px/1 "Geist Mono",monospace;transition:.25s}.terminal-chip:hover{color:#fff;border-color:var(--line-strong);background:rgba(255,255,255,.06)}\
-      .terminal-bottom{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-top:1px solid var(--line);background:rgba(255,255,255,.025);color:#666;font:500 10px/1 "Geist Mono",monospace}.terminal-bottom span:last-child{color:#8b8b8b}\
-      @media(max-width:800px){.hero-terminal-real{transform:none}.terminal-screen{min-height:390px;padding:20px 18px 16px}.terminal-top{padding:0 12px}.terminal-tab{display:none}.terminal-help{display:none}}\
-      @media(prefers-reduced-motion:reduce){.hero-terminal-real,.hero-terminal-real:hover{transform:none}.terminal-cursor{animation:none}}\
-    `}</style>
+    <style>{` .hero-terminal-real{position:relative;overflow:hidden;border:1px solid var(--line-strong);border-radius:24px;background:radial-gradient(circle at 80% 0%,rgba(255,255,255,.09),transparent 38%),#090909;box-shadow:0 28px 90px var(--shadow),inset 0 1px 0 rgba(255,255,255,.08);transform:perspective(1200px) rotateY(-2deg) rotateX(1deg);transition:transform .7s cubic-bezier(.32,.72,0,1),box-shadow .7s cubic-bezier(.32,.72,0,1)} .hero-terminal-real:hover{transform:perspective(1200px) rotateY(0) rotateX(0) translateY(-5px);box-shadow:0 34px 100px var(--shadow),inset 0 1px 0 rgba(255,255,255,.1)} .hero-terminal-real:before{content:"";position:absolute;inset:52px 0 0;pointer-events:none;background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(255,255,255,.018) 4px);mask-image:linear-gradient(to bottom,black,transparent 95%)} .terminal-top{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.045);font:500 11px/1 "Geist Mono",monospace;color:var(--muted)} .terminal-top-left{display:flex;align-items:center;gap:12px}.terminal-dots{display:flex;gap:6px}.terminal-dots i{width:8px;height:8px;border-radius:50%;background:var(--muted);opacity:.55}.terminal-tab{padding:8px 12px;border:1px solid var(--line);border-radius:9px;background:rgba(255,255,255,.035);color:var(--text)}.terminal-status{display:flex;align-items:center;gap:7px}.terminal-status i{width:6px;height:6px;border-radius:50%;background:var(--text);box-shadow:0 0 12px var(--text)} .terminal-screen{position:relative;min-height:410px;padding:24px 24px 18px;font:500 13px/21px "Geist Mono",monospace;color:#bcbcbc}.terminal-boot{margin-bottom:18px;color:#777}.terminal-boot b{color:#fff}.terminal-history{display:grid;gap:2px;min-height:188px}.terminal-line{white-space:pre-wrap}.terminal-command{color:#fff}.terminal-command:before{content:"› ";color:#8f8f8f}.terminal-output-line{color:#8e8e8e}.terminal-form{display:flex;align-items:center;gap:9px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}.terminal-prompt{color:#fff}.terminal-input{min-width:0;flex:1;border:0;outline:0;background:transparent;color:#fff;font:inherit;caret-color:#fff}.terminal-input::placeholder{color:#5f5f5f}.terminal-cursor{width:7px;height:16px;background:#fff;opacity:.85;animation:terminalBlink 1s steps(1) infinite}@keyframes terminalBlink{50%{opacity:0}} .terminal-help{display:flex;justify-content:space-between;gap:12px;margin-top:12px;color:#555;font-size:10px}.terminal-quick{display:flex;gap:6px;flex-wrap:wrap}.terminal-chip{padding:5px 8px;border:1px solid var(--line);border-radius:7px;background:transparent;color:#777;font:500 10px/1 "Geist Mono",monospace}.terminal-chip:hover{color:#fff;border-color:var(--line-strong);background:rgba(255,255,255,.06)} .terminal-bottom{display:flex;justify-content:space-between;padding:11px 16px;border-top:1px solid var(--line);background:rgba(255,255,255,.025);color:#666;font:500 10px/1 "Geist Mono",monospace}@media(max-width:800px){.hero-terminal-real{transform:none}.terminal-screen{min-height:390px;padding:20px 18px 16px}.terminal-tab{display:none}.terminal-help{display:none}}@media(prefers-reduced-motion:reduce){.hero-terminal-real,.hero-terminal-real:hover{transform:none}.terminal-cursor{animation:none}} `}</style>
     <div className="terminal-top"><div className="terminal-top-left"><span className="terminal-dots"><i/><i/><i/></span><span className="terminal-tab">portfolio.py</span><span>zsh — portfolio</span></div><span className="terminal-status"><i/> local · ready</span></div>
     <div className="terminal-screen">
       {booted && <div className="terminal-boot"><b>portfolio@zaheer</b>:~$ ./start.sh<br/><span>loading profile… done · loading projects… done · terminal ready.</span></div>}
       <div className="terminal-history" aria-live="polite">{history.slice(-9).map((line, index) => <div key={`${line}-${index}`} className={line.startsWith("$ ") ? "terminal-line terminal-command" : "terminal-line terminal-output-line"}>{line}</div>)}</div>
-      <form className="terminal-form" onSubmit={submit}>
-        <span className="terminal-prompt">$</span><input ref={inputRef} className="terminal-input" value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={onKeyDown} placeholder={booted ? "type a command…" : "initializing…"} disabled={!booted} aria-label="Terminal command input" autoComplete="off" spellCheck={false}/><span className="terminal-cursor" aria-hidden="true"/>
-      </form>
+      <form className="terminal-form" onSubmit={submit}><span className="terminal-prompt">$</span><input ref={inputRef} className="terminal-input" value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={onKeyDown} placeholder={booted ? "type a command…" : "initializing…"} disabled={!booted} aria-label="Terminal command input" autoComplete="off" spellCheck={false}/><span className="terminal-cursor" aria-hidden="true"/></form>
       <div className="terminal-help"><span>↑↓ history · Tab autocomplete · Enter run</span><div className="terminal-quick">{["help","about","projects","skills"].map((command) => <button key={command} type="button" className="terminal-chip" onClick={() => { setInput(command); inputRef.current?.focus(); }}>{command}</button>)}</div></div>
     </div>
     <div className="terminal-bottom"><span>PORTFOLIO SHELL v1.0</span><span>next.js · client runtime</span></div>
   </div>;
 }
 '''
-
           text = text.replace('export default function Home() {', component + '\nexport default function Home() {', 1)
-
-          hero = r'''<section className="hero section-pad"><div className="hero-copy"><Reveal><p className="eyebrow"><span className="status-dot" /> CSIT undergraduate · ML &amp; Data Science</p></Reveal><Reveal delay={0.08}><h1>I build practical machine learning projects and data driven tools.</h1></Reveal><Reveal delay={0.16}><p className="hero-description">I am Mohd Zaheer Uddin. I work mainly with Python, scikit learn, pandas, NumPy, and Streamlit while building a stronger foundation in machine learning.</p></Reveal><Reveal delay={0.24}><div className="hero-actions"><a className="button button-primary" href="#work" onClick={() => sound.enabled && playTone("success")}>See the work <ArrowDown size={17} weight="bold" /></a><button className="text-button" onClick={copyEmail}>{copied ? "Email copied" : "Copy email"} <PaperPlaneTilt size={16} weight="bold" /></button></div></Reveal><Reveal delay={0.32}><div className="proof-row"><span>7 projects</span><span>22 tools learning</span><span>Open to internships</span></div></Reveal></div><Reveal className="hero-art" delay={0.18}><HeroTerminal soundEnabled={sound.enabled}/><div className="hero-note">Try <b>help</b>, <b>projects</b>, or <b>about</b> — this one is actually playable.</div></Reveal></section>'''
-
-          pattern = r'<section className="hero section-pad">.*?</section>'
-          text, count = re.subn(pattern, hero, text, count=1, flags=re.S)
-          if count != 1:
-              raise SystemExit('Hero section not found')
+          hero = '''<section className="hero section-pad"><div className="hero-copy"><Reveal><p className="eyebrow"><span className="status-dot" /> CSIT undergraduate · ML &amp; Data Science</p></Reveal><Reveal delay={0.08}><h1>I build practical machine learning projects and data driven tools.</h1></Reveal><Reveal delay={0.16}><p className="hero-description">I am Mohd Zaheer Uddin. I work mainly with Python, scikit learn, pandas, NumPy, and Streamlit while building a stronger foundation in machine learning.</p></Reveal><Reveal delay={0.24}><div className="hero-actions"><a className="button button-primary" href="#work" onClick={() => sound.enabled && playTone("success")}>See the work <ArrowDown size={17} weight="bold" /></a><button className="text-button" onClick={copyEmail}>{copied ? "Email copied" : "Copy email"} <PaperPlaneTilt size={16} weight="bold" /></button></div></Reveal><Reveal delay={0.32}><div className="proof-row"><span>7 projects</span><span>22 tools learning</span><span>Open to internships</span></div></Reveal></div><Reveal className="hero-art" delay={0.18}><HeroTerminal soundEnabled={sound.enabled}/><div className="hero-note">Try <b>help</b>, <b>projects</b>, or <b>about</b> — this one is actually playable.</div></Reveal></section>'''
+          text, count = re.subn(r'<section className="hero section-pad">.*?</section>', hero, text, count=1, flags=re.S)
+          if count != 1: raise SystemExit('hero not found')
           path.write_text(text)
-      - name: Commit and clean up
+          PY
+
+      - name: Commit result
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
