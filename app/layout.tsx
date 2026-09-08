@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import ThemeEffects from "./theme-effects";
+import "./enhancements.css";
+import ThemeEnhancer from "./ThemeEnhancer";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mohd-zaheer-uddin.vercel.app"),
@@ -16,14 +17,17 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   colorScheme: "dark light",
-  themeColor: "#000000",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+    { media: "(prefers-color-scheme: light)", color: "#f4f4f2" },
+  ],
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ThemeEffects />
+        <ThemeEnhancer />
         {children}
       </body>
     </html>
