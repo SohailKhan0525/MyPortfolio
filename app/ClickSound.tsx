@@ -11,41 +11,57 @@ export default function ClickSound() {
       if (contextRef.current) return contextRef.current;
       const Ctor = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (!Ctor) return null;
-      const context = new Ctor({ latencyHint: "interactive" });
-      contextRef.current = context;
-      return context;
+      try {
+        const context = new Ctor();
+        contextRef.current = context;
+        return context;
+      } catch {
+        return null;
+      }
+    };
+
+    const playClick = (context: AudioContext) => {
+      const time = context.currentTime;
+      const gain = context.createGain();
+      const body = context.createOscillator();
+      const tick = context.createOscillator();
+
+      body.type = "sine";
+      body.frequency.setValueAtTime(520, time);
+      body.frequency.exponentialRampToValueAtTime(260, time + 0.075);
+
+      tick.type = "triangle";
+      tick.frequency.setValueAtTime(1450, time);
+      tick.frequency.exponentialRampToValueAtTime(700, time + 0.035);
+
+      gain.gain.setValueAtTime(0.0001, time);
+      gain.gain.exponentialRampToValueAtTime(0.055, time + 0.004);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.095);
+
+      body.connect(gain);
+      tick.connect(gain);
+      gain.connect(context.destination);
+      body.start(time);
+      tick.start(time);
+      body.stop(time + 0.1);
+      tick.stop(time + 0.055);
     };
 
     const handlePointerDown = (event: PointerEvent) => {
-      if (event.button !== 0) return;
-      if (localStorage.getItem("portfolio-sound") === "off") return;
-
+      if (event.button !== 0 || !event.isPrimary) return;
       const now = performance.now();
-      if (now - lastClickRef.current < 55) return;
+      if (now - lastClickRef.current < 70) return;
       lastClickRef.current = now;
 
       const context = getContext();
       if (!context) return;
 
-      const play = () => {
-        const oscillator = context.createOscillator();
-        const gain = context.createGain();
-        const time = context.currentTime;
-        oscillator.type = "sine";
-        oscillator.frequency.setValueAtTime(330, time);
-        oscillator.frequency.exponentialRampToValueAtTime(250, time + 0.055);
-        gain.gain.setValueAtTime(0.0001, time);
-        gain.gain.exponentialRampToValueAtTime(0.018, time + 0.006);
-        gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.07);
-        oscillator.connect(gain).connect(context.destination);
-        oscillator.start(time);
-        oscillator.stop(time + 0.075);
-      };
-
-      if (context.state === "suspended" || context.state === "interrupted") {
-        void context.resume().then(play).catch(() => undefined);
+      if (context.state !== "running") {
+        void context.resume().then(() => {
+          if (context.state === "running") playClick(context);
+        }).catch(() => undefined);
       } else {
-        play();
+        playClick(context);
       }
     };
 
