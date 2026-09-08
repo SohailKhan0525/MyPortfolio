@@ -3,7 +3,7 @@
 import { Howl } from "howler";
 import { useEffect, useRef } from "react";
 
-const CLICK_SOUND = "https://cdn.pixabay.com/download/audio/2021/09/20/audio_8c1876e3b4.mp3?filename=click-button-140881.mp3";
+const CLICK_SOUND = "/sounds/click.mp3";
 
 export default function ClickSound() {
   const soundRef = useRef<Howl | null>(null);
