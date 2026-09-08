@@ -1,74 +1,45 @@
 "use client";
 
+import { Howl } from "howler";
 import { useEffect, useRef } from "react";
 
+const CLICK_SOUND = "https://cdn.pixabay.com/download/audio/2021/09/20/audio_8c1876e3b4.mp3?filename=click-button-140881.mp3";
+
 export default function ClickSound() {
-  const contextRef = useRef<AudioContext | null>(null);
-  const lastClickRef = useRef(0);
+  const soundRef = useRef<Howl | null>(null);
 
   useEffect(() => {
-    const getContext = () => {
-      if (contextRef.current) return contextRef.current;
-      const Ctor = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-      if (!Ctor) return null;
-      try {
-        const context = new Ctor();
-        contextRef.current = context;
-        return context;
-      } catch {
-        return null;
-      }
+    const sound = new Howl({
+      src: [CLICK_SOUND],
+      preload: true,
+      volume: 1,
+      html5: false,
+    });
+    soundRef.current = sound;
+
+    const play = () => {
+      if (sound.state() !== "loaded") sound.load();
+      sound.stop();
+      sound.volume(1);
+      sound.play();
     };
 
-    const playClick = (context: AudioContext) => {
-      const time = context.currentTime;
-      const gain = context.createGain();
-      const body = context.createOscillator();
-      const tick = context.createOscillator();
-
-      body.type = "sine";
-      body.frequency.setValueAtTime(520, time);
-      body.frequency.exponentialRampToValueAtTime(260, time + 0.075);
-
-      tick.type = "triangle";
-      tick.frequency.setValueAtTime(1450, time);
-      tick.frequency.exponentialRampToValueAtTime(700, time + 0.035);
-
-      gain.gain.setValueAtTime(0.0001, time);
-      gain.gain.exponentialRampToValueAtTime(0.055, time + 0.004);
-      gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.095);
-
-      body.connect(gain);
-      tick.connect(gain);
-      gain.connect(context.destination);
-      body.start(time);
-      tick.start(time);
-      body.stop(time + 0.1);
-      tick.stop(time + 0.055);
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target?.closest("[data-sound]")) return;
+      play();
     };
 
-    const handlePointerDown = (event: PointerEvent) => {
-      if (event.button !== 0 || !event.isPrimary) return;
-      const now = performance.now();
-      if (now - lastClickRef.current < 70) return;
-      lastClickRef.current = now;
+    const handleRequestedSound = () => play();
 
-      const context = getContext();
-      if (!context) return;
+    document.addEventListener("click", handleClick, true);
+    window.addEventListener("portfolio:click-sound", handleRequestedSound);
 
-      if (context.state !== "running") {
-        void context.resume().then(() => {
-          if (context.state === "running") playClick(context);
-        }).catch(() => undefined);
-      } else {
-        playClick(context);
-      }
-    };
-
-    document.addEventListener("pointerdown", handlePointerDown, true);
     return () => {
-      document.removeEventListener("pointerdown", handlePointerDown, true);
-      void contextRef.current?.close();
+      document.removeEventListener("click", handleClick, true);
+      window.removeEventListener("portfolio:click-sound", handleRequestedSound);
+      sound.unload();
+      soundRef.current = null;
     };
   }, []);
 
