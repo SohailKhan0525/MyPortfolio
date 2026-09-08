@@ -1,166 +1,55 @@
 /* Defensive layout rules: long URLs, project names, terminal output, and labels must never create viewport overflow. */
-html, body {
-  max-width: 100%;
-  overflow-x: hidden;
-}
+html, body { max-width: 100%; overflow-x: hidden; }
+*, *::before, *::after { min-width: 0; }
+h1, h2, h3, h4, h5, h6, p, a, button, span, small, strong, em, code, pre { overflow-wrap: anywhere; word-break: normal; }
+.site-shell, main, section, article, .surface, .hero-copy, .hero-art, .work-layout, .about-grid, .github-card, .project-detail, .contact-card, .contact-actions { max-width: 100%; min-width: 0; }
+.hero-terminal-real, .terminal-screen, .terminal-history, .terminal-form, .terminal-top, .terminal-bottom { min-width: 0; max-width: 100%; }
+.hero-terminal-real { overflow: hidden; }
+.terminal-screen, .terminal-history { overflow: hidden; }
+.terminal-line, .terminal-output-line, .terminal-command, .terminal-boot, .terminal-form { overflow-wrap: anywhere; word-break: break-word; }
+.terminal-form { width: 100%; }
+.terminal-input { width: 0; max-width: 100%; min-width: 0; overflow: hidden; text-overflow: clip; }
+.terminal-cursor { display: none !important; }
+.terminal-quick, .terminal-help, .terminal-bottom, .terminal-top-left, .terminal-status { min-width: 0; max-width: 100%; }
+.terminal-help, .terminal-bottom { flex-wrap: wrap; }
+.terminal-bottom span, .hero-note, .hero-description { overflow-wrap: anywhere; }
+.hero-art { min-width: 0; overflow: hidden; }
+.hero-note { max-width: 100%; }
+.project-row { max-width: 100%; }
+.contribution-wrap { max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; }
+.contribution-wrap img { max-width: none; }
 
-*, *::before, *::after {
-  min-width: 0;
-}
+/* Compact icon controls: one clear icon, no theme dropdown, stable hit area. */
+.theme-button { width: 40px; height: 40px; min-width: 40px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; }
+.theme-button svg { display: block; flex: 0 0 auto; }
+.icon-button:focus-visible, .mobile-menu-button:focus-visible, .button:focus-visible, .text-button:focus-visible, .terminal-chip:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
 
-h1, h2, h3, h4, h5, h6, p, a, button, span, small, strong, em, code, pre {
-  overflow-wrap: anywhere;
-  word-break: normal;
-}
+/* Live GitHub activity: dense enough to scan, but flexible on small screens. */
+.contribution-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; margin-top: 16px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--line); }
+.contribution-stats > div { min-width: 0; padding: 14px 12px; background: var(--surface, rgba(255,255,255,.025)); }
+.contribution-stats strong, .contribution-stats span, .contribution-stats small { display: block; overflow-wrap: anywhere; }
+.contribution-stats strong { font: 700 clamp(18px, 3vw, 24px)/1.1 "Geist Mono", monospace; color: var(--text); letter-spacing: -.04em; }
+.contribution-stats span { margin-top: 6px; color: var(--text); font-size: 12px; font-weight: 650; }
+.contribution-stats small { margin-top: 3px; color: var(--muted); font-size: 10px; line-height: 1.35; }
+.stats-loading { grid-column: 1 / -1; display: flex !important; align-items: center; gap: 8px; color: var(--muted); font-size: 11px; }
+.loading-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; animation: statPulse 1.2s ease-in-out infinite; flex: 0 0 auto; }
+@keyframes statPulse { 50% { opacity: .25; transform: scale(.75); } }
 
-.site-shell,
-main,
-section,
-article,
-.surface,
-.hero-copy,
-.hero-art,
-.work-layout,
-.about-grid,
-.github-card,
-.project-detail,
-.contact-card,
-.contact-actions {
-  max-width: 100%;
-  min-width: 0;
+@media (max-width: 760px) {
+  .contribution-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-
-/* Terminal: keep the shell inside its card at every width. */
-.hero-terminal-real,
-.terminal-screen,
-.terminal-history,
-.terminal-form,
-.terminal-top,
-.terminal-bottom {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.hero-terminal-real {
-  overflow: hidden;
-}
-
-.terminal-screen {
-  overflow: hidden;
-}
-
-.terminal-history {
-  overflow: hidden;
-}
-
-.terminal-line,
-.terminal-output-line,
-.terminal-command,
-.terminal-boot,
-.terminal-form {
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-
-.terminal-form {
-  width: 100%;
-}
-
-.terminal-input {
-  width: 0;
-  max-width: 100%;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: clip;
-}
-
-/* The real input caret is enough. The decorative blinking span was creating a
-   second, visually confusing cursor. */
-.terminal-cursor {
-  display: none !important;
-}
-
-.terminal-quick,
-.terminal-help,
-.terminal-bottom,
-.terminal-top-left,
-.terminal-status {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.terminal-help,
-.terminal-bottom {
-  flex-wrap: wrap;
-}
-
-.terminal-bottom span {
-  overflow-wrap: anywhere;
-}
-
-/* Prevent motion transforms from creating a few-pixel horizontal scrollbar. */
-.project-row {
-  max-width: 100%;
-}
-
-/* Contribution image stays inside its own scrolling frame instead of enlarging
-   the page itself. */
-.contribution-wrap {
-  max-width: 100%;
-  min-width: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-
-.contribution-wrap img {
-  max-width: none;
-}
-
 @media (max-width: 620px) {
-  .section-pad {
-    width: min(calc(100% - 32px), 1184px);
-  }
-
-  .hero-terminal-real {
-    border-radius: 18px;
-  }
-
-  .terminal-top {
-    overflow: hidden;
-  }
-
-  .terminal-top-left {
-    overflow: hidden;
-  }
-
-  .terminal-top-left > span:last-child {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .terminal-status {
-    white-space: nowrap;
-    flex: 0 0 auto;
-  }
-
-  .terminal-form {
-    gap: 7px;
-  }
-
-  .terminal-input {
-    font-size: 12px;
-  }
-
-  .terminal-bottom {
-    gap: 8px;
-  }
+  .section-pad { width: min(calc(100% - 32px), 1184px); }
+  .hero-terminal-real { border-radius: 18px; }
+  .terminal-top { overflow: hidden; }
+  .terminal-top-left { overflow: hidden; }
+  .terminal-top-left > span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .terminal-status { white-space: nowrap; flex: 0 0 auto; }
+  .terminal-form { gap: 7px; }
+  .terminal-input { font-size: 12px; }
+  .terminal-bottom { gap: 8px; }
 }
-
 @media (prefers-reduced-motion: reduce) {
-  .project-row:hover,
-  .button:hover,
-  .text-button:hover {
-    transform: none !important;
-  }
+  .project-row:hover, .button:hover, .text-button:hover { transform: none !important; }
+  .loading-dot { animation: none; }
 }
