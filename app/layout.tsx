@@ -3,6 +3,7 @@ import "./globals.css";
 import "./enhancements.css";
 import "./interaction-fixes.css";
 import ThemeEnhancer from "./ThemeEnhancer";
+import ClickSound from "./ClickSound";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mohd-zaheer-uddin.vercel.app"),
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" suppressHydrationWarning>
       <body>
         <ThemeEnhancer />
+        <ClickSound />
         {children}
       </body>
     </html>
