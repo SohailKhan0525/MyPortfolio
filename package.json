@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@types/howler": "^2.2.13",
-    "@types/node": "^22.15.0",
+    "@types/node": "^26.4.1",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "typescript": "^7.0.2"
