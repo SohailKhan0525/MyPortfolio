@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./enhancements.css";
 import "./interaction-fixes.css";
+import "./mobile-polish.css";
 import ClickSound from "./ClickSound";
 
 export const metadata: Metadata = {
