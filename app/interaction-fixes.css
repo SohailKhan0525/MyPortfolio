@@ -1,0 +1,166 @@
+/* Defensive layout rules: long URLs, project names, terminal output, and labels must never create viewport overflow. */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+*, *::before, *::after {
+  min-width: 0;
+}
+
+h1, h2, h3, h4, h5, h6, p, a, button, span, small, strong, em, code, pre {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.site-shell,
+main,
+section,
+article,
+.surface,
+.hero-copy,
+.hero-art,
+.work-layout,
+.about-grid,
+.github-card,
+.project-detail,
+.contact-card,
+.contact-actions {
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Terminal: keep the shell inside its card at every width. */
+.hero-terminal-real,
+.terminal-screen,
+.terminal-history,
+.terminal-form,
+.terminal-top,
+.terminal-bottom {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.hero-terminal-real {
+  overflow: hidden;
+}
+
+.terminal-screen {
+  overflow: hidden;
+}
+
+.terminal-history {
+  overflow: hidden;
+}
+
+.terminal-line,
+.terminal-output-line,
+.terminal-command,
+.terminal-boot,
+.terminal-form {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.terminal-form {
+  width: 100%;
+}
+
+.terminal-input {
+  width: 0;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+/* The real input caret is enough. The decorative blinking span was creating a
+   second, visually confusing cursor. */
+.terminal-cursor {
+  display: none !important;
+}
+
+.terminal-quick,
+.terminal-help,
+.terminal-bottom,
+.terminal-top-left,
+.terminal-status {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.terminal-help,
+.terminal-bottom {
+  flex-wrap: wrap;
+}
+
+.terminal-bottom span {
+  overflow-wrap: anywhere;
+}
+
+/* Prevent motion transforms from creating a few-pixel horizontal scrollbar. */
+.project-row {
+  max-width: 100%;
+}
+
+/* Contribution image stays inside its own scrolling frame instead of enlarging
+   the page itself. */
+.contribution-wrap {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.contribution-wrap img {
+  max-width: none;
+}
+
+@media (max-width: 620px) {
+  .section-pad {
+    width: min(calc(100% - 32px), 1184px);
+  }
+
+  .hero-terminal-real {
+    border-radius: 18px;
+  }
+
+  .terminal-top {
+    overflow: hidden;
+  }
+
+  .terminal-top-left {
+    overflow: hidden;
+  }
+
+  .terminal-top-left > span:last-child {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .terminal-status {
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+
+  .terminal-form {
+    gap: 7px;
+  }
+
+  .terminal-input {
+    font-size: 12px;
+  }
+
+  .terminal-bottom {
+    gap: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-row:hover,
+  .button:hover,
+  .text-button:hover {
+    transform: none !important;
+  }
+}
