@@ -2,8 +2,12 @@
   "name": "mohd-zaheer-uddin-portfolio",
   "version": "2.0.1",
   "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
+    "typecheck": "tsc --noEmit",
     "build": "next build",
     "start": "next start"
   },
