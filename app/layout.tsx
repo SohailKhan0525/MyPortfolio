@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import ThemeEffects from "./theme-effects";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mohd-zaheer-uddin.vercel.app"),
@@ -21,7 +22,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>{children}</body>
+      <body>
+        <ThemeEffects />
+        {children}
+      </body>
     </html>
   );
 }
