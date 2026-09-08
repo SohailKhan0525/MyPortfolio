@@ -33,10 +33,29 @@ function tone(kind: "tap" | "success") {
   } catch {}
 }
 
+function applyTheme(next: Theme) {
+  const root = document.documentElement;
+  const commit = () => { root.dataset.theme = next; localStorage.setItem("portfolio-theme", next); };
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!reduced && "startViewTransition" in document) {
+    try { (document as Document & { startViewTransition?: (callback: () => void) => { ready: Promise<void> } }).startViewTransition?.(commit); return; } catch {}
+  }
+  commit();
+}
+
 function useTheme() {
   const [theme, setTheme] = useState<Theme>("dark");
-  useEffect(() => { const saved = localStorage.getItem("portfolio-theme"); const next: Theme = saved === "light" || saved === "dark" ? saved : "dark"; setTheme(next); document.documentElement.dataset.theme = next; }, []);
-  const change = (next: Theme) => { localStorage.setItem("portfolio-theme", next); setTheme(next); document.documentElement.dataset.theme = next; tone("success"); };
+  useEffect(() => {
+    const saved = localStorage.getItem("portfolio-theme");
+    const next: Theme = saved === "light" || saved === "dark" ? saved : "dark";
+    setTheme(next);
+    document.documentElement.dataset.theme = next;
+  }, []);
+  const change = (next: Theme) => {
+    setTheme(next);
+    applyTheme(next);
+    tone("success");
+  };
   return { theme, change };
 }
 
@@ -46,7 +65,7 @@ function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; 
 
 function ThemeToggle({ theme, change }: { theme: Theme; change: (theme: Theme) => void }) {
   const next = theme === "dark" ? "light" : "dark";
-  return <button className="icon-button theme-button" type="button" aria-label={`Switch to ${next} mode`} title={`Switch to ${next} mode`} onClick={() => change(next)}>{theme === "dark" ? <Sun size={18} weight="bold" aria-hidden="true"/> : <Moon size={18} weight="bold" aria-hidden="true"/>}</button>;
+  return <button className="icon-button theme-button" type="button" aria-label={`Switch to ${next} mode`} aria-pressed={theme === "light"} title={`Switch to ${next} mode`} onClick={() => change(next)}>{theme === "dark" ? <Sun key="sun" size={18} weight="bold" aria-hidden="true"/> : <Moon key="moon" size={18} weight="bold" aria-hidden="true"/>}</button>;
 }
 
 function Contributions() {
