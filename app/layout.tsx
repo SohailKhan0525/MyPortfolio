@@ -2,11 +2,10 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./enhancements.css";
 import "./interaction-fixes.css";
-import ThemeEnhancer from "./ThemeEnhancer";
 import ClickSound from "./ClickSound";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://mohd-zaheer-uddin.vercel.app"),
+  metadataBase: new URL("https://mohdzaheeruddin0525.vercel.app"),
   title: "Mohd Zaheer Uddin | ML & Data Science",
   description: "Portfolio of Mohd Zaheer Uddin, a CSIT undergraduate building practical machine learning and data science projects with Python.",
   openGraph: {
@@ -29,7 +28,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <body dir="ltr">
-        <ThemeEnhancer />
         <ClickSound />
         {children}
       </body>
