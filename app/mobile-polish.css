@@ -1,0 +1,20 @@
+/* Mobile visual polish: compact the hero/terminal without changing the desktop composition. */
+html { scroll-padding-top: 92px; }
+.hero-art { overflow: visible !important; }
+@media (max-width: 620px) {
+  .hero { min-height: auto !important; padding-top: 76px !important; padding-bottom: 56px !important; gap: 28px !important; align-items: start !important; }
+  h1 { font-size: clamp(40px, 11.5vw, 54px) !important; line-height: .98 !important; }
+  .hero-description { font-size: 16px !important; line-height: 25px !important; max-width: 34rem !important; }
+  .hero-actions { gap: 14px !important; margin-top: 22px !important; }
+  .hero-actions .button { min-height: 50px !important; border-radius: 14px !important; font-size: 15px !important; }
+  .proof-row { margin-top: 26px !important; padding-top: 14px !important; gap: 7px !important; font-size: 11px !important; }
+  .hero-terminal-real { width: 100% !important; max-width: 100% !important; border-radius: 18px !important; transform: none !important; box-shadow: 0 16px 42px var(--shadow) !important; }
+  .terminal-top { min-height: 42px !important; padding-inline: 11px !important; }
+  .terminal-screen { padding: 17px 13px 15px !important; font-size: 11.5px !important; line-height: 1.6 !important; }
+  .terminal-history { max-height: 116px !important; margin-top: 11px !important; }
+  .terminal-help { margin-top: 14px !important; gap: 9px !important; }
+  .terminal-quick { gap: 5px !important; }
+  .terminal-chip { min-height: 30px !important; padding: 5px 9px !important; border-radius: 8px !important; }
+  .terminal-bottom { min-height: 40px !important; padding: 9px 11px !important; font-size: 8px !important; }
+  .hero-note { margin: 10px 2px 0 !important; font-size: 10px !important; }
+}
