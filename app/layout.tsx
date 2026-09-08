@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./enhancements.css";
+import "./interaction-fixes.css";
 import ThemeEnhancer from "./ThemeEnhancer";
 
 export const metadata: Metadata = {
