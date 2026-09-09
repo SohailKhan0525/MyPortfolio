@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
 import Link from "next/link";
 import { ArrowDown, ArrowUpRight, Briefcase, Check, Code, GithubLogo, LinkedinLogo, List, Moon, PaperPlaneTilt, Sparkle, Sun, X } from "@phosphor-icons/react";
+import VisitorStats from "./VisitorStats";
 
 type Theme = "light" | "dark";
 type Contribution = { date: string; count: number; level: 0 | 1 | 2 | 3 | 4 };
@@ -213,45 +214,13 @@ function Terminal() {
 
   return (
     <div className="hero-terminal-real" dir="ltr">
-      <div className="terminal-top">
-        <div className="terminal-top-left">
-          <span className="terminal-dots" aria-hidden="true"><i /><i /><i /></span>
-          <span className="terminal-tab">portfolio.py</span>
-          <span className="terminal-title">zsh — portfolio</span>
-        </div>
-        <span className="terminal-status"><i /> {ready ? "ready" : "booting"}</span>
-      </div>
-
+      <div className="terminal-top"><div className="terminal-top-left"><span className="terminal-dots" aria-hidden="true"><i /><i /><i /></span><span className="terminal-tab">portfolio.py</span><span className="terminal-title">zsh — portfolio</span></div><span className="terminal-status"><i /> {ready ? "ready" : "booting"}</span></div>
       <div className="terminal-screen">
-        <div className="terminal-boot" aria-live="polite">
-          <AnimatePresence initial={false}>
-            {bootLines >= 1 && <motion.div key="boot-command" initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.25 }}><b>portfolio@zaheer</b>:~$ ./start.sh</motion.div>}
-            {bootLines >= 2 && <motion.div key="boot-status" initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.25 }}><span>{ready ? "profile loaded · terminal ready." : "loading profile…"}</span></motion.div>}
-          </AnimatePresence>
-        </div>
-
-        <div ref={historyRef} className="terminal-history" aria-live="polite" aria-label="Terminal output">
-          <AnimatePresence initial={false} mode="popLayout">
-            {history.slice(-14).map((line, i) => (
-              <motion.div key={`${line}-${i}`} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} transition={{ duration: 0.18 }} className={`terminal-line ${line.startsWith("$ ") ? "terminal-command" : "terminal-output-line"}`}>{line}</motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-
-        <form className="terminal-form" dir="ltr" onSubmit={submit}>
-          <span className="terminal-prompt" aria-hidden="true">$</span>
-          <input ref={inputRef} className="terminal-input" type="text" dir="ltr" value={input} onChange={e => setInput(e.target.value)} onKeyDown={key} disabled={!ready} placeholder={ready ? "type a command…" : "booting…"} aria-label="Terminal command" autoComplete="off" autoCorrect="off" autoCapitalize="none" spellCheck={false} />
-          <span className={`terminal-caret ${ready ? "is-ready" : ""}`} aria-hidden="true" />
-        </form>
-
-        <div className="terminal-help">
-          <span>↑↓ history · Tab autocomplete · Enter run</span>
-          <div className="terminal-quick" aria-label="Quick terminal commands">
-            {["help", "projects", "skills", "about"].map(cmd => <button key={cmd} type="button" className="terminal-chip" data-sound onClick={() => runQuick(cmd)}>{cmd}</button>)}
-          </div>
-        </div>
+        <div className="terminal-boot" aria-live="polite"><AnimatePresence initial={false}>{bootLines >= 1 && <motion.div key="boot-command" initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.25 }}><b>portfolio@zaheer</b>:~$ ./start.sh</motion.div>}{bootLines >= 2 && <motion.div key="boot-status" initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.25 }}><span>{ready ? "profile loaded · terminal ready." : "loading profile…"}</span></motion.div>}</AnimatePresence></div>
+        <div ref={historyRef} className="terminal-history" aria-live="polite" aria-label="Terminal output"><AnimatePresence initial={false} mode="popLayout">{history.slice(-14).map((line, i) => <motion.div key={`${line}-${i}`} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} transition={{ duration: 0.18 }} className={`terminal-line ${line.startsWith("$ ") ? "terminal-command" : "terminal-output-line"}`}>{line}</motion.div>)}</AnimatePresence></div>
+        <form className="terminal-form" dir="ltr" onSubmit={submit}><span className="terminal-prompt" aria-hidden="true">$</span><input ref={inputRef} className="terminal-input" type="text" dir="ltr" value={input} onChange={e => setInput(e.target.value)} onKeyDown={key} disabled={!ready} placeholder={ready ? "type a command…" : "booting…"} aria-label="Terminal command" autoComplete="off" autoCorrect="off" autoCapitalize="none" spellCheck={false} /></form>
+        <div className="terminal-help"><span>↑↓ history · Tab autocomplete · Enter run</span><div className="terminal-quick" aria-label="Quick terminal commands">{["help", "projects", "skills", "about"].map(cmd => <button key={cmd} type="button" className="terminal-chip" data-sound onClick={() => runQuick(cmd)}>{cmd}</button>)}</div></div>
       </div>
-
       <div className="terminal-bottom"><span>PORTFOLIO SHELL v1.1</span><span>interactive · responsive</span></div>
     </div>
   );
@@ -263,16 +232,12 @@ export default function Home() {
   const [active, setActive] = useState(0);
   const [copied, setCopied] = useState(false);
   const email = "sohailkhannnn.0525@gmail.com";
+  const linkedin = "https://www.linkedin.com/in/mohd-zaheer-uddin-166b3b356/";
 
   const copyEmail = async () => {
     requestClickSound();
-    try {
-      await navigator.clipboard.writeText(email);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      window.location.href = `mailto:${email}`;
-    }
+    try { await navigator.clipboard.writeText(email); setCopied(true); setTimeout(() => setCopied(false), 1500); }
+    catch { window.location.href = `mailto:${email}`; }
   };
 
   const nav = [["Work", "#work"], ["About", "#about"], ["Journey", "#journey"], ["Skills", "#skills"], ["Resume", "/resume"], ["Contact", "#contact"]];
@@ -280,65 +245,25 @@ export default function Home() {
 
   return (
     <div className="site-shell">
-      <header className="site-header">
-        <Link href="#top" className="brand" data-sound onClick={() => setMobile(false)}><span className="brand-mark">Q</span><span>Mohd Zaheer Uddin</span></Link>
-        <nav className={`desktop-nav ${mobile ? "mobile-visible" : ""}`} aria-label="Primary navigation">
-          {nav.map(([label, href]) => <Link key={label} href={href} className="nav-link" data-sound onClick={() => setMobile(false)}>{label}</Link>)}
-        </nav>
-        <div className="header-actions">
-          <ThemeToggle theme={theme} change={change} />
-          <button className="mobile-menu-button" data-sound type="button" onClick={() => setMobile(v => !v)} aria-expanded={mobile} aria-label="Toggle navigation">{mobile ? <X size={20} /> : <List size={20} />}</button>
-        </div>
-      </header>
-
+      <header className="site-header"><Link href="#top" className="brand" data-sound onClick={() => setMobile(false)}><span className="brand-mark">Q</span><span>Mohd Zaheer Uddin</span></Link><nav className={`desktop-nav ${mobile ? "mobile-visible" : ""}`} aria-label="Primary navigation">{nav.map(([label, href]) => <Link key={label} href={href} className="nav-link" data-sound onClick={() => setMobile(false)}>{label}</Link>)}</nav><div className="header-actions"><ThemeToggle theme={theme} change={change} /><button className="mobile-menu-button" data-sound type="button" onClick={() => setMobile(v => !v)} aria-expanded={mobile} aria-label="Toggle navigation">{mobile ? <X size={20} /> : <List size={20} />}</button></div></header>
       <main id="top">
-        <section className="hero section-pad">
-          <div className="hero-copy">
-            <Reveal><p className="eyebrow"><span className="status-dot" /> CSIT undergraduate · ML &amp; Data Science</p></Reveal>
-            <Reveal delay={0.08}><h1>I build practical machine learning projects and data-driven tools.</h1></Reveal>
-            <Reveal delay={0.16}><p className="hero-description">Python-first, curious, and focused on turning concepts into useful things people can actually try.</p></Reveal>
-            <Reveal delay={0.24}><div className="hero-actions"><a className="button button-primary" data-sound href="#work">See the work <ArrowDown size={17} /></a><button className="text-button" data-sound type="button" onClick={copyEmail}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={16} /> : <PaperPlaneTilt size={16} />}</button></div></Reveal>
-            <Reveal delay={0.32}><div className="proof-row"><span>7 projects</span><span>Python + ML focus</span><span>Open to internships</span></div></Reveal>
-          </div>
-          <Reveal className="hero-art" delay={0.16}><Terminal /><p className="hero-note">Try <b>help</b>, <b>projects</b>, <b>skills</b>, or <b>about</b>.</p></Reveal>
-        </section>
-
-        <section id="work" className="section-pad section-block">
-          <Reveal className="section-heading"><div><p className="eyebrow">Selected work</p><h2>Projects with a purpose.</h2></div><p>Small enough to explain. Real enough to show how I work.</p></Reveal>
-          <div className="work-layout">
-            <div className="project-list">
-              {projects.map((p, i) => <motion.button key={p[0]} type="button" className={`project-row ${active === i ? "active" : ""}`} data-sound onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)} onClick={() => setActive(i)} whileTap={{ scale: 0.985 }}><span className="project-number">{p[0]}</span><span className="project-name"><strong>{p[1]}</strong><small>{p[2]}</small></span><ArrowUpRight className="project-arrow" size={17} /></motion.button>)}
-            </div>
-            <AnimatePresence mode="wait">
-              <motion.article key={project[0]} className="project-detail surface" initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-                <div><div className="detail-top"><span className="eyebrow">{project[2]}</span><span>{project[0]}</span></div><h3>{project[1]}</h3><p>{project[3]}</p><div className="stack-row">{project[4].map(x => <span key={x}>{x}</span>)}</div></div>
-                <div className="detail-actions"><a className="button button-primary" data-sound href={project[5]} target="_blank" rel="noreferrer">Open project <ArrowUpRight size={16} /></a><a className="button button-secondary" data-sound href={project[6]} target="_blank" rel="noreferrer"><GithubLogo size={17} /> Source</a></div>
-              </motion.article>
-            </AnimatePresence>
-          </div>
-        </section>
-
-        <section id="about" className="section-pad section-block">
-          <Reveal className="section-heading"><div><p className="eyebrow">About</p><h2>Curious, practical, still learning.</h2></div><p>Visible work, visible learning, steady improvement.</p></Reveal>
-          <div className="about-grid"><div className="about-copy"><p>I am a CSIT undergraduate focused on Python, machine learning, data analysis, and practical web development.</p><div className="about-facts"><span><Briefcase size={17} /> Open to internships</span><span><Code size={17} /> Python + ML</span><span><Sparkle size={17} /> Learning by building</span></div></div><Contributions /></div>
-        </section>
-
-        <section id="journey" className="section-pad section-block">
-          <Reveal className="section-heading"><div><p className="eyebrow">Journey</p><h2>From fundamentals to systems.</h2></div><p>Understand the basics, build projects, then make the projects better.</p></Reveal>
-          <div className="journey-grid">{[["01", "Python foundations", "Core syntax, OOP, files, data structures"], ["02", "ML experiments", "Regression, classification, evaluation"], ["03", "Interactive apps", "Turning models into usable tools"], ["04", "Better engineering", "Responsive UI, deployment, accessibility"]].map(x => <Reveal key={x[0]}><article className="journey-item"><span>{x[0]}</span><h3>{x[1]}</h3><p>{x[2]}</p></article></Reveal>)}</div>
-        </section>
-
-        <section id="skills" className="section-pad section-block">
-          <Reveal className="section-heading"><div><p className="eyebrow">Skills</p><h2>The current toolkit.</h2></div><p>Tools I use today and continue improving through projects.</p></Reveal>
-          <div className="skills-grid">{skills.map(([name, desc], i) => <motion.article key={name} className="skill-card surface" whileHover={{ y: -4 }}><span className="skill-index">0{i + 1}</span><strong>{name}</strong><span>{desc}</span></motion.article>)}</div>
-        </section>
-
-        <section id="contact" className="section-pad section-block">
-          <Reveal><div className="surface contact-card"><div><p className="eyebrow">Contact</p><h2>Let’s build something useful.</h2><p>Looking for an intern, collaborator, or someone who enjoys learning by building? I would love to hear from you.</p></div><div className="contact-actions"><button className="button button-primary" data-sound type="button" onClick={copyEmail}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={17} /> : <PaperPlaneTilt size={17} />}</button><a className="button button-secondary" data-sound href="https://www.linkedin.com" target="_blank" rel="noreferrer"><LinkedinLogo size={17} /> LinkedIn</a><a className="button button-secondary" data-sound href="https://github.com/SohailKhan0525" target="_blank" rel="noreferrer"><GithubLogo size={17} /> GitHub</a></div></div></Reveal>
-        </section>
+        <section className="hero section-pad"><div className="hero-copy"><Reveal><p className="eyebrow"><span className="status-dot" /> CSIT undergraduate · ML &amp; Data Science</p></Reveal><Reveal delay={0.08}><h1>I build practical machine learning projects and data-driven tools.</h1></Reveal><Reveal delay={0.16}><p className="hero-description">Python-first, curious, and focused on turning concepts into useful things people can actually try.</p></Reveal><Reveal delay={0.24}><div className="hero-actions"><a className="button button-primary" data-sound href="#work">See the work <ArrowDown size={17} /></a><button className="text-button" data-sound type="button" onClick={copyEmail}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={16} /> : <PaperPlaneTilt size={16} />}</button></div></Reveal><Reveal delay={0.32}><div className="proof-row"><span>7 projects</span><span>Python + ML focus</span><span>Open to internships</span></div></Reveal></div><Reveal className="hero-art" delay={0.16}><Terminal /><p className="hero-note">Try <b>help</b>, <b>projects</b>, <b>skills</b>, or <b>about</b>.</p></Reveal></section>
+        <section id="work" className="section-pad section-block"><Reveal className="section-heading"><div><p className="eyebrow">Selected work</p><h2>Projects with a purpose.</h2></div><p>Small enough to explain. Real enough to show how I work.</p></Reveal><div className="work-layout"><div className="project-list">{projects.map((p, i) => <motion.button key={p[0]} type="button" className={`project-row ${active === i ? "active" : ""}`} data-sound onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)} onClick={() => setActive(i)} whileTap={{ scale: 0.985 }}><span className="project-number">{p[0]}</span><span className="project-name"><strong>{p[1]}</strong><small>{p[2]}</small></span><ArrowUpRight className="project-arrow" size={17} /></motion.button>)}</div><AnimatePresence mode="wait"><motion.article key={project[0]} className="project-detail surface" initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}><div><div className="detail-top"><span className="eyebrow">{project[2]}</span><span>{project[0]}</span></div><h3>{project[1]}</h3><p>{project[3]}</p><div className="stack-row">{project[4].map(x => <span key={x}>{x}</span>)}</div></div><div className="detail-actions"><a className="button button-primary" data-sound href={project[5]} target="_blank" rel="noreferrer">Open project <ArrowUpRight size={16} /></a><a className="button button-secondary" data-sound href={project[6]} target="_blank" rel="noreferrer"><GithubLogo size={17} /> Source</a></div></motion.article></AnimatePresence></div></section>
+        <section id="about" className="section-pad section-block"><Reveal className="section-heading"><div><p className="eyebrow">About</p><h2>Curious, practical, still learning.</h2></div><p>Visible work, visible learning, steady improvement.</p></Reveal><div className="about-grid"><div className="about-copy"><p>I am a CSIT undergraduate focused on Python, machine learning, data analysis, and practical web development.</p><div className="about-facts"><span><Briefcase size={17} /> Open to internships</span><span><Code size={17} /> Python + ML</span><span><Sparkle size={17} /> Learning by building</span></div></div><Contributions /></div></section>
+        <section id="journey" className="section-pad section-block"><Reveal className="section-heading"><div><p className="eyebrow">Journey</p><h2>From fundamentals to systems.</h2></div><p>Understand the basics, build projects, then make the projects better.</p></Reveal><div className="journey-grid">{[["01", "Python foundations", "Core syntax, OOP, files, data structures"], ["02", "ML experiments", "Regression, classification, evaluation"], ["03", "Interactive apps", "Turning models into usable tools"], ["04", "Better engineering", "Responsive UI, deployment, accessibility"]].map(x => <Reveal key={x[0]}><article className="journey-item"><span>{x[0]}</span><h3>{x[1]}</h3><p>{x[2]}</p></article></Reveal>)}</div></section>
+        <section id="skills" className="section-pad section-block"><Reveal className="section-heading"><div><p className="eyebrow">Skills</p><h2>The current toolkit.</h2></div><p>Tools I use today and continue improving through projects.</p></Reveal><div className="skills-grid">{skills.map(([name, desc], i) => <motion.article key={name} className="skill-card surface" whileHover={{ y: -4 }}><span className="skill-index">0{i + 1}</span><strong>{name}</strong><span>{desc}</span></motion.article>)}</div></section>
+        <section id="contact" className="section-pad section-block"><Reveal><div className="surface contact-card"><div><p className="eyebrow">Contact</p><h2>Let’s build something useful.</h2><p>Looking for an intern, collaborator, or someone who enjoys learning by building? I would love to hear from you.</p></div><div className="contact-actions"><button className="button button-primary" data-sound type="button" onClick={copyEmail}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={17} /> : <PaperPlaneTilt size={17} />}</button><a className="button button-secondary" data-sound href={linkedin} target="_blank" rel="noreferrer"><LinkedinLogo size={17} /> LinkedIn</a><a className="button button-secondary" data-sound href="https://github.com/SohailKhan0525" target="_blank" rel="noreferrer"><GithubLogo size={17} /> GitHub</a></div></div></Reveal></section>
       </main>
 
-      <footer className="site-footer section-pad"><span>© 2026 Mohd Zaheer Uddin</span><span>Python mindset · shipped on Vercel</span></footer>
+      <VisitorStats />
+
+      <footer className="site-footer section-pad">
+        <div className="footer-main">
+          <div className="footer-brand"><span className="brand-mark">Q</span><div><strong>Mohd Zaheer Uddin</strong><span>ML &amp; Data Science · Python-first</span></div></div>
+          <div className="footer-links"><Link href="#work">Work</Link><Link href="#about">About</Link><Link href="#skills">Skills</Link><Link href="#contact">Contact</Link><a href={linkedin} target="_blank" rel="noreferrer">LinkedIn</a><a href="https://github.com/SohailKhan0525" target="_blank" rel="noreferrer">GitHub</a></div>
+        </div>
+        <div className="footer-bottom"><span>© 2026 Mohd Zaheer Uddin. Built with Next.js &amp; deployed on Vercel.</span><span>Available for internships &amp; collaborations.</span></div>
+      </footer>
     </div>
   );
 }
