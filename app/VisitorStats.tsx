@@ -40,32 +40,24 @@ export default function VisitorStats() {
       .catch(() => undefined);
     load();
     const timer = window.setInterval(load, 60_000);
-    const onPresence = () => setLive((value) => Math.max(value, 1));
-    window.addEventListener("visibilitychange", onPresence);
-    return () => {
-      alive = false;
-      window.clearInterval(timer);
-      window.removeEventListener("visibilitychange", onPresence);
-    };
+    return () => { alive = false; window.clearInterval(timer); };
   }, []);
 
   useEffect(() => {
-    setLive(1);
-    const hide = () => setLive(0);
-    const show = () => setLive(1);
-    document.addEventListener("visibilitychange", () => {});
-    const interval = window.setInterval(() => setLive(document.visibilityState === "visible" ? 1 : 0), 5000);
-    window.addEventListener("focus", show);
-    window.addEventListener("blur", hide);
+    const sync = () => setLive(document.visibilityState === "visible" ? 1 : 0);
+    sync();
+    document.addEventListener("visibilitychange", sync);
+    window.addEventListener("focus", sync);
+    window.addEventListener("blur", sync);
     return () => {
-      window.clearInterval(interval);
-      window.removeEventListener("focus", show);
-      window.removeEventListener("blur", hide);
+      document.removeEventListener("visibilitychange", sync);
+      window.removeEventListener("focus", sync);
+      window.removeEventListener("blur", sync);
     };
   }, []);
 
   const dayViews = stats.daily.length ? totalRows(stats.daily, "pageviews") : stats.month.pageviews;
-  const returning = Math.max(0, stats.month.visitors > 0 ? stats.month.pageviews - stats.month.visitors : 0);
+  const returning = Math.max(0, stats.month.pageviews - stats.month.visitors);
   const repeatRate = stats.month.pageviews > 0 ? Math.round((returning / stats.month.pageviews) * 100) : 0;
   const monthLabel = useMemo(() => new Intl.DateTimeFormat("en", { month: "long", year: "numeric" }).format(new Date()), []);
 
