@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import "./enhancements.css";
 import "./interaction-fixes.css";
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body dir="ltr">
         <ClickSound />
         {children}
+        <Analytics />
       </body>
     </html>
   );
