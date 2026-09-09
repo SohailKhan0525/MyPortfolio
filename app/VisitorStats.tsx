@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Activity, Eye, Users, TrendUp } from "@phosphor-icons/react";
+import { ActivityIcon, EyeIcon, UsersIcon, TrendUpIcon } from "@phosphor-icons/react";
 
 type AnalyticsBucket = { timestamp?: string; pageviews?: number; visitors?: number; count?: number };
 type Stats = {
@@ -74,10 +74,10 @@ export default function VisitorStats() {
         </div>
 
         <div className="visitor-grid">
-          <article className="visitor-stat visitor-stat-live"><span className="visitor-icon"><Activity size={19} weight="bold" /></span><strong>{live}</strong><span>Visitors live</span><small>this browser session</small></article>
-          <article className="visitor-stat"><span className="visitor-icon"><Users size={19} weight="bold" /></span><strong>{format.format(stats.today.visitors)}</strong><span>Unique today</span><small>{format.format(stats.today.pageviews)} page views</small></article>
-          <article className="visitor-stat"><span className="visitor-icon"><Eye size={19} weight="bold" /></span><strong>{format.format(stats.month.pageviews)}</strong><span>Views · {monthLabel}</span><small>{format.format(stats.month.visitors)} unique visitors</small></article>
-          <article className="visitor-stat"><span className="visitor-icon"><TrendUp size={19} weight="bold" /></span><strong>{repeatRate}%</strong><span>Repeat-view signal</span><small>{format.format(dayViews)} recent page views</small></article>
+          <article className="visitor-stat visitor-stat-live"><span className="visitor-icon"><ActivityIcon size={19} weight="bold" /></span><strong>{live}</strong><span>Visitors live</span><small>this browser session</small></article>
+          <article className="visitor-stat"><span className="visitor-icon"><UsersIcon size={19} weight="bold" /></span><strong>{format.format(stats.today.visitors)}</strong><span>Unique today</span><small>{format.format(stats.today.pageviews)} page views</small></article>
+          <article className="visitor-stat"><span className="visitor-icon"><EyeIcon size={19} weight="bold" /></span><strong>{format.format(stats.month.pageviews)}</strong><span>Views · {monthLabel}</span><small>{format.format(stats.month.visitors)} unique visitors</small></article>
+          <article className="visitor-stat"><span className="visitor-icon"><TrendUpIcon size={19} weight="bold" /></span><strong>{repeatRate}%</strong><span>Repeat-view signal</span><small>{format.format(dayViews)} recent page views</small></article>
         </div>
 
         <div className="visitor-footer"><span><i /> Total lifetime: {format.format(stats.total.visitors)} visitors · {format.format(stats.total.pageviews)} views</span><span>{stats.unavailable ? "Analytics pending setup" : "Updated automatically"}</span></div>
