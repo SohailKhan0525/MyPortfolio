@@ -1,6 +1,6 @@
 {
   "name": "mohd-zaheer-uddin-portfolio",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "private": true,
   "engines": {
     "node": ">=20.9.0"
@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.7",
+    "@vercel/analytics": "^2.0.1",
     "howler": "^2.2.4",
     "motion": "^13.2.0",
     "next": "^16.0.1",
