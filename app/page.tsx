@@ -1,10 +1,10 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
 import Link from "next/link";
-import { ArrowDown, ArrowUpRight, Briefcase, Check, Code, GithubLogo, LinkedinLogo, List, Moon, PaperPlaneTilt, Sparkle, Sun, X } from "@phosphor-icons/react";
-import VisitorStats from "./VisitorStats";
+import LiveStats from "./LiveStats";
+import { ArrowDown, ArrowUpRight, Brain, Briefcase, CaretDown, Check, Code, Cpu, GithubLogo, LinkedinLogo, List, Moon, PaperPlaneTilt, Sparkle, Sun, X } from "@phosphor-icons/react";
 
 type Theme = "light" | "dark";
 type Contribution = { date: string; count: number; level: 0 | 1 | 2 | 3 | 4 };
@@ -20,6 +20,36 @@ const projects = [
 ] as const;
 
 const skills = [["Python", "Primary language"], ["scikit learn", "ML workflows"], ["pandas", "Data analysis"], ["NumPy", "Numerical computing"], ["Streamlit", "Interactive apps"], ["Git / GitHub", "Version control"], ["HTML / CSS / JS", "Web foundations"]];
+
+const aiEra = [
+  {
+    id: "loopproof",
+    name: "LoopProof",
+    tag: "SaaS product",
+    status: "Building",
+    blurb: "An AI-powered testimonial and social-proof tool for solo founders and indie hackers — collect text testimonials through a shareable link, review and approve them, embed them on a site, then let AI repurpose the approved ones into ready LinkedIn and X post drafts.",
+    why: "I mapped the whole product in a detailed prompt document and I'm building it phase by phase with an AI coding agent — domain first, then services, then one page at a time — while I own every product and data decision myself.",
+    stack: ["Next.js", "Appwrite", "Cloudflare Pages", "Gemini API", "Clerk"],
+  },
+  {
+    id: "qofeno",
+    name: "Qofeno Labs",
+    tag: "Web tools platform",
+    status: "~85% complete",
+    blurb: "A platform aiming for 1,000+ free and paid web-based tools — lightweight tools run on serverless functions, heavier jobs like PDF, image, and media processing route to dedicated cloud containers with scale-to-zero cost protection.",
+    why: "This is a bigger system than I could hand-build alone at my current stage. AI helps me scaffold the architecture fast, and I use that speed to actually study why each piece works instead of just shipping it blind.",
+    stack: ["React", "Vite", "Appwrite", "Azure Container Apps", "Cloudflare"],
+  },
+  {
+    id: "agentx",
+    name: "AI AgentX CLI",
+    tag: "Open-source CLI",
+    status: "Live · 26,000+ downloads",
+    blurb: "An open-source command-line tool published on npm and used by other developers — the most public proof I have that AI-assisted building can ship something people actually install and run.",
+    why: "Open source keeps me honest about this: the code is public, so I have to read, test, and actually understand every part an AI helps me write before it goes out into anyone else's terminal.",
+    stack: ["Node.js", "npm", "CLI tooling"],
+  },
+] as const;
 
 function requestClickSound() {
   if (typeof window !== "undefined") window.dispatchEvent(new Event("portfolio:click-sound"));
@@ -60,6 +90,31 @@ function useTheme() {
 
 function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; delay?: number; className?: string }) {
   return <motion.div className={className} initial={{ opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.12 }} transition={{ duration: 0.65, delay, ease: [0.32, 0.72, 0, 1] }}>{children}</motion.div>;
+}
+
+function AiEraCard({ item, index }: { item: (typeof aiEra)[number]; index: number }) {
+  const [open, setOpen] = useState(index === 0);
+  return (
+    <motion.article layout className="ai-card surface" transition={{ layout: { duration: 0.45, ease: [0.32, 0.72, 0, 1] } }}>
+      <button type="button" className="ai-card-head" data-sound onClick={() => setOpen(v => !v)} aria-expanded={open}>
+        <span className="ai-card-index">0{index + 1}</span>
+        <span className="ai-card-title"><strong>{item.name}</strong><small>{item.tag}</small></span>
+        <span className={`ai-status status-${item.id}`}>{item.status}</span>
+        <motion.span className="ai-caret" animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}><CaretDown size={16} /></motion.span>
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div key="body" className="ai-card-body" initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}>
+            <div className="ai-card-body-inner">
+              <p>{item.blurb}</p>
+              <div className="ai-why"><Brain size={16} weight="bold" /><p>{item.why}</p></div>
+              <div className="stack-row">{item.stack.map(s => <span key={s}>{s}</span>)}</div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.article>
+  );
 }
 
 function ThemeToggle({ theme, change }: { theme: Theme; change: (theme: Theme) => void }) {
@@ -126,7 +181,7 @@ function Contributions() {
 }
 
 function Terminal() {
-  const commands = ["help", "about", "projects", "skills", "contact", "clear"];
+  const commands = ["help", "about", "projects", "ai", "skills", "contact", "clear"];
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [index, setIndex] = useState(-1);
@@ -150,12 +205,14 @@ function Terminal() {
   }, [history]);
 
   const output = (cmd: string) => cmd === "help"
-    ? ["help      show commands", "about     current focus", "projects  selected work", "skills    current toolkit", "contact   jump to contact", "clear     clear terminal"]
+    ? ["help      show commands", "about     current focus", "projects  selected work", "ai        what I'm building with AI", "skills    current toolkit", "contact   jump to contact", "clear     clear terminal"]
     : cmd === "about" || cmd === "whoami"
       ? ["Mohd Zaheer Uddin", "CSIT undergraduate · ML & Data Science", "building practical Python + ML projects."]
       : cmd === "projects" || cmd === "ls"
         ? projects.map(p => `${p[0]}  ${p[1]}`)
-        : cmd === "skills"
+        : cmd === "ai"
+          ? [...aiEra.map(a => `${a.name} — ${a.status}`), "scroll to \"The AI era\" section for the full story"]
+          : cmd === "skills"
           ? ["Python · scikit learn · pandas · NumPy", "Streamlit · Git/GitHub · HTML/CSS/JS"]
           : cmd === "contact"
             ? ["Opening contact section…"]
@@ -219,7 +276,7 @@ function Terminal() {
         <div className="terminal-boot" aria-live="polite"><AnimatePresence initial={false}>{bootLines >= 1 && <motion.div key="boot-command" initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.25 }}><b>portfolio@zaheer</b>:~$ ./start.sh</motion.div>}{bootLines >= 2 && <motion.div key="boot-status" initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.25 }}><span>{ready ? "profile loaded · terminal ready." : "loading profile…"}</span></motion.div>}</AnimatePresence></div>
         <div ref={historyRef} className="terminal-history" aria-live="polite" aria-label="Terminal output"><AnimatePresence initial={false} mode="popLayout">{history.slice(-14).map((line, i) => <motion.div key={`${line}-${i}`} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} transition={{ duration: 0.18 }} className={`terminal-line ${line.startsWith("$ ") ? "terminal-command" : "terminal-output-line"}`}>{line}</motion.div>)}</AnimatePresence></div>
         <form className="terminal-form" dir="ltr" onSubmit={submit}><span className="terminal-prompt" aria-hidden="true">$</span><input ref={inputRef} className="terminal-input" type="text" dir="ltr" value={input} onChange={e => setInput(e.target.value)} onKeyDown={key} disabled={!ready} placeholder={ready ? "type a command…" : "booting…"} aria-label="Terminal command" autoComplete="off" autoCorrect="off" autoCapitalize="none" spellCheck={false} /></form>
-        <div className="terminal-help"><span>↑↓ history · Tab autocomplete · Enter run</span><div className="terminal-quick" aria-label="Quick terminal commands">{["help", "projects", "skills", "about"].map(cmd => <button key={cmd} type="button" className="terminal-chip" data-sound onClick={() => runQuick(cmd)}>{cmd}</button>)}</div></div>
+        <div className="terminal-help"><span>↑↓ history · Tab autocomplete · Enter run</span><div className="terminal-quick" aria-label="Quick terminal commands">{["help", "projects", "ai", "skills", "about"].map(cmd => <button key={cmd} type="button" className="terminal-chip" data-sound onClick={() => runQuick(cmd)}>{cmd}</button>)}</div></div>
       </div>
       <div className="terminal-bottom"><span>PORTFOLIO SHELL v1.1</span><span>interactive · responsive</span></div>
     </div>
@@ -240,22 +297,31 @@ export default function Home() {
     catch { window.location.href = `mailto:${email}`; }
   };
 
-  const nav = [["Work", "#work"], ["About", "#about"], ["Journey", "#journey"], ["Skills", "#skills"], ["Resume", "/resume"], ["Contact", "#contact"]];
+  const nav = [["Work", "#work"], ["AI Era", "#ai-era"], ["About", "#about"], ["Journey", "#journey"], ["Skills", "#skills"], ["Resume", "/resume"], ["Contact", "#contact"]];
+  const heroRef = useRef<HTMLDivElement>(null);
+  const handleHeroMove = (e: PointerEvent<HTMLDivElement>) => {
+    const el = heroRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    el.style.setProperty("--mx", `${((e.clientX - rect.left) / rect.width) * 100}%`);
+    el.style.setProperty("--my", `${((e.clientY - rect.top) / rect.height) * 100}%`);
+  };
   const project = projects[active];
 
   return (
     <div className="site-shell">
       <header className="site-header"><Link href="#top" className="brand" data-sound onClick={() => setMobile(false)}><span className="brand-mark">Q</span><span>Mohd Zaheer Uddin</span></Link><nav className={`desktop-nav ${mobile ? "mobile-visible" : ""}`} aria-label="Primary navigation">{nav.map(([label, href]) => <Link key={label} href={href} className="nav-link" data-sound onClick={() => setMobile(false)}>{label}</Link>)}</nav><div className="header-actions"><ThemeToggle theme={theme} change={change} /><button className="mobile-menu-button" data-sound type="button" onClick={() => setMobile(v => !v)} aria-expanded={mobile} aria-label="Toggle navigation">{mobile ? <X size={20} /> : <List size={20} />}</button></div></header>
       <main id="top">
-        <section className="hero section-pad"><div className="hero-copy"><Reveal><p className="eyebrow"><span className="status-dot" /> CSIT undergraduate · ML &amp; Data Science</p></Reveal><Reveal delay={0.08}><h1>I build practical machine learning projects and data-driven tools.</h1></Reveal><Reveal delay={0.16}><p className="hero-description">Python-first, curious, and focused on turning concepts into useful things people can actually try.</p></Reveal><Reveal delay={0.24}><div className="hero-actions"><a className="button button-primary" data-sound href="#work">See the work <ArrowDown size={17} /></a><button className="text-button" data-sound type="button" onClick={copyEmail}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={16} /> : <PaperPlaneTilt size={16} />}</button></div></Reveal><Reveal delay={0.32}><div className="proof-row"><span>7 projects</span><span>Python + ML focus</span><span>Open to internships</span></div></Reveal></div><Reveal className="hero-art" delay={0.16}><Terminal /><p className="hero-note">Try <b>help</b>, <b>projects</b>, <b>skills</b>, or <b>about</b>.</p></Reveal></section>
-        <section id="work" className="section-pad section-block"><Reveal className="section-heading"><div><p className="eyebrow">Selected work</p><h2>Projects with a purpose.</h2></div><p>Small enough to explain. Real enough to show how I work.</p></Reveal><div className="work-layout"><div className="project-list">{projects.map((p, i) => <motion.button key={p[0]} type="button" className={`project-row ${active === i ? "active" : ""}`} data-sound onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)} onClick={() => setActive(i)} whileTap={{ scale: 0.985 }}><span className="project-number">{p[0]}</span><span className="project-name"><strong>{p[1]}</strong><small>{p[2]}</small></span><ArrowUpRight className="project-arrow" size={17} /></motion.button>)}</div><AnimatePresence mode="wait"><motion.article key={project[0]} className="project-detail surface" initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}><div><div className="detail-top"><span className="eyebrow">{project[2]}</span><span>{project[0]}</span></div><h3>{project[1]}</h3><p>{project[3]}</p><div className="stack-row">{project[4].map(x => <span key={x}>{x}</span>)}</div></div><div className="detail-actions"><a className="button button-primary" data-sound href={project[5]} target="_blank" rel="noreferrer">Open project <ArrowUpRight size={16} /></a><a className="button button-secondary" data-sound href={project[6]} target="_blank" rel="noreferrer"><GithubLogo size={17} /> Source</a></div></motion.article></AnimatePresence></div></section>
+        <section className="hero section-pad" ref={heroRef} onPointerMove={handleHeroMove}><div className="hero-copy"><Reveal><p className="eyebrow"><span className="status-dot" /> CSIT undergraduate · ML &amp; Data Science</p></Reveal><Reveal delay={0.08}><h1>I build practical machine learning projects and data-driven tools.</h1></Reveal><Reveal delay={0.16}><p className="hero-description">Python-first, curious, and focused on turning concepts into useful things people can actually try.</p></Reveal><Reveal delay={0.24}><div className="hero-actions"><a className="button button-primary" data-sound href="#work">See the work <ArrowDown size={17} /></a><button className="text-button" data-sound type="button" onClick={copyEmail}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={16} /> : <PaperPlaneTilt size={16} />}</button></div></Reveal><Reveal delay={0.32}><div className="proof-row"><span>7 projects</span><span>Python + ML focus</span><span>Open to internships</span></div></Reveal></div><Reveal className="hero-art" delay={0.16}><Terminal /><p className="hero-note">Try <b>help</b>, <b>projects</b>, <b>skills</b>, or <b>about</b>.</p></Reveal></section>
+        <section id="work" className="section-pad section-block"><Reveal className="section-heading"><div><p className="eyebrow">Selected work</p><h2>Projects with a purpose.</h2></div><p>Small enough to explain. Real enough to show how I work.</p></Reveal><Reveal className="work-layout" delay={0.1}><div className="project-list">{projects.map((p, i) => <motion.button key={p[0]} type="button" className={`project-row ${active === i ? "active" : ""}`} data-sound onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)} onClick={() => setActive(i)} whileTap={{ scale: 0.985 }}><span className="project-number">{p[0]}</span><span className="project-name"><strong>{p[1]}</strong><small>{p[2]}</small></span><ArrowUpRight className="project-arrow" size={17} /></motion.button>)}</div><AnimatePresence mode="wait"><motion.article key={project[0]} className="project-detail surface" initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}><div><div className="detail-top"><span className="eyebrow">{project[2]}</span><span>{project[0]}</span></div><h3>{project[1]}</h3><p>{project[3]}</p><div className="stack-row">{project[4].map(x => <span key={x}>{x}</span>)}</div></div><div className="detail-actions"><a className="button button-primary" data-sound href={project[5]} target="_blank" rel="noreferrer">Open project <ArrowUpRight size={16} /></a><a className="button button-secondary" data-sound href={project[6]} target="_blank" rel="noreferrer"><GithubLogo size={17} /> Source</a></div></motion.article></AnimatePresence></Reveal></section>
+        <section id="ai-era" className="section-pad section-block ai-era"><Reveal className="section-heading"><div><p className="eyebrow"><Cpu size={13} weight="bold" /> The AI era</p><h2>Building ahead of my current skill level — on purpose.</h2></div><p>I&apos;m a machine learning beginner, still working through the fundamentals properly. But I don&apos;t want that to stop me from building real products today. I use AI coding agents as serious collaborators: I write the specs, make the architecture and product calls, and review what comes back line by line. Here&apos;s what that&apos;s building right now.</p></Reveal><div className="ai-era-grid">{aiEra.map((item, i) => <Reveal key={item.id} delay={i * 0.08}><AiEraCard item={item} index={i} /></Reveal>)}</div></section>
         <section id="about" className="section-pad section-block"><Reveal className="section-heading"><div><p className="eyebrow">About</p><h2>Curious, practical, still learning.</h2></div><p>Visible work, visible learning, steady improvement.</p></Reveal><div className="about-grid"><div className="about-copy"><p>I am a CSIT undergraduate focused on Python, machine learning, data analysis, and practical web development.</p><div className="about-facts"><span><Briefcase size={17} /> Open to internships</span><span><Code size={17} /> Python + ML</span><span><Sparkle size={17} /> Learning by building</span></div></div><Contributions /></div></section>
         <section id="journey" className="section-pad section-block"><Reveal className="section-heading"><div><p className="eyebrow">Journey</p><h2>From fundamentals to systems.</h2></div><p>Understand the basics, build projects, then make the projects better.</p></Reveal><div className="journey-grid">{[["01", "Python foundations", "Core syntax, OOP, files, data structures"], ["02", "ML experiments", "Regression, classification, evaluation"], ["03", "Interactive apps", "Turning models into usable tools"], ["04", "Better engineering", "Responsive UI, deployment, accessibility"]].map(x => <Reveal key={x[0]}><article className="journey-item"><span>{x[0]}</span><h3>{x[1]}</h3><p>{x[2]}</p></article></Reveal>)}</div></section>
-        <section id="skills" className="section-pad section-block"><Reveal className="section-heading"><div><p className="eyebrow">Skills</p><h2>The current toolkit.</h2></div><p>Tools I use today and continue improving through projects.</p></Reveal><div className="skills-grid">{skills.map(([name, desc], i) => <motion.article key={name} className="skill-card surface" whileHover={{ y: -4 }}><span className="skill-index">0{i + 1}</span><strong>{name}</strong><span>{desc}</span></motion.article>)}</div></section>
+        <section id="skills" className="section-pad section-block"><Reveal className="section-heading"><div><p className="eyebrow">Skills</p><h2>The current toolkit.</h2></div><p>Tools I use today and continue improving through projects.</p></Reveal><div className="skills-grid">{skills.map(([name, desc], i) => <Reveal key={name} delay={(i % 4) * 0.06}><motion.article className="skill-card surface" whileHover={{ y: -4 }}><span className="skill-index">0{i + 1}</span><strong>{name}</strong><span>{desc}</span></motion.article></Reveal>)}</div></section>
         <section id="contact" className="section-pad section-block"><Reveal><div className="surface contact-card"><div><p className="eyebrow">Contact</p><h2>Let’s build something useful.</h2><p>Looking for an intern, collaborator, or someone who enjoys learning by building? I would love to hear from you.</p></div><div className="contact-actions"><button className="button button-primary" data-sound type="button" onClick={copyEmail}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={17} /> : <PaperPlaneTilt size={17} />}</button><a className="button button-secondary" data-sound href={linkedin} target="_blank" rel="noreferrer"><LinkedinLogo size={17} /> LinkedIn</a><a className="button button-secondary" data-sound href="https://github.com/SohailKhan0525" target="_blank" rel="noreferrer"><GithubLogo size={17} /> GitHub</a></div></div></Reveal></section>
       </main>
 
-      <VisitorStats />
+      <LiveStats />
 
       <footer className="site-footer section-pad">
         <div className="footer-main">

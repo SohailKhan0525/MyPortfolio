@@ -5,7 +5,9 @@ import "./enhancements.css";
 import "./interaction-fixes.css";
 import "./mobile-polish.css";
 import "./terminal-polish.css";
+import "./premium-enhancements.css";
 import ClickSound from "./ClickSound";
+import ChromeEffects from "./ChromeEffects";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mohdzaheeruddin0525.vercel.app"),
@@ -32,6 +34,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <body dir="ltr">
         <ClickSound />
+        <ChromeEffects />
         {children}
         <Analytics />
       </body>

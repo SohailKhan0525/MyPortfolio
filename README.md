@@ -143,3 +143,7 @@ Released under the MIT License. See [`LICENSE`](LICENSE).
 ---
 
 Built with care by **Mohd Zaheer Uddin**.
+
+## Live analytics
+
+The "Live analytics" section counts page views (today / this month) and unique visitors, with a 30-day graph. Counts are stored in Upstash Redis: add the **Upstash Redis** integration to the Vercel project (it provides `KV_REST_API_URL` and `KV_REST_API_TOKEN`). Visit the site once with `?notrack` to exclude your own browser; use `?track` to opt back in.
