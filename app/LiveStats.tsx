@@ -28,30 +28,33 @@ export default function LiveStats() {
     } catch {}
   }, []);
 
-  // Count this visit once per browser session. Visit once with ?notrack to exclude your own browser; ?track to undo.
+  // Count every page load (a 15s throttle ignores rapid refreshes). Visit once with ?notrack to exclude your own browser; ?track to undo.
   useEffect(() => {
     let counted = false;
     try {
       const q = new URLSearchParams(window.location.search);
       if (q.has("notrack")) localStorage.setItem("portfolio-notrack", "1");
       if (q.has("track")) localStorage.removeItem("portfolio-notrack");
-      if (!localStorage.getItem("portfolio-notrack") && !sessionStorage.getItem("portfolio-counted")) {
+      const last = Number(sessionStorage.getItem("portfolio-counted-at") ?? 0);
+      if (!localStorage.getItem("portfolio-notrack") && Date.now() - last > 15000) {
         let vid = localStorage.getItem("portfolio-vid");
         if (!vid) { vid = crypto.randomUUID(); localStorage.setItem("portfolio-vid", vid); }
-        sessionStorage.setItem("portfolio-counted", "1");
         counted = true;
-        fetch("/api/analytics", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ vid }), keepalive: true }).finally(load);
+        fetch("/api/analytics", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ vid }), keepalive: true })
+          .then(r => { if (r.ok) sessionStorage.setItem("portfolio-counted-at", String(Date.now())); })
+          .catch(() => {})
+          .finally(load);
       }
     } catch {}
     if (!counted) load();
   }, [load]);
 
-  // Live refresh every 20s while the tab is visible.
+  // Live refresh every 8s while the tab is visible.
   useEffect(() => {
     const id = window.setInterval(() => {
       if (document.visibilityState === "visible") load();
       tick(n => n + 1);
-    }, 20000);
+    }, 8000);
     return () => window.clearInterval(id);
   }, [load]);
 
