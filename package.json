@@ -15,7 +15,7 @@
     "@phosphor-icons/react": "^2.1.7",
     "@vercel/analytics": "^2.0.1",
     "howler": "^2.2.4",
-    "motion": "^13.2.0",
+    "motion": "^14.1.0",
     "next": "^16.0.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
