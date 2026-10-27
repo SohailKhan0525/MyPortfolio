@@ -25,3 +25,5 @@ Smaller fluid hero typography, earlier navigation collapse, stacked layouts on n
 TypeScript 5.9 no-emit check passed. Hallmark static scan improved from 55 FAIL / 175 REFLEX / 10 WARN to 1 FAIL / 0 REFLEX / 8 WARN. The remaining FAIL54 is a false positive on the résumé’s semantic Projects section heading preceding project entries; it is retained. Remaining warnings concern the existing stylesheet structure, deliberately preserved under polish scope. Static notes are not a render pass. Browser and deployment validation is recorded in the delivery message.
 
 Hallmark’s automated render tier was not available in the local environment. Do not interpret the static result as a complete automated visual audit.
+
+Fresh-context source review completed: removed duplicate About introduction and hid the contribution chart on failure. Browser checks exercised menu Escape, terminal help, AI accordion and mobile project selection/scroll. Widths 375, 414, 768, 1024, 1280, 1440 and 1920 had no document overflow. The 320px test found a legacy body minimum width, removed in follow-up.
