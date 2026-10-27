@@ -65,17 +65,16 @@ export default function LiveStats() {
 
   return (
     <section id="analytics" className="section-pad vs-section">
-      <motion.div className="surface vs-card" initial={{ opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.65, ease: [0.32, 0.72, 0, 1] }}>
+      <motion.div className="surface vs-card" initial={false} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.65, ease: [0.32, 0.72, 0, 1] }}>
         <div className="vs-head">
           <div>
-            <p className="eyebrow"><span className="vs-dot" /> Live analytics</p>
-            <h3>Who&rsquo;s actually visiting</h3>
+            <h3>Site visits</h3>
           </div>
           <span className="vs-updated">{secs === null ? "connecting…" : secs < 5 ? "updated just now" : `updated ${secs}s ago`}</span>
         </div>
 
         {stats && !stats.configured ? (
-          <p className="vs-note">Analytics isn&rsquo;t connected yet. Add the Upstash Redis integration in Vercel to switch this on.</p>
+          <p className="vs-note">Visit statistics are not available yet.</p>
         ) : stats?.error ? (
           <p className="vs-note">Couldn&rsquo;t reach the analytics store just now. Retrying automatically.</p>
         ) : (

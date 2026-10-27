@@ -1,3 +1,7 @@
+/* Hallmark · checked: 2026-10-27 · genre: modern-minimal (inferred)
+ * built: the project · redesign: polish · v2.0.0
+ * Scope: original layout, palette, terminal, routes and data calls retained.
+ * Verification: static checks and browser review recorded in docs/hallmark-polish.md. */
 /* Mobile visual polish: compact the hero/terminal without changing the desktop composition. */
 html { scroll-padding-top: 92px; }
 .hero-art { overflow: visible !important; }

@@ -18,9 +18,9 @@ export default function ResumePage() {
       <div className="resume-top">
         <div>
           <Link href="/" className="text-button"><span aria-hidden="true">←</span> Back to portfolio</Link>
-          <p className="eyebrow resume-eyebrow">Resume</p>
+
           <h1>Mohd Zaheer Uddin</h1>
-          <p>Computer Science (CSIT) undergraduate · Machine Learning · Data Science</p>
+          <p>Computer Science (CSIT) undergraduate, Machine Learning and Data Science</p>
         </div>
         <div className="resume-actions">
           <button className="button button-secondary" onClick={() => window.print()}><span aria-hidden="true">⎙</span> Print</button>

@@ -66,7 +66,7 @@ export default function VisitorStats() {
       <div className="visitor-panel surface">
         <div className="visitor-header">
           <div>
-            <p className="eyebrow">Live site pulse</p>
+
             <h2 id="visitor-title">People are actually here.</h2>
             <p>Anonymous traffic totals from Vercel Web Analytics, refreshed every minute.</p>
           </div>

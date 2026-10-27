@@ -1,3 +1,7 @@
+/* Hallmark · checked: 2026-10-27 · genre: modern-minimal (inferred)
+ * built: the project · redesign: polish · v2.0.0
+ * Scope: original layout, palette, terminal, routes and data calls retained.
+ * Verification: static checks and browser review recorded in docs/hallmark-polish.md. */
 /* Responsive terminal: bounded viewport, scrollable output, fixed command row. */
 .page-transition{min-height:100%;will-change:opacity,transform,filter}
 .hero-terminal-real{transform:none!important;display:flex;flex-direction:column;max-width:760px;border-radius:22px;overflow:hidden}
@@ -6,7 +10,7 @@
 .terminal-boot{min-height:48px}
 .terminal-history{min-height:0;max-height:none;margin-top:10px;padding:2px 4px 8px 0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent}
 .terminal-history::-webkit-scrollbar{width:5px}.terminal-history::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:999px}
-.terminal-form{position:relative;min-height:42px;margin-top:8px;padding:9px 10px;border:1px solid var(--line);border-radius:11px;background:var(--surface);box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
+.terminal-form{position:relative;min-height:42px;margin-top:8px;padding:9px 10px;border:1px solid var(--line);border-radius:11px;background:var(--surface);box-shadow:inset 0 1px 0 var(--legacy-ink-7)}
 .terminal-form:focus-within{border-color:var(--line-strong);box-shadow:0 0 0 3px color-mix(in srgb,var(--text) 8%,transparent)}
 .terminal-input{font-size:14px!important;line-height:22px!important}
 .terminal-caret{display:none!important}
@@ -25,7 +29,7 @@
 @media(max-width:620px){
   .hero-terminal-real{border-radius:18px;box-shadow:0 16px 48px var(--shadow)!important}
   .terminal-top{min-height:44px;padding-inline:11px}
-  .terminal-top-left{gap:8px}.terminal-dots{gap:4px}.terminal-dots i{width:6px;height:6px}.terminal-tab{padding:4px 7px}.terminal-title{display:none}
+  .terminal-top-left{gap:8px}.terminal-tab{padding:4px 7px}.terminal-title{display:none}
   .terminal-status{font-size:10px}
   .terminal-screen{grid-template-rows:auto minmax(110px,1fr) auto auto;min-height:365px;max-height:430px;padding:18px 12px 14px;font-size:12px;line-height:1.65}
   .terminal-boot{min-height:42px}.terminal-history{margin-top:8px;padding-right:3px}

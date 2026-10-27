@@ -1,8 +1,12 @@
+/* Hallmark · checked: 2026-10-27 · genre: modern-minimal (inferred)
+ * built: the project · redesign: polish · v2.0.0
+ * Scope: original layout, palette, terminal, routes and data calls retained.
+ * Verification: static checks and browser review recorded in docs/hallmark-polish.md. */
 /* Intro boot overlay */
 .intro-boot{position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:var(--bg)}
 .intro-boot-inner{display:flex;flex-direction:column;align-items:center;gap:20px;width:min(88%,380px);text-align:center}
-.intro-mark{width:52px;height:52px;display:grid;place-items:center;border:1px solid var(--line-strong);border-radius:14px;font:600 20px/1 "Geist Mono",monospace;color:var(--text);background:var(--surface)}
-.intro-lines{min-height:66px;font:500 13px/22px "Geist Mono",monospace;color:var(--muted)}
+.intro-mark{width:52px;height:52px;display:grid;place-items:center;border:1px solid var(--line-strong);border-radius:14px;font:600 20px/1 var(--font-code);color:var(--text);background:var(--surface)}
+.intro-lines{min-height:66px;font:500 13px/22px var(--font-code);color:var(--muted)}
 .intro-lines p{margin:2px 0}
 .intro-ready{color:var(--text)}
 .intro-progress{width:100%;height:2px;border-radius:999px;background:var(--surface-2);overflow:hidden}
@@ -23,11 +27,11 @@
 .ai-card{border-radius:20px;overflow:hidden}
 .ai-card-head{width:100%;display:grid;grid-template-columns:34px 1fr auto auto;align-items:center;gap:16px;padding:22px 24px;text-align:left;background:transparent;color:var(--text);transition:background .5s cubic-bezier(.32,.72,0,1)}
 .ai-card-head:hover{background:var(--surface-2)}
-.ai-card-index{color:var(--muted);font:500 12px/16px "Geist Mono",monospace;opacity:.6}
+.ai-card-index{color:var(--muted);font:500 12px/16px var(--font-code);opacity:.6}
 .ai-card-title{display:flex;flex-direction:column;gap:3px}
 .ai-card-title strong{font-size:19px;line-height:26px;font-weight:600}
-.ai-card-title small{color:var(--muted);font-size:12px;font-family:"Geist Mono",monospace}
-.ai-status{padding:5px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font:500 11px/14px "Geist Mono",monospace;white-space:nowrap}
+.ai-card-title small{color:var(--muted);font-size:12px;font-family:var(--font-body)}
+.ai-status{padding:5px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font:500 11px/14px var(--font-code);white-space:nowrap}
 .ai-status.status-agentx{color:var(--text);border-color:var(--line-strong)}
 .ai-caret{display:grid;place-items:center;color:var(--muted)}
 .ai-card-body{overflow:hidden}
@@ -44,19 +48,19 @@
 .vs-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .vs-head .eyebrow{display:flex;align-items:center;gap:8px}
 .vs-dot{width:8px;height:8px;border-radius:50%;background:var(--text);box-shadow:0 0 0 4px var(--surface-3);animation:heroPulse 2s ease-in-out infinite}
-.vs-updated{color:var(--muted);font:500 11px/16px "Geist Mono",monospace}
+.vs-updated{color:var(--muted);font:500 11px/16px var(--font-code)}
 .vs-note{margin:20px 0 0;font-size:14px}
 .vs-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin-top:24px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--line)}
 .vs-stat{padding:18px 20px;background:var(--surface-2);display:flex;flex-direction:column;gap:4px}
-.vs-stat span{color:var(--muted);font:500 11px/16px "Geist Mono",monospace;text-transform:uppercase;letter-spacing:.06em}
-.vs-stat strong{font:700 clamp(28px,4vw,40px)/1.05 "Geist Mono",monospace;letter-spacing:-.04em}
+.vs-stat span{color:var(--muted);font:500 11px/16px var(--font-code);text-transform:none;letter-spacing:normal}
+.vs-stat strong{font:700 clamp(28px,4vw,40px)/1.05 var(--font-code);letter-spacing:-.04em}
 .vs-stat small{color:var(--muted);font-size:12px}
 .vs-chart{margin-top:22px;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--bg)}
 .vs-bars{display:flex;align-items:flex-end;gap:3px;height:140px}
 .vs-bars i{flex:1;min-width:0;border-radius:3px 3px 1px 1px;background:color-mix(in srgb,var(--text) 32%,var(--surface-3));transform-origin:bottom;animation:vsGrow .6s cubic-bezier(.32,.72,0,1) both;transition:background .2s ease}
 .vs-bars i:hover{background:color-mix(in srgb,var(--text) 65%,var(--surface-3))}
 .vs-bars i.is-today{background:var(--text)}
-.vs-axis{display:flex;justify-content:space-between;margin-top:10px;color:var(--muted);font:500 10px/14px "Geist Mono",monospace}
+.vs-axis{display:flex;justify-content:space-between;margin-top:10px;color:var(--muted);font:500 10px/14px var(--font-code)}
 @keyframes vsGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
 
 @media (prefers-reduced-motion:reduce){.intro-boot{display:none}.hero:before{display:none}.vs-bars i{animation:none}}
@@ -70,3 +74,83 @@
   .ai-card-body-inner{padding:0 18px 22px}
   .vs-card{padding:20px;border-radius:20px}.vs-grid{grid-template-columns:1fr}.vs-bars{height:110px;gap:2px}
 }
+
+/* Hallmark polish: retain the original system and composition. */
+html, body { overflow-x: clip; }
+h1, h2, h3 { overflow-wrap: break-word; min-width: 0; }
+.hero { grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); gap: 48px; min-height: min(720px, calc(100svh - 96px)); padding-block: 64px; }
+.hero h1 { font-size: clamp(42px, 4.8vw, 68px); line-height: 1.08; color: var(--text); background: none; }
+.hero-description { max-width: 48ch; text-wrap: pretty; }
+.eyebrow { font: 500 14px/1.5 var(--font-body); letter-spacing: normal; text-transform: none; }
+.hero:before, .hero-copy:after, .hero-art:before, .hero-art:after, .hero-note:before, .proof-row span:after { display: none; }
+.hero-note { display: block; font-size: 12px; line-height: 1.6; }
+.site-header { background: var(--bg); backdrop-filter: none; box-shadow: none; }
+.surface, .hero-terminal-real, .activity-card, .project-detail, .journey-item, .contact-card { box-shadow: none; }
+.hero-terminal-real, .hero-terminal-real:hover { background: var(--surface); transform: none; box-shadow: none; }
+.journey-item:hover, .skill-card:hover { transform: none; box-shadow: none; background: var(--surface); border-color: var(--line); }
+.ai-why { border: 0; border-radius: 0; background: none; padding: 0; }
+.activity-stats, .contribution-grid, .vs-grid, .vs-chart { border: 0; border-radius: 0; }
+.activity-stats { background: none; }
+.contribution-grid { padding-inline: 0; grid-auto-columns: minmax(0, 1fr); }
+.stack-row span, .ai-status { border: 0; border-radius: 0; padding-inline: 0; font-family: var(--font-body); font-size: 13px; }
+.stack-row { gap: 8px 16px; }
+.ai-card-title small, .activity-legend, .footer-brand span, .footer-bottom, .vs-updated, .vs-stat span, .vs-axis { font-family: var(--font-body); font-size: 12px; line-height: 1.5; letter-spacing: normal; text-transform: none; }
+.terminal-bottom { font-size: 11px; letter-spacing: normal; text-transform: none; }
+.terminal-help { font-size: 12px; }
+.terminal-chip { min-height: 36px; font-size: 12px; }
+.terminal-input:disabled { color: var(--muted); background: var(--surface-2); cursor: not-allowed; }
+.terminal-input:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+.terminal-screen { grid-template-rows: auto minmax(80px, 1fr) auto auto; min-height: 350px; max-height: 440px; }
+.terminal-history { overflow-y: auto; }
+.project-detail { scroll-margin-top: 112px; }
+.project-row[aria-pressed="true"] { color: var(--text); background: var(--surface-2); }
+.button, .text-button, .nav-link, .terminal-chip, .footer-links a { white-space: nowrap; }
+.theme-button, .mobile-menu-button { min-width: 44px !important; min-height: 44px !important; }
+.skip-link { position: fixed; top: 12px; left: 16px; z-index: 300; padding: 12px 16px; color: var(--bg); background: var(--text); transform: translateY(-200%); }
+.skip-link:focus { transform: none; }
+:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; transition: none; }
+.resume-section p { overflow-wrap: anywhere; }
+@media (max-width: 64rem) {
+  .desktop-nav { display: none; position: absolute; top: calc(100% + 8px); left: 0; right: 0; flex-direction: column; align-items: stretch; padding: 12px; border: 1px solid var(--line); border-radius: 20px; background: var(--bg); max-height: calc(100dvh - 100px); overflow-y: auto; }
+  .desktop-nav.mobile-visible { display: flex; }
+  .mobile-menu-button { display: grid; }
+  .nav-link { min-height: 44px; }
+}
+@media (max-width: 60rem) {
+  .hero, .work-layout, .about-grid, .section-heading { grid-template-columns: minmax(0, 1fr) !important; }
+  .hero { min-height: auto; gap: 32px; padding-block: 48px; }
+  .hero-copy { max-width: 680px; }
+  .hero-art { width: 100%; max-width: 760px; margin-inline: 0; }
+  .project-detail { position: relative; top: auto; min-height: 320px; }
+  .project-detail h3 { margin-top: 32px; }
+  .contact-card { grid-template-columns: minmax(0, 1fr); }
+  .contact-actions { justify-content: flex-start; }
+  .journey-grid, .skills-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 40rem) {
+  .section-pad, .site-footer { width: calc(100% - 32px) !important; }
+  .hero { padding-top: 40px !important; padding-bottom: 48px !important; }
+  .hero h1 { font-size: clamp(36px, 9vw, 48px) !important; line-height: 1.1 !important; }
+  .hero-description { font-size: 16px !important; }
+  .hero-actions { gap: 12px !important; }
+  .proof-row { display: flex; flex-wrap: wrap; gap: 12px !important; font-size: 12px !important; }
+  .terminal-screen { min-height: 360px; max-height: 460px; font-size: 12px !important; }
+  .terminal-help>span { font-size: 11px; }
+  .terminal-chip { min-height: 44px !important; padding: 8px 10px !important; font-size: 12px !important; }
+  .terminal-bottom, .terminal-bottom span { font-size: 11px !important; }
+  .hero-note { font-size: 12px !important; }
+  .activity-stats span { font-size: 11px; }
+  .contribution-grid { gap: 2px; }
+  .journey-grid, .skills-grid { grid-template-columns: minmax(0, 1fr); }
+  .ai-card-head { padding: 18px; }
+  .ai-status { white-space: normal; }
+  .contact-card { padding: 24px !important; }
+  .footer-links a { min-height: 44px; display: inline-flex; align-items: center; font-size: 13px; }
+  .footer-bottom { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .page-transition, .hero-terminal-real, .theme-icon { transform: none !important; filter: none !important; }
+}
+.resume-section h2 { font-size: 20px; line-height: 1.4; letter-spacing: normal; text-transform: none; }

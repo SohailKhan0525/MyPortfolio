@@ -6,8 +6,8 @@ export default function Template({ children }: { children: React.ReactNode }) {
   return (
     <motion.div
       className="page-transition"
-      initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      initial={false}
+      animate={{ opacity: 1 }}
       transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
