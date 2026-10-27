@@ -1,40 +1,35 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
-import "./enhancements.css";
-import "./interaction-fixes.css";
-import "./mobile-polish.css";
-import "./terminal-polish.css";
-import "./premium-enhancements.css";
-import ClickSound from "./ClickSound";
-import ChromeEffects from "./ChromeEffects";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mohdzaheeruddin0525.vercel.app"),
   title: "Mohd Zaheer Uddin | ML & Data Science",
-  description: "Portfolio of Mohd Zaheer Uddin, a CSIT undergraduate building practical machine learning and data science projects with Python.",
+  description:
+    "Portfolio of Mohd Zaheer Uddin, a CSIT undergraduate building practical machine learning and data science projects with Python.",
   openGraph: {
     title: "Mohd Zaheer Uddin | ML & Data Science",
-    description: "Projects, learning journey, skills, resume, and contact details for Mohd Zaheer Uddin.",
+    description:
+      "Projects, learning journey, skills, resume, and contact details for Mohd Zaheer Uddin.",
     type: "website",
   },
   icons: { icon: "/favicon.svg" },
 };
 
 export const viewport: Viewport = {
-  colorScheme: "dark light",
+  colorScheme: "light dark",
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
-    { media: "(prefers-color-scheme: light)", color: "#f4f4f2" },
+    { media: "(prefers-color-scheme: dark)", color: "#20211e" },
+    { media: "(prefers-color-scheme: light)", color: "#f6f3eb" },
   ],
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <body dir="ltr">
-        <ClickSound />
-        <ChromeEffects />
         {children}
         <Analytics />
       </body>
