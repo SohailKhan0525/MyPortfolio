@@ -26,8 +26,8 @@
 .instrument-description { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @media (max-width: 28rem) {
   .data-instrument { margin-top: 24px; }
-  .instrument-title { font-size: 11px; }
-  .instrument-replay { gap: 4px; font-size: 10px; min-height: 44px; }
+  .instrument-title { font-size: 12px; }
+  .instrument-replay { gap: 4px; font-size: 12px; min-height: 44px; }
   .instrument-labels { font-size: 9px; }
 }
 @media (prefers-reduced-motion: reduce) {
