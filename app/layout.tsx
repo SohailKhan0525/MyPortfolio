@@ -6,6 +6,7 @@ import "./interaction-fixes.css";
 import "./mobile-polish.css";
 import "./terminal-polish.css";
 import "./premium-enhancements.css";
+import "./portfolio-craft.css";
 import ClickSound from "./ClickSound";
 import ChromeEffects from "./ChromeEffects";
 

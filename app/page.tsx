@@ -1,10 +1,11 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
+import { AnimatePresence, LayoutGroup, MotionConfig, motion, useReducedMotion } from "motion/react";
+import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
 import Link from "next/link";
 import LiveStats from "./LiveStats";
-import { ArrowDown, ArrowUpRight, Brain, Briefcase, CaretDown, Check, Code, Cpu, GithubLogo, LinkedinLogo, List, Moon, PaperPlaneTilt, Sparkle, Sun, X } from "@phosphor-icons/react";
+import ProjectDisclosures from "./ProjectDisclosures";
+import { ArrowDown, ArrowUpRight, Briefcase, Check, Code, GithubLogo, LinkedinLogo, List, Moon, PaperPlaneTilt, Sparkle, Sun, X } from "@phosphor-icons/react";
 
 type Theme = "light" | "dark";
 type Contribution = { date: string; count: number; level: 0 | 1 | 2 | 3 | 4 };
@@ -93,32 +94,6 @@ function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; 
   return <div className={className}>{children}</div>;
 }
 
-function AiEraCard({ item, index }: { item: (typeof aiEra)[number]; index: number }) {
-  const [open, setOpen] = useState(index === 0);
-  const reduced = useReducedMotion();
-  return (
-    <motion.article className="ai-card surface" transition={{ layout: { duration: 0.45, ease: [0.32, 0.72, 0, 1] } }}>
-      <button type="button" className="ai-card-head" data-sound onClick={() => setOpen(v => !v)} aria-expanded={open} aria-controls={`ai-body-${item.id}`}>
-        <span className="ai-card-index">0{index + 1}</span>
-        <span className="ai-card-title"><strong>{item.name}</strong><small>{item.tag}</small></span>
-        <span className={`ai-status status-${item.id}`}>{item.status}</span>
-        <motion.span className="ai-caret" animate={{ rotate: open ? 180 : 0 }} transition={{ duration: reduced ? 0 : 0.15 }}><CaretDown size={16} /></motion.span>
-      </button>
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div key="body" id={`ai-body-${item.id}`} className="ai-card-body" initial={false} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduced ? 0 : 0.15 }}>
-            <div className="ai-card-body-inner">
-              <p>{item.blurb}</p>
-              <div className="ai-why"><Brain size={16} weight="bold" /><p>{item.why}</p></div>
-              <div className="stack-row">{item.stack.map(s => <span key={s}>{s}</span>)}</div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.article>
-  );
-}
-
 function ThemeToggle({ theme, change }: { theme: Theme; change: (theme: Theme) => void }) {
   const next = theme === "dark" ? "light" : "dark";
   const reduced = useReducedMotion();
@@ -188,7 +163,7 @@ function Terminal() {
   const reduced = useReducedMotion();
   const commands = ["help", "about", "projects", "ai", "skills", "contact", "clear"];
   const [input, setInput] = useState("");
-  const [history, setHistory] = useState<string[]>([]);
+  const [history, setHistory] = useState<string[]>(["$ whoami", "Mohd Zaheer Uddin", "CSIT undergraduate, ML & Data Science", "building practical Python + ML projects."]);
   const [index, setIndex] = useState(-1);
   const [ready, setReady] = useState(false);
   const [bootLines, setBootLines] = useState(0);
@@ -216,7 +191,7 @@ function Terminal() {
       : cmd === "projects" || cmd === "ls"
         ? projects.map(p => `${p[0]}  ${p[1]}`)
         : cmd === "ai"
-          ? [...aiEra.map(a => `${a.name} — ${a.status}`), "scroll to \"The AI era\" section for the full story"]
+          ? [...aiEra.map(a => `${a.name} — ${a.status}`), "scroll to \"Building with AI\" section for the full story"]
           : cmd === "skills"
           ? ["Python · scikit learn · pandas · NumPy", "Streamlit · Git/GitHub · HTML/CSS/JS"]
           : cmd === "contact"
@@ -242,10 +217,9 @@ function Terminal() {
 
   const key = (e: KeyboardEvent<HTMLInputElement>) => {
     const items = history.filter(x => x.startsWith("$ ")).map(x => x.slice(2));
-    if (e.key === "Tab") {
-      e.preventDefault();
-      const match = commands.find(c => c.startsWith(input.toLowerCase()));
-      if (match) setInput(match);
+    if (e.key === "Tab" && !e.shiftKey && input.trim()) {
+      const match = commands.find(c => c.startsWith(input.trim().toLowerCase()) && c !== input.trim().toLowerCase());
+      if (match) { e.preventDefault(); setInput(match); }
       return;
     }
     if (e.key === "ArrowUp") {
@@ -280,7 +254,7 @@ function Terminal() {
       <div className="terminal-screen">
         <div className="terminal-boot" aria-live="polite"><AnimatePresence initial={false}>{bootLines >= 1 && <motion.div key="boot-command" initial={false} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.25 }}><b>portfolio@zaheer</b>:~$ ./start.sh</motion.div>}{bootLines >= 2 && <motion.div key="boot-status" initial={false} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.25 }}><span>{ready ? "profile loaded. terminal ready." : "loading profile…"}</span></motion.div>}</AnimatePresence></div>
         <div ref={historyRef} className="terminal-history" aria-live="polite" aria-label="Terminal output"><AnimatePresence initial={false} mode="popLayout">{history.slice(-14).map((line, i) => <motion.div key={`${line}-${i}`} initial={false} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} transition={{ duration: reduced ? 0 : 0.15 }} className={`terminal-line ${line.startsWith("$ ") ? "terminal-command" : "terminal-output-line"}`}>{line}</motion.div>)}</AnimatePresence></div>
-        <form className="terminal-form" dir="ltr" onSubmit={submit}><span className="terminal-prompt" aria-hidden="true">$</span><input ref={inputRef} className="terminal-input" type="text" dir="ltr" value={input} onChange={e => setInput(e.target.value)} onKeyDown={key} disabled={!ready} placeholder={ready ? "type a command…" : "booting…"} aria-label="Terminal command" autoComplete="off" autoCorrect="off" autoCapitalize="none" spellCheck={false} /></form>
+        <form className="terminal-form" dir="ltr" onSubmit={submit}><span className="terminal-prompt" aria-hidden="true">$</span><input ref={inputRef} className="terminal-input" type="text" dir="ltr" value={input} onChange={e => setInput(e.target.value)} onKeyDown={key} disabled={!ready} placeholder={ready ? "type a command…" : "booting…"} aria-label="Terminal command" autoComplete="off" autoCorrect="off" autoCapitalize="none" spellCheck={false} /><button type="submit" className="terminal-submit" aria-label="Run command" disabled={!ready || !input.trim()}><ArrowUpRight size={18} aria-hidden="true" /></button></form>
         <div className="terminal-help"><span>↑↓ history / Tab complete / Enter run</span><div className="terminal-quick" aria-label="Quick terminal commands">{["help", "projects", "ai", "skills", "about"].map(cmd => <button key={cmd} type="button" className="terminal-chip" data-sound onClick={() => runQuick(cmd)}>{cmd}</button>)}</div></div>
       </div>
       <div className="terminal-bottom"><span>Portfolio shell v1.1</span><span>Type help to start</span></div>
@@ -296,6 +270,7 @@ export default function Home() {
   const [mobile, setMobile] = useState(false);
   const [active, setActive] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [currentSection, setCurrentSection] = useState("");
   const email = "sohailkhannnn.0525@gmail.com";
   const linkedin = "https://www.linkedin.com/in/mohd-zaheer-uddin-166b3b356/";
 
@@ -306,27 +281,27 @@ export default function Home() {
   };
 
   const nav = [["Work", "#work"], ["AI Era", "#ai-era"], ["About", "#about"], ["Journey", "#journey"], ["Skills", "#skills"], ["Resume", "/resume"], ["Contact", "#contact"]];
-  const heroRef = useRef<HTMLDivElement>(null);
-  const handleHeroMove = (e: PointerEvent<HTMLDivElement>) => {
-    const el = heroRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    el.style.setProperty("--mx", `${((e.clientX - rect.left) / rect.width) * 100}%`);
-    el.style.setProperty("--my", `${((e.clientY - rect.top) / rect.height) * 100}%`);
-  };
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      const visible = entries.find(entry => entry.isIntersecting);
+      if (visible) setCurrentSection(`#${visible.target.id}`);
+    }, { rootMargin: "-15% 0px -65% 0px" });
+    document.querySelectorAll("main section[id]").forEach(section => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
   const project = projects[active];
 
   return (
-    <div className="site-shell">
-      <header className="site-header" onKeyDown={e => { if (e.key === "Escape" && mobile) { setMobile(false); menuRef.current?.focus(); } }}><Link href="#top" className="brand" data-sound onClick={() => setMobile(false)}><span className="brand-mark">Q</span><span>Mohd Zaheer Uddin</span></Link><nav className={`desktop-nav ${mobile ? "mobile-visible" : ""}`} id="primary-navigation" aria-label="Primary navigation">{nav.map(([label, href]) => <Link key={label} href={href} className="nav-link" data-sound onClick={() => setMobile(false)}>{label}</Link>)}</nav><div className="header-actions"><ThemeToggle theme={theme} change={change} /><button ref={menuRef} className="mobile-menu-button" aria-controls="primary-navigation" data-sound type="button" onClick={() => setMobile(v => !v)} aria-expanded={mobile} aria-label="Toggle navigation">{mobile ? <X size={20} /> : <List size={20} />}</button></div></header>
+    <MotionConfig reducedMotion="user" transition={{ type: "spring", stiffness: 420, damping: 38 }}><div className="site-shell">
+      <header className="site-header" onKeyDown={e => { if (e.key === "Escape" && mobile) { setMobile(false); menuRef.current?.focus(); } }}><Link href="#top" className="brand" data-sound onClick={() => setMobile(false)}><span className="brand-mark">Q</span><span>Mohd Zaheer Uddin</span></Link><nav className={`desktop-nav ${mobile ? "mobile-visible" : ""}`} id="primary-navigation" aria-label="Primary navigation">{nav.map(([label, href]) => <Link key={label} href={href} className="nav-link" aria-current={currentSection === href ? "location" : undefined} data-sound onClick={() => setMobile(false)}>{label}{currentSection === href && <motion.span className="nav-current" layoutId="navigation-current" transition={{ duration: reduced ? 0 : 0.2 }} />}</Link>)}</nav><div className="header-actions"><ThemeToggle theme={theme} change={change} /><button ref={menuRef} className="mobile-menu-button" aria-controls="primary-navigation" data-sound type="button" onClick={() => setMobile(v => !v)} aria-expanded={mobile} aria-label="Toggle navigation">{mobile ? <X size={20} /> : <List size={20} />}</button></div></header>
       <a className="skip-link" href="#top">Skip to content</a><main id="top">
-        <section className="hero section-pad" ref={heroRef} onPointerMove={handleHeroMove}><div className="hero-copy"><Reveal delay={0.08}><h1>I build Python apps and machine learning projects.</h1></Reveal><Reveal delay={0.16}><p className="hero-description">I’m a CSIT undergraduate learning through datasets, models, and working apps.</p></Reveal><Reveal delay={0.24}><div className="hero-actions"><a className="button button-primary" data-sound href="#work">See the work <ArrowDown size={17} /></a><button className="text-button" data-sound type="button" onClick={copyEmail}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={16} /> : <PaperPlaneTilt size={16} />}</button></div></Reveal><Reveal delay={0.32}><div className="proof-row"><span>7 projects</span><span>Python + ML focus</span><span>Open to internships</span></div></Reveal></div><Reveal className="hero-art" delay={0.16}><Terminal /><p className="hero-note">Try <b>help</b>, <b>projects</b>, <b>skills</b>, or <b>about</b>.</p></Reveal></section>
-        <section id="work" className="section-pad section-block"><Reveal className="section-heading"><div><h2>Selected projects</h2></div><p>Select a project to see the app and its source code.</p></Reveal><Reveal className="work-layout" delay={0.1}><div className="project-list">{projects.map((p, i) => <motion.button key={p[0]} type="button" className={`project-row ${active === i ? "active" : ""}`} data-sound onMouseEnter={() => setActive(i)} onFocus={() => setActive(i)} aria-pressed={active === i} aria-controls="project-detail" onClick={() => { setActive(i); if (window.matchMedia("(max-width: 60rem)").matches) requestAnimationFrame(() => detailRef.current?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" })); }} whileTap={reduced ? undefined : { scale: 0.985 }}><span className="project-number">{p[0]}</span><span className="project-name"><strong>{p[1]}</strong><small>{p[2]}</small></span><ArrowUpRight className="project-arrow" size={17} /></motion.button>)}</div><AnimatePresence mode="wait"><motion.article key="project-detail" ref={detailRef} id="project-detail" aria-live="polite" className="project-detail surface" initial={false} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: reduced ? 0 : 0.15, ease: [0.22, 1, 0.36, 1] }}><div><div className="detail-top"><span className="eyebrow">{project[2]}</span><span>{project[0]}</span></div><h3>{project[1]}</h3><p>{project[3]}</p><div className="stack-row">{project[4].map(x => <span key={x}>{x}</span>)}</div></div><div className="detail-actions"><a className="button button-primary" data-sound href={project[5]} target="_blank" rel="noreferrer">Open project <ArrowUpRight size={16} /></a><a className="button button-secondary" data-sound href={project[6]} target="_blank" rel="noreferrer"><GithubLogo size={17} /> Source</a></div></motion.article></AnimatePresence></Reveal></section>
-        <section id="ai-era" className="section-pad section-block ai-era"><Reveal className="section-heading"><div><h2>Building with AI</h2></div><p>I use AI coding agents while learning the fundamentals. I write the specs, choose the architecture, and review the code. These are the products I’m working on.</p></Reveal><div className="ai-era-grid">{aiEra.map((item, i) => <Reveal key={item.id} delay={i * 0.08}><AiEraCard item={item} index={i} /></Reveal>)}</div></section>
+        <section className="hero section-pad" ><div className="hero-copy"><Reveal delay={0.08}><h1>I build Python apps and machine learning projects.</h1></Reveal><Reveal delay={0.16}><p className="hero-description">I’m a CSIT undergraduate learning through datasets, models, and working apps.</p></Reveal><Reveal delay={0.24}><div className="hero-actions"><a className="button button-primary" data-sound href="#work">See the work <ArrowDown size={17} /></a><button className="text-button" data-sound type="button" onClick={copyEmail}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={16} /> : <PaperPlaneTilt size={16} />}</button></div></Reveal><Reveal delay={0.32}><div className="proof-row"><span>7 projects</span><span>Python + ML focus</span><span>Open to internships</span></div></Reveal></div><Reveal className="hero-art" delay={0.16}><Terminal /><p className="hero-note">Try <b>help</b>, <b>projects</b>, <b>skills</b>, or <b>about</b>.</p></Reveal></section>
+        <section id="work" className="section-pad section-block"><Reveal className="section-heading"><div><h2>Selected projects</h2></div><p>Select a project to see the app and its source code.</p></Reveal><Reveal className="work-layout" delay={0.1}><LayoutGroup id="project-selection"><div className="project-list">{projects.map((p, i) => <motion.button key={p[0]} type="button" className={`project-row ${active === i ? "active" : ""}`} data-sound aria-pressed={active === i} aria-controls="project-detail" onClick={() => { setActive(i); if (window.matchMedia("(max-width: 60rem)").matches) requestAnimationFrame(() => detailRef.current?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" })); }} whileTap={reduced ? undefined : { scale: 0.985 }}>{active === i && <motion.span className="project-selection" layoutId="selected-project" transition={{ duration: reduced ? 0 : 0.22 }} aria-hidden="true" />}<span className="project-number">{p[0]}</span><span className="project-name"><strong>{p[1]}</strong><small>{p[2]}</small></span><ArrowUpRight className="project-arrow" size={17} /></motion.button>)}</div></LayoutGroup><article ref={detailRef} id="project-detail" aria-live="polite" className="project-detail surface"><motion.div key={project[0]} className="project-detail-content" initial={reduced ? false : { x: 8 }} animate={{ x: 0 }} transition={{ duration: reduced ? 0 : 0.2 }}><div><div className="detail-top"><span>{project[2]}</span><span className="detail-number">{project[0]}</span></div><h3>{project[1]}</h3><p>{project[3]}</p><div className="stack-row">{project[4].map(x => <span key={x}>{x}</span>)}</div></div><div className="detail-actions"><a className="button button-primary" data-sound href={project[5]} target="_blank" rel="noreferrer">Open project <ArrowUpRight size={16} /></a><a className="button button-secondary" data-sound href={project[6]} target="_blank" rel="noreferrer"><GithubLogo size={17} /> Source</a></div></motion.div></article></Reveal></section>
+        <section id="ai-era" className="section-pad section-block ai-era"><Reveal className="section-heading"><div><h2>Building with AI</h2></div><p>I use AI coding agents while learning the fundamentals. I write the specs, choose the architecture, and review the code. These are the products I’m working on.</p></Reveal><ProjectDisclosures items={aiEra} /></section>
         <section id="about" className="section-pad section-block"><Reveal className="section-heading"><div><h2>About me</h2></div></Reveal><div className="about-grid"><div className="about-copy"><p>I am a CSIT undergraduate focused on Python, machine learning, data analysis, and practical web development.</p><div className="about-facts"><span><Briefcase size={17} /> Open to internships</span><span><Code size={17} /> Python + ML</span><span><Sparkle size={17} /> Learning by building</span></div></div><Contributions /></div></section>
         <section id="journey" className="section-pad section-block"><Reveal className="section-heading"><div><h2>What I’m learning</h2></div><p>From Python fundamentals to models, apps, and deployment.</p></Reveal><div className="journey-grid">{[["01", "Python foundations", "Core syntax, OOP, files, data structures"], ["02", "ML experiments", "Regression, classification, evaluation"], ["03", "Interactive apps", "Turning models into usable tools"], ["04", "Better engineering", "Responsive UI, deployment, accessibility"]].map(x => <Reveal key={x[0]}><article className="journey-item"><span>{x[0]}</span><h3>{x[1]}</h3><p>{x[2]}</p></article></Reveal>)}</div></section>
         <section id="skills" className="section-pad section-block"><Reveal className="section-heading"><div><h2>Tools I use</h2></div><p>The languages and libraries behind these projects.</p></Reveal><div className="skills-grid">{skills.map(([name, desc], i) => <Reveal key={name} delay={(i % 4) * 0.06}><motion.article className="skill-card surface" ><span className="skill-index">0{i + 1}</span><strong>{name}</strong><span>{desc}</span></motion.article></Reveal>)}</div></section>
-        <section id="contact" className="section-pad section-block"><Reveal><div className="surface contact-card"><div><h2>Get in touch</h2><p>I’m open to internships and collaborations. Email me or connect on LinkedIn.</p></div><div className="contact-actions"><button className="button button-primary" data-sound type="button" onClick={copyEmail}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={17} /> : <PaperPlaneTilt size={17} />}</button><a className="button button-secondary" data-sound href={linkedin} target="_blank" rel="noreferrer"><LinkedinLogo size={17} /> LinkedIn</a><a className="button button-secondary" data-sound href="https://github.com/SohailKhan0525" target="_blank" rel="noreferrer"><GithubLogo size={17} /> GitHub</a></div></div></Reveal></section>
+        <section id="contact" className="section-pad section-block"><Reveal><div className="surface contact-card"><div><h2>Get in touch</h2><p>I’m open to internships and collaborations. Email me or connect on LinkedIn.</p></div><div className="contact-actions"><a className="contact-email" href={`mailto:${email}`}>{email}</a><button className="button button-primary" data-sound type="button" onClick={copyEmail}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={17} /> : <PaperPlaneTilt size={17} />}</button><a className="button button-secondary" data-sound href={linkedin} target="_blank" rel="noreferrer"><LinkedinLogo size={17} /> LinkedIn</a><a className="button button-secondary" data-sound href="https://github.com/SohailKhan0525" target="_blank" rel="noreferrer"><GithubLogo size={17} /> GitHub</a></div></div></Reveal></section>
       </main>
 
       <LiveStats />
@@ -338,6 +313,6 @@ export default function Home() {
         </div>
         <div className="footer-bottom"><span>© 2026 Mohd Zaheer Uddin. Built with Next.js &amp; deployed on Vercel.</span><span>Available for internships &amp; collaborations.</span></div>
       </footer>
-    </div>
+    </div></MotionConfig>
   );
 }

@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.7",
+    "@radix-ui/react-accordion": "^1.2.12",
     "@vercel/analytics": "^2.0.1",
     "howler": "^2.2.4",
     "motion": "^13.2.0",
