@@ -94,7 +94,7 @@ function Earthquake({ draw }: { draw: boolean }) {
 
 function Heart({ draw }: { draw: boolean }) {
   return <>
-    <motion.g initial={false} style={{ transformBox: "view-box", transformOrigin: "168px 120px" }}
+    <motion.g initial={false} style={{ transformBox: "view-box", originX: "168px", originY: "120px" }}
       animate={{ scale: draw ? [1, 1.07, 1, 1.04, 1] : 1 }}
       transition={{ duration: draw ? 1.7 : 0, ease: "easeInOut" }}>
       <path d="M168 186C138 170 92 145 91 105c-1-30 20-51 47-48 14 1 24 9 30 20 7-11 18-19 33-20 27-2 46 20 45 48-2 38-45 65-78 81Z" fill={wash} strokeWidth="1.6" />
@@ -169,7 +169,7 @@ function Bank({ draw }: { draw: boolean }) {
     <path d="M77 62 209 86v118L77 180Z M77 62l42-29 132 24v118l-42 29 M209 86l42-29" />
     <path d="m94 83 97 18v81l-97-18Z" stroke={secondary} />
     <ellipse cx="143" cy="132" rx="24" ry="30" transform="rotate(-11 143 132)" fill={wash} />
-    <motion.g initial={false} style={{ transformBox: "view-box", transformOrigin: "143px 132px" }} animate={{ rotate: draw ? [-75, 0] : 0 }} transition={{ duration: draw ? 1.6 : 0, ease }}>
+    <motion.g initial={false} style={{ transformBox: "view-box", originX: "143px", originY: "132px" }} animate={{ rotate: draw ? [-75, 0] : 0 }} transition={{ duration: draw ? 1.6 : 0, ease }}>
       <ellipse cx="143" cy="132" rx="7" ry="9" transform="rotate(-11 143 132)" stroke={signal} />
       <path d="m143 123-3-14 M149 130l13-4 M148 139l8 14 M137 136l-13 6" stroke={secondary} />
     </motion.g>

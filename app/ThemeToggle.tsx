@@ -105,7 +105,7 @@ export default function ThemeToggle() {
           ))}
           <motion.path d="M25 7v4m-2-2h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"
             initial={false} animate={{ opacity: light ? 0 : 0.9, scale: light ? 0.3 : 1 }}
-            style={{ transformBox: "view-box", transformOrigin: "25px 9px" }} transition={spring} />
+            style={{ transformBox: "view-box", originX: "25px", originY: "9px" }} transition={spring} />
         </motion.svg>
       </motion.span>
     </motion.button>
