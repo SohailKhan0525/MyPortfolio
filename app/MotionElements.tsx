@@ -21,12 +21,12 @@ export function Reveal({ children, delay = 0, className = "", sequence = false }
     // Observe the stationary wrapper and move only its children. Moving the
     // observed node itself can retrigger IntersectionObserver at a scroll edge.
     const targets = Array.from(node.children);
-    if (reduced || !inView) {
+    if (!inView) {
       animate(targets, { opacity: 1, y: 0 }, { duration: 0 });
       return;
     }
-    const controls = animate(targets, { opacity: [0.12, 1], y: [32, 0] }, {
-      duration: 0.85, delay: sequence ? stagger(0.09, { startDelay: delay }) : delay, ease: easeOut,
+    const controls = animate(targets, { opacity: reduced ? [0.65, 1] : [0.12, 1], y: reduced ? 0 : [32, 0] }, {
+      duration: reduced ? 0.28 : 0.85, delay: reduced ? 0 : sequence ? stagger(0.09, { startDelay: delay }) : delay, ease: easeOut,
     });
     return () => controls.stop();
   }, [inView, reduced, ready, sequence, delay, animate, scope]);
@@ -54,9 +54,9 @@ export function AnimatedHeading({ children }: { children: string }) {
   const { reduced, ready } = usePortfolioMotion();
   useEffect(() => {
     if (!scope.current || !ready) return;
-    if (reduced || !inView) { animate(".hero-word", { y: 0, opacity: 1, rotateX: 0 }, { duration: 0 }); return; }
-    const controls = animate(".hero-word", { y: [32, 0], opacity: [0.1, 1], rotateX: [20, 0] }, {
-      duration: 0.85, delay: stagger(0.055), ease: easeOut,
+    if (!inView) { animate(".hero-word", { y: 0, opacity: 1, rotateX: 0 }, { duration: 0 }); return; }
+    const controls = animate(".hero-word", { y: reduced ? 0 : [32, 0], opacity: reduced ? [0.65, 1] : [0.1, 1], rotateX: reduced ? 0 : [20, 0] }, {
+      duration: reduced ? 0.28 : 0.85, delay: reduced ? 0 : stagger(0.055), ease: easeOut,
     });
     return () => controls.stop();
   }, [inView, reduced, ready, animate, scope]);

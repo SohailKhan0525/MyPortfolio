@@ -24,7 +24,9 @@ export default function PortfolioMotionProvider({ children }: { children: ReactN
   const value = useMemo(() => ({ reduced, ready }), [reduced, ready]);
 
   return <MotionPreferences.Provider value={value}>
-    <MotionConfig reducedMotion={reduced ? "always" : "user"} transition={{ type: "spring", stiffness: 400, damping: 36 }}>
+    {/* Motion 13 captures this policy when each visual element mounts. Starting
+        with "always" permanently disabled its transform animation after hydration. */}
+    <MotionConfig reducedMotion="user" transition={{ type: "spring", stiffness: 400, damping: 36 }}>
       {children}
     </MotionConfig>
   </MotionPreferences.Provider>;

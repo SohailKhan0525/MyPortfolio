@@ -9,6 +9,7 @@ import DataInstrument from "./DataInstrument";
 import ProjectIllustration from "./ProjectIllustration";
 import LearningJourney from "./LearningJourney";
 import ThemeToggle from "./ThemeToggle";
+import UnderpageFooter from "./UnderpageFooter";
 import { usePortfolioMotion } from "./MotionPreferences";
 import { AnimatedHeading, AnimatedMetric, CopyLabel, MotionButton, MotionLink, MotionSection, Reveal } from "./MotionElements";
 import { ArrowDown, ArrowUpRight, Briefcase, Check, Code, GithubLogo, LinkedinLogo, List, PaperPlaneTilt, Sparkle, X } from "@phosphor-icons/react";
@@ -245,6 +246,7 @@ export default function Home() {
 
   return (
     <div className="site-shell">
+      <div className="portfolio-foreground">
       <header className="site-header" onKeyDown={e => { if (e.key === "Escape" && mobile) { setMobile(false); menuRef.current?.focus(); } }}><Link href="#top" className="brand" data-sound onClick={() => setMobile(false)}><span className="brand-mark">Q</span><span>Mohd Zaheer Uddin</span></Link><nav className={`desktop-nav ${mobile ? "mobile-visible" : ""}`} id="primary-navigation" aria-label="Primary navigation">{nav.map(([label, href]) => <Link key={label} href={href} className="nav-link" aria-current={currentSection === href ? "location" : undefined} data-sound onClick={() => setMobile(false)}>{label}{currentSection === href && <motion.span className="nav-current" layoutId="navigation-current" transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 380, damping: 32 }} />}</Link>)}</nav><div className="header-actions"><ThemeToggle /><motion.button whileTap={reduced ? undefined : { scale: 0.92 }} ref={menuRef} className="mobile-menu-button" aria-controls="primary-navigation" data-sound type="button" onClick={() => setMobile(v => !v)} aria-expanded={mobile} aria-label="Toggle navigation"><AnimatePresence mode="wait" initial={false}><motion.span key={String(mobile)} initial={reduced ? false : { opacity: 0, rotate: -45 }} animate={{ opacity: 1, rotate: 0 }} exit={{ opacity: 0, rotate: reduced ? 0 : 45 }} transition={{ type: "tween", duration: reduced ? 0 : 0.16 }}>{mobile ? <X size={20} /> : <List size={20} />}</motion.span></AnimatePresence></motion.button></div></header>
       <a className="skip-link" href="#top">Skip to content</a><main id="top">
         <MotionSection id="intro" className="hero section-pad"><div className="hero-copy"><AnimatedHeading>I build Python apps and machine learning projects.</AnimatedHeading><Reveal delay={0.16}><p className="hero-description">I’m a CSIT undergraduate learning through datasets, models, and working apps.</p></Reveal><Reveal delay={0.24}><div className="hero-actions"><MotionLink className="button button-primary" data-sound href="#work">See the work <ArrowDown size={17} /></MotionLink><MotionButton className="text-button" data-sound type="button" onClick={copyEmail}><CopyLabel copied={copied}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={16} /> : <PaperPlaneTilt size={16} />}</CopyLabel></MotionButton></div></Reveal><Reveal delay={0.32}><div className="proof-row"><span>7 projects</span><span>Python + ML focus</span><span>Open to internships</span></div></Reveal><DataInstrument /></div><Reveal className="hero-art" delay={0.16}><Terminal /><p className="hero-note">Try <b>help</b>, <b>projects</b>, <b>skills</b>, or <b>about</b>.</p></Reveal></MotionSection>
@@ -258,13 +260,8 @@ export default function Home() {
 
       <LiveStats />
 
-      <footer className="site-footer section-pad"><Reveal sequence>
-        <div className="footer-main">
-          <div className="footer-brand"><span className="brand-mark">Q</span><div><strong>Mohd Zaheer Uddin</strong><span>ML &amp; Data Science with Python</span></div></div>
-          <div className="footer-links"><Link href="#work">Work</Link><Link href="#about">About</Link><Link href="#skills">Skills</Link><Link href="#contact">Contact</Link><a href={linkedin} target="_blank" rel="noreferrer">LinkedIn</a><a href="https://github.com/SohailKhan0525" target="_blank" rel="noreferrer">GitHub</a></div>
-        </div>
-        <div className="footer-bottom"><span>© 2026 Mohd Zaheer Uddin. Built with Next.js &amp; deployed on Vercel.</span><span>Available for internships &amp; collaborations.</span></div>
-      </Reveal></footer>
+      </div>
+      <UnderpageFooter linkedin={linkedin} />
     </div>
   );
 }

@@ -30,7 +30,7 @@ html[data-motion="reduced"] .hero-word,
 html[data-motion="reduced"] .motion-control,
 html[data-motion="reduced"] .skill-card,
 html[data-motion="reduced"] .project-row {
-  opacity: 1 !important; transform: none !important;
+  transform: none !important;
 }
 @media (max-width: 40rem) {
   .header-actions { gap: 4px; }

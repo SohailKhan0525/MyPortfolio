@@ -1,0 +1,37 @@
+/* Hallmark · 2026-10-28 · existing system; Magic UI circular theme reveal.
+ * Critique: isolate the requested reveal from legacy root animations. */
+.magicui-theme-toggler {
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.magicui-theme-toggler:hover { border-color: var(--signal); color: var(--signal); }
+.magicui-theme-toggler:focus-visible { outline: 2px solid var(--signal); outline-offset: 4px; }
+.magicui-theme-icon { display: grid; place-items: center; width: 24px; height: 24px; }
+.magicui-theme-icon svg { display: block; width: 22px; height: 22px; }
+html[data-magicui-theme-vt="active"][data-theme]::view-transition-group(root) {
+  animation-duration: var(--magicui-theme-toggle-vt-duration);
+}
+html[data-magicui-theme-vt="active"][data-theme]::view-transition-old(root),
+html[data-magicui-theme-vt="active"][data-theme]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html[data-magicui-theme-vt="active"][data-theme]::view-transition-old(root) { z-index: 1; }
+html[data-magicui-theme-vt="active"][data-theme]::view-transition-new(root) {
+  z-index: 2;
+  clip-path: var(--magicui-theme-vt-clip-from);
+}
+@media (prefers-reduced-motion: reduce) {
+  .magicui-theme-toggler { transition: none !important; }
+}
