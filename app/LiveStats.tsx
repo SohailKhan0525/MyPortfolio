@@ -1,6 +1,8 @@
 "use client";
 
 import { motion } from "motion/react";
+import { AnimatedMetric, Reveal, easeOut } from "./MotionElements";
+import { usePortfolioMotion } from "./MotionPreferences";
 import { useCallback, useEffect, useState } from "react";
 
 type Stats = {
@@ -16,6 +18,7 @@ type Stats = {
 const fmt = (n = 0) => n.toLocaleString("en-IN");
 
 export default function LiveStats() {
+  const { reduced } = usePortfolioMotion();
   const [stats, setStats] = useState<Stats | null>(null);
   const [updated, setUpdated] = useState<Date | null>(null);
   const [, tick] = useState(0);
@@ -65,7 +68,7 @@ export default function LiveStats() {
 
   return (
     <section id="analytics" className="section-pad vs-section">
-      <motion.div className="surface vs-card" initial={false} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.65, ease: [0.32, 0.72, 0, 1] }}>
+      <Reveal className="surface vs-card" sequence>
         <div className="vs-head">
           <div>
             <h3>Site visits</h3>
@@ -80,21 +83,21 @@ export default function LiveStats() {
         ) : (
           <>
             <div className="vs-grid">
-              <div className="vs-stat"><span>Today</span><strong>{stats ? fmt(stats.today) : "–"}</strong><small>page views</small></div>
-              <div className="vs-stat"><span>This month</span><strong>{stats ? fmt(stats.month) : "–"}</strong><small>page views</small></div>
-              <div className="vs-stat"><span>Unique visitors</span><strong>{stats ? fmt(stats.unique) : "–"}</strong><small>this month{stats ? ` · ${fmt(stats.uniqueToday)} today` : ""}</small></div>
+              <div className="vs-stat"><span>Today</span><strong>{stats ? <AnimatedMetric value={stats.today ?? 0} /> : "–"}</strong><small>page views</small></div>
+              <div className="vs-stat"><span>This month</span><strong>{stats ? <AnimatedMetric value={stats.month ?? 0} /> : "–"}</strong><small>page views</small></div>
+              <div className="vs-stat"><span>Unique visitors</span><strong>{stats ? <AnimatedMetric value={stats.unique ?? 0} /> : "–"}</strong><small>this month{stats ? ` · ${fmt(stats.uniqueToday)} today` : ""}</small></div>
             </div>
             <div className="vs-chart" role="img" aria-label="Page views per day for the last 30 days">
               <div className="vs-bars">
                 {bars.map((d, i) => (
-                  <i key={d.date} className={i === bars.length - 1 ? "is-today" : ""} title={`${d.date}: ${d.views} views`} style={{ height: `${Math.max(3, (d.views / max) * 100)}%`, animationDelay: `${i * 18}ms` }} />
+                  <motion.i initial={false} whileInView={reduced ? { scaleY: 1 } : { scaleY: [0.05, 1] }} viewport={{ once: true }} transition={{ type: "tween", duration: reduced ? 0 : 0.6, delay: reduced ? 0 : i * 0.012, ease: easeOut }} key={d.date} className={i === bars.length - 1 ? "is-today" : ""} title={`${d.date}: ${d.views} views`} style={{ height: `${Math.max(3, (d.views / max) * 100)}%` }} />
                 ))}
               </div>
               <div className="vs-axis"><span>30 days ago</span><span>daily page views</span><span>today</span></div>
             </div>
           </>
         )}
-      </motion.div>
+      </Reveal>
     </section>
   );
 }

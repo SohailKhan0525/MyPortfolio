@@ -1,6 +1,8 @@
 "use client";
 
-import { motion, useInView, useReducedMotion } from "motion/react";
+import { usePortfolioMotion } from "./MotionPreferences";
+
+import { motion, useInView } from "motion/react";
 import { useRef, type ReactNode } from "react";
 
 const ink = "var(--text)";
@@ -168,7 +170,7 @@ const scenes = [House, Earthquake, Heart, Student, Outcomes, Bank, Files];
 
 /** Original vector studies of the project subjects, not screenshots or model results. */
 export default function ProjectIllustration({ index }: { index: number }) {
-  const reducedMotion = useReducedMotion();
+  const { reduced: reducedMotion } = usePortfolioMotion();
   const drawing = useRef<SVGSVGElement>(null);
   const inView = useInView(drawing, { once: true, amount: 0.5 });
   const safeIndex = Number.isInteger(index) && index >= 0 && index < scenes.length ? index : 0;

@@ -1,0 +1,34 @@
+/* A coordinated motion system; all content has a readable, static server render. */
+.hero-word { display: inline-block; transform-origin: 50% 90%; }
+.motion-toggle { min-width: 44px; min-height: 44px; border-radius: 4px; background: transparent; }
+.motion-toggle[aria-pressed="true"] { color: var(--signal); }
+.motion-toggle[aria-disabled="true"] { cursor: default; }
+.copy-label, .copy-label > span { display: inline-flex; align-items: center; gap: 8px; }
+.copy-label { min-width: 98px; justify-content: center; }
+.metric-accessible { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.activity-stats strong span, .vs-stat strong span { font: inherit; color: inherit; margin: 0; }
+/* Motion owns transforms on these controls; CSS owns colors and focus outlines. */
+.button.motion-control, .text-button.motion-control { transition-property: background-color, color, border-color; }
+.button.motion-control:hover, .text-button.motion-control:hover,
+.button.motion-control:active, .text-button.motion-control:active { transform: none; }
+.project-row { transition-property: color, background-color, border-color; }
+.skill-card { transition-property: color, background-color, border-color; }
+.skill-card:hover .skill-index { color: var(--signal); }
+.vs-bars i { animation: none; }
+.footer-main { width: 100%; }
+html[data-motion="reduced"] { scroll-behavior: auto; }
+html[data-motion="reduced"] *, html[data-motion="reduced"] *::before, html[data-motion="reduced"] *::after {
+  animation: none !important; transition: none !important;
+}
+html[data-motion="reduced"] .motion-reveal,
+html[data-motion="reduced"] .motion-reveal > *,
+html[data-motion="reduced"] .hero-word,
+html[data-motion="reduced"] .motion-control,
+html[data-motion="reduced"] .skill-card,
+html[data-motion="reduced"] .project-row {
+  opacity: 1 !important; transform: none !important;
+}
+@media (max-width: 40rem) {
+  .header-actions { gap: 4px; }
+  .hero-word { letter-spacing: inherit; }
+}

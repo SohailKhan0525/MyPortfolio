@@ -1,6 +1,8 @@
 "use client";
 
-import { motion, useInView, useReducedMotion } from "motion/react";
+import { usePortfolioMotion } from "./MotionPreferences";
+
+import { motion, useInView } from "motion/react";
 import { useEffect, useId, useRef, useState } from "react";
 import "./data-instrument.css";
 
@@ -9,7 +11,7 @@ export default function DataInstrument() {
   const ref = useRef<HTMLElement>(null);
   const descriptionId = useId();
   const inView = useInView(ref, { once: true, amount: 0.6 });
-  const reduced = useReducedMotion();
+  const { reduced } = usePortfolioMotion();
   const [run, setRun] = useState(0);
 
   useEffect(() => {

@@ -10,6 +10,8 @@ import "./portfolio-craft.css";
 import "./portfolio-motion.css";
 import ClickSound from "./ClickSound";
 import ChromeEffects from "./ChromeEffects";
+import PortfolioMotionProvider from "./MotionPreferences";
+import "./motion-system.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mohdzaheeruddin0525.vercel.app"),
@@ -36,8 +38,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <body dir="ltr">
         <ClickSound />
-        <ChromeEffects />
-        {children}
+        <PortfolioMotionProvider>
+          <ChromeEffects />
+          {children}
+        </PortfolioMotionProvider>
         <Analytics />
       </body>
     </html>

@@ -34,6 +34,17 @@
   font-variant-numeric: tabular-nums;
 }
 
+.learning-journey .learning-node-fill {
+  position: absolute;
+  inset: -1px;
+  border: 1px solid var(--signal, var(--text));
+  border-radius: inherit;
+  background: var(--signal-soft, var(--surface));
+  pointer-events: none;
+}
+
+.learning-journey .learning-node-number { position: relative; z-index: 1; }
+
 .learning-journey .learning-copy { margin-top: 24px; }
 
 .learning-journey h3 {
@@ -119,4 +130,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .learning-journey .learning-seam span { transform: none !important; }
+  .learning-journey .learning-copy, .learning-journey .learning-node { opacity: 1 !important; transform: none !important; }
+  .learning-journey .learning-node-fill { opacity: 1 !important; }
 }

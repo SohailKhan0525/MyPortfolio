@@ -76,3 +76,37 @@ and a static timeline. Keep the keyboard-operated terminal and disclosure semant
   emulation, so an emulated reduced-motion run is not claimed.
 
 No frame-rate, Lighthouse or Core Web Vitals score is claimed from source review.
+
+## Expanded portfolio choreography
+
+The subsequent request explicitly asks for motion across the portfolio and a
+direct push to main without temporary previews. The implementation now covers:
+
+- Hero word entrances, followed by description, actions, proof and terminal.
+- Once-per-visit section and row entrances using `useInView`, `useAnimate` and
+  `stagger`, from complete, readable server-rendered markup.
+- Spring hover, press and keyboard-focus feedback on actionable links/buttons.
+- Shared navigation and project-selection indicators, project-detail entrances,
+  presence-driven copy confirmation, and theme/menu icon transitions.
+- Smooth accordion expansion and collapse, with staggered body content. This is
+  a deliberate bounded height-animation exception for the requested interaction.
+  Closed regions keep stable IDs and are immediately inert and aria-hidden.
+- Scroll-linked timeline node fills and scale, plus the page-progress spring.
+- Actual contribution/visitor number transitions and staggered chart-bar growth.
+- The existing finite SVG traces and replayable data instrument.
+
+The header motion control persists the visitor's choice. The operating system's
+reduced-motion preference takes precedence. The shared setting stops imperative
+sequences, custom traces and CSS transitions and renders their completed states.
+No data, content sections, destinations or terminal commands are removed.
+
+This uses the installed Motion 13 API set, not every demo or paid component in
+the latest documentation. GSAP is not needed for these interactions. Primary
+references: [scoped animation](https://motion.dev/docs/react-use-animate),
+[gestures](https://motion.dev/docs/react-gestures), and
+[presence](https://motion.dev/docs/react-animate-presence).
+
+Pre-push checks: TypeScript and whitespace checks passed; project/skill/AI records,
+section order and link destinations match the previous main. Independent source
+review found no blocking preservation or reduced-motion issues. Live verification
+follows the direct production deployment; no temporary preview is created.
