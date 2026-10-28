@@ -1,0 +1,49 @@
+.robot-companion {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  height: 232px;
+  margin: 0;
+  overflow: hidden;
+  isolation: isolate;
+  contain: layout paint;
+  pointer-events: none;
+  user-select: none;
+}
+
+.robot-canvas,
+.robot-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.robot-canvas { opacity: 0; }
+.robot-poster { object-fit: contain; }
+.robot-companion[data-loaded="true"] .robot-canvas { opacity: 1; }
+.robot-companion[data-loaded="true"] .robot-poster { visibility: hidden; }
+.robot-companion canvas { display: block; width: 100%; height: 100%; }
+
+@media (max-width: 40rem) {
+  .robot-companion { height: 216px; }
+}
+
+@media (max-width: 900px) {
+  /* Keep the automatic hello visible before the long hero copy on phones. */
+  .hero.hero-with-companion { row-gap: 28px; }
+  .hero-with-companion > .robot-companion { grid-column: 1; grid-row: 1; }
+  .hero-with-companion > .hero-copy { grid-column: 1; grid-row: 2; }
+  .hero-with-companion > .hero-art { grid-column: 1; grid-row: 3; }
+}
+
+@media print {
+  .robot-companion .robot-canvas { display: none; }
+  .robot-companion .robot-poster { visibility: visible; }
+}
+.hero.hero-with-companion { row-gap: 0; }
+.hero-with-companion > .hero-copy { grid-column: 1; grid-row: 1 / span 2; }
+.hero-with-companion > .robot-companion { grid-column: 2; grid-row: 1; align-self: end; }
+.hero-with-companion > .hero-art { grid-column: 2; grid-row: 2; align-self: start; }
+
