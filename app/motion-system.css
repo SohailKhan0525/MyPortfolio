@@ -29,9 +29,20 @@ html[data-motion="reduced"] .motion-reveal > *,
 html[data-motion="reduced"] .hero-word,
 html[data-motion="reduced"] .motion-control,
 html[data-motion="reduced"] .skill-card,
-html[data-motion="reduced"] .project-row {
+html[data-motion="reduced"] .project-row,
+html[data-motion="reduced"] .mobile-menu-button,
+html[data-motion="reduced"] .mobile-menu-button > span,
+html[data-motion="reduced"] .terminal-boot > div,
+html[data-motion="reduced"] .terminal-line,
+html[data-motion="reduced"] .copy-label > span,
+html[data-motion="reduced"] .vs-bars i,
+html[data-motion="reduced"] .nav-current,
+html[data-motion="reduced"] .project-selection,
+html[data-motion="reduced"] .ai-card-body-inner > *,
+html[data-motion="reduced"] .ai-caret {
   transform: none !important;
 }
+html[data-motion="reduced"] .ai-card[data-state="open"] .ai-caret { transform: rotate(180deg) !important; }
 @media (max-width: 40rem) {
   .header-actions { gap: 4px; }
   .hero-word { letter-spacing: inherit; }

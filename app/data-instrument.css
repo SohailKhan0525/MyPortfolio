@@ -1,4 +1,5 @@
-/* A finite, replayable illustration of the portfolio's actual subject. */
+/* Hallmark · 2026-10-28 · data traces replay only while visible.
+ * Critique: keep readable diagrams active while the visitor explores. */
 .data-instrument {
   width: 100%; max-width: 500px; margin: 28px 0 0; padding-top: 16px;
   border-top: 1px solid var(--line); color: var(--muted);
@@ -7,14 +8,14 @@
 .instrument-title { color: var(--text2, var(--muted)); font: 400 12px/1.5 var(--font-code, monospace); }
 .instrument-replay {
   display: inline-flex; align-items: center; justify-content: flex-end; gap: 8px;
-  min-height: 36px; padding: 4px 0 4px 8px; border: 0; border-radius: 3px;
-  background: transparent; color: var(--muted); font: 400 11px/1.5 var(--font-code, monospace);
+  min-height: 44px; padding: 4px 0 4px 8px; border: 0; border-radius: 3px;
+  background: transparent; color: var(--muted); font: 400 12px/1.5 var(--font-body);
   cursor: pointer; transition: color 160ms ease;
 }
 .instrument-replay:hover { color: var(--signal, var(--text)); }
 .instrument-replay:focus-visible { outline: 2px solid var(--signal, var(--text)); outline-offset: 3px; }
 .instrument-replay svg { flex: none; }
-.instrument-static { font: 400 11px/36px var(--font-code, monospace); }
+.instrument-static { font: 400 12px/44px var(--font-body); }
 .instrument-drawing { display: block; width: 100%; height: auto; overflow: visible; }
 .instrument-structure { stroke: color-mix(in srgb, var(--muted) 66%, transparent); }
 .instrument-ink { stroke: var(--text2, var(--muted)); }

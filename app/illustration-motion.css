@@ -1,0 +1,46 @@
+/* Hallmark · 2026-10-28 · original diagrams, visible playback controls.
+ * Critique: a one-shot trace was easy to miss while reading the page. */
+.illustration-playback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--muted);
+  font: 400 12px/1.5 var(--font-body);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 160ms ease;
+}
+.illustration-playback:hover { color: var(--signal); }
+.illustration-playback:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
+.illustration-playback:disabled { cursor: default; }
+.illustration-playback svg { flex: none; width: 14px; height: 14px; }
+.project-illustration { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
+.project-illustration > svg { grid-column: 1 / -1; }
+.project-illustration .illustration-playback,
+.project-illustration .illustration-static {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: center;
+  justify-self: end;
+  margin-inline: 12px;
+}
+.illustration-static { color: var(--muted); font: 400 12px/1.5 var(--font-body); }
+.project-illustration > figcaption {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: center;
+  min-width: 0;
+  margin-top: 0;
+  margin-right: 0;
+}
+.project-illustration .illustration-static { min-height: 44px; display: flex; align-items: center; }
+@media (prefers-reduced-motion: reduce) {
+  .illustration-playback { transition: none; }
+}

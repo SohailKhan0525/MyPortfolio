@@ -1,6 +1,7 @@
 "use client";
 
-import { usePortfolioMotion } from "./MotionPreferences";
+import { useIllustrationPlayback } from "./useIllustrationPlayback";
+import "./illustration-motion.css";
 
 import { motion, useInView } from "motion/react";
 import { useRef, type ReactNode } from "react";
@@ -32,20 +33,20 @@ function Registration({ x, y }: { x: number; y: number }) {
 const ease = [0.22, 1, 0.36, 1] as const;
 
 function Accent({ d, draw, delay = 0.7 }: { d: string; draw: boolean; delay?: number }) {
-  return <motion.path d={d} fill="none" stroke={signal} strokeWidth="2" initial={false}
-    animate={{ pathLength: draw ? [0, 1] : 1 }} transition={{ duration: draw ? 1.8 : 0, delay: draw ? delay : 0, ease }} />;
+  return <motion.path d={d} fill="none" stroke={signal} strokeWidth="2" initial={draw ? { pathLength: 0 } : false}
+    animate={{ pathLength: draw ? [0, 1] : 1 }} transition={{ type: "tween", duration: draw ? 1.8 : 0, delay: draw ? delay : 0, ease }} />;
 }
 
-/** Each drawing finishes in its complete state; scrolling back replays the study. */
+/** Each short study settles into its complete drawing between visible replays. */
 function Arrive({ draw, delay = 0, children }: { draw: boolean; delay?: number; children: ReactNode }) {
-  return <motion.g initial={false} animate={{ opacity: draw ? [0.15, 1] : 1, y: draw ? [12, 0] : 0 }}
-    transition={{ duration: draw ? 0.9 : 0, delay: draw ? delay : 0, ease }}>{children}</motion.g>;
+  return <motion.g initial={draw ? { opacity: 0.15, y: 12 } : false} animate={{ opacity: draw ? [0.15, 1] : 1, y: draw ? [12, 0] : 0 }}
+    transition={{ type: "tween", duration: draw ? 0.9 : 0, delay: draw ? delay : 0, ease }}>{children}</motion.g>;
 }
 
 function Pulse({ x, y, draw, delay = 0, radius = 30 }: { x: number; y: number; draw: boolean; delay?: number; radius?: number }) {
-  return <motion.circle cx={x} cy={y} fill="none" stroke={signal} strokeWidth="1.5" initial={false}
+  return <motion.circle cx={x} cy={y} fill="none" stroke={signal} strokeWidth="1.5" initial={draw ? { r: 5, opacity: 0 } : false}
     animate={{ r: draw ? [5, radius] : radius, opacity: draw ? [0, 0.85, 0] : 0 }}
-    transition={{ duration: draw ? 1.45 : 0, delay: draw ? delay : 0, ease: "easeOut" }} />;
+    transition={{ type: "tween", duration: draw ? 1.45 : 0, delay: draw ? delay : 0, ease: "easeOut" }} />;
 }
 
 function House({ draw }: { draw: boolean }) {
@@ -94,9 +95,9 @@ function Earthquake({ draw }: { draw: boolean }) {
 
 function Heart({ draw }: { draw: boolean }) {
   return <>
-    <motion.g initial={false} style={{ transformBox: "view-box", originX: "168px", originY: "120px" }}
+    <motion.g initial={draw ? { scale: 1 } : false} style={{ transformBox: "view-box", originX: "168px", originY: "120px" }}
       animate={{ scale: draw ? [1, 1.07, 1, 1.04, 1] : 1 }}
-      transition={{ duration: draw ? 1.7 : 0, ease: "easeInOut" }}>
+      transition={{ type: "tween", duration: draw ? 1.7 : 0, ease: "easeInOut" }}>
       <path d="M168 186C138 170 92 145 91 105c-1-30 20-51 47-48 14 1 24 9 30 20 7-11 18-19 33-20 27-2 46 20 45 48-2 38-45 65-78 81Z" fill={wash} strokeWidth="1.6" />
       <path d="M111 107c-1-19 12-31 27-30 M168 95v70" stroke={secondary} />
     </motion.g>
@@ -169,7 +170,7 @@ function Bank({ draw }: { draw: boolean }) {
     <path d="M77 62 209 86v118L77 180Z M77 62l42-29 132 24v118l-42 29 M209 86l42-29" />
     <path d="m94 83 97 18v81l-97-18Z" stroke={secondary} />
     <ellipse cx="143" cy="132" rx="24" ry="30" transform="rotate(-11 143 132)" fill={wash} />
-    <motion.g initial={false} style={{ transformBox: "view-box", originX: "143px", originY: "132px" }} animate={{ rotate: draw ? [-75, 0] : 0 }} transition={{ duration: draw ? 1.6 : 0, ease }}>
+    <motion.g initial={draw ? { rotate: -75 } : false} style={{ transformBox: "view-box", originX: "143px", originY: "132px" }} animate={{ rotate: draw ? [-75, 0] : 0 }} transition={{ type: "tween", duration: draw ? 1.6 : 0, ease }}>
       <ellipse cx="143" cy="132" rx="7" ry="9" transform="rotate(-11 143 132)" stroke={signal} />
       <path d="m143 123-3-14 M149 130l13-4 M148 139l8 14 M137 136l-13 6" stroke={secondary} />
     </motion.g>
@@ -204,18 +205,32 @@ const scenes = [House, Earthquake, Heart, Student, Outcomes, Bank, Files];
 
 /** Original vector studies of the project subjects, not screenshots or model results. */
 export default function ProjectIllustration({ index }: { index: number }) {
-  const { reduced: reducedMotion } = usePortfolioMotion();
   const drawing = useRef<SVGSVGElement>(null);
   const inView = useInView(drawing, { amount: 0.2, margin: "0px 0px -8% 0px" });
   const safeIndex = Number.isInteger(index) && index >= 0 && index < scenes.length ? index : 0;
+  const playback = useIllustrationPlayback(inView, 6800, safeIndex);
   const Scene = scenes[safeIndex];
   return (
+    <>
     <svg ref={drawing} className="project-drawing" viewBox="0 0 600 220" role="img" aria-label={descriptions[safeIndex]} style={{ display: "block", width: "100%", height: "auto", overflow: "visible" }} fill="none" stroke={ink} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
       <Registration x={18} y={18} />
       <Registration x={582} y={18} />
       <Registration x={18} y={202} />
       <Registration x={582} y={202} />
-      <Scene key={safeIndex} draw={inView && reducedMotion === false} />
+      <Scene key={`${safeIndex}-${playback.run}`} draw={playback.playing} />
     </svg>
+    {playback.ready && playback.reduced ? <span className="illustration-static">Reduced motion</span> : (
+      <motion.button type="button" className="illustration-playback" onClick={playback.toggle}
+        disabled={!playback.ready}
+        aria-label={playback.paused ? "Resume project illustration animation" : "Pause project illustration animation"}
+        title={playback.paused ? "Resume the animated study" : "Pause animation and show the completed drawing"}
+        whileTap={{ scale: 0.96 }} transition={{ type: "spring", stiffness: 420, damping: 28 }}>
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          {playback.paused ? <path d="m5 3 7 5-7 5Z" fill="currentColor" /> : <path d="M5 3v10M11 3v10" stroke="currentColor" strokeWidth="2" />}
+        </svg>
+        {playback.paused ? "Resume drawing" : "Pause drawing"}
+      </motion.button>
+    )}
+    </>
   );
 }

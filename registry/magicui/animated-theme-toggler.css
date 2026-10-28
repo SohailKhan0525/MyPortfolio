@@ -19,6 +19,12 @@
 .magicui-theme-toggler:focus-visible { outline: 2px solid var(--signal); outline-offset: 4px; }
 .magicui-theme-icon { display: grid; place-items: center; width: 24px; height: 24px; }
 .magicui-theme-icon svg { display: block; width: 22px; height: 22px; }
+.magicui-theme-toggler[data-reduced-motion="true"],
+.magicui-theme-toggler[data-reduced-motion="true"] .magicui-theme-icon {
+  transform: none !important;
+  opacity: 1 !important;
+  transition: none !important;
+}
 html[data-magicui-theme-vt="active"][data-theme]::view-transition-group(root) {
   animation-duration: var(--magicui-theme-toggle-vt-duration);
 }
@@ -33,5 +39,12 @@ html[data-magicui-theme-vt="active"][data-theme]::view-transition-new(root) {
   clip-path: var(--magicui-theme-vt-clip-from);
 }
 @media (prefers-reduced-motion: reduce) {
-  .magicui-theme-toggler { transition: none !important; }
+  .magicui-theme-toggler, .magicui-theme-icon {
+    transform: none !important;
+    opacity: 1 !important;
+    transition: none !important;
+  }
+  html[data-magicui-theme-vt="active"][data-theme]::view-transition-new(root) {
+    clip-path: none !important;
+  }
 }

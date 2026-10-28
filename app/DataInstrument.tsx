@@ -1,9 +1,10 @@
 "use client";
 
-import { usePortfolioMotion } from "./MotionPreferences";
+import { useIllustrationPlayback } from "./useIllustrationPlayback";
+import "./illustration-motion.css";
 
 import { motion, useInView } from "motion/react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useId, useRef } from "react";
 import "./data-instrument.css";
 
 /** A conceptual drawing, not a chart of measured model performance. */
@@ -11,30 +12,28 @@ export default function DataInstrument() {
   const ref = useRef<HTMLElement>(null);
   const descriptionId = useId();
   const inView = useInView(ref, { amount: 0.2, margin: "0px 0px -8% 0px" });
-  const { reduced } = usePortfolioMotion();
-  const [run, setRun] = useState(0);
-
-  useEffect(() => {
-    if (inView && reduced === false) setRun((current) => current + 1);
-  }, [inView, reduced]);
+  const playback = useIllustrationPlayback(inView);
+  const { ready, reduced, paused, run, playing } = playback;
 
   return (
     <figure ref={ref} className="data-instrument" aria-describedby={descriptionId}>
       <figcaption className="instrument-heading">
         <span className="instrument-title">Data → model → app</span>
-        {reduced ? <span className="instrument-static">Static view</span> : (
+        {ready && reduced ? <span className="instrument-static">Reduced motion</span> : (
           <motion.button
             type="button"
-            className="instrument-replay"
-            onClick={() => setRun((current) => current + 1)}
-            aria-label="Trace a record from data through a model into an app"
+            className="instrument-replay illustration-playback"
+            onClick={playback.toggle}
+            disabled={!ready}
+            aria-label={paused ? "Resume data record animation" : "Pause data record animation"}
+            title={paused ? "Resume tracing records through the model" : "Pause animation and show the completed diagram"}
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 420, damping: 28 }}
           >
             <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true">
-              <path d="M3.1 5.5A5 5 0 1 1 3 10M3 2v3.5h3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+              {paused ? <path d="m5 3 7 5-7 5Z" fill="currentColor" /> : <path d="M5 3v10M11 3v10" stroke="currentColor" strokeWidth="2" />}
             </svg>
-            Trace a record
+            {paused ? "Resume trace" : "Pause trace"}
           </motion.button>
         )}
       </figcaption>
@@ -73,19 +72,19 @@ export default function DataInstrument() {
           <path d="m450 58 5 5 10-12" className="instrument-signal" strokeWidth="1.7" />
         </g>
 
-        {run > 0 && inView && reduced === false && (
+        {playing && (
           <g key={run}>
             <motion.rect
               x="17" y="52" width="96" height="16" rx="1"
               fill="var(--signal, currentColor)"
               initial={{ opacity: 0 }}
               animate={{ opacity: [0, 0.42, 0] }}
-              transition={{ duration: 0.95, ease: "easeOut" }}
+              transition={{ type: "tween", duration: 0.95, ease: "easeOut" }}
             />
             <motion.g
               initial={{ x: 0, opacity: 0 }}
               animate={{ x: [0, 0, 184, 184, 368, 368], opacity: [0, 1, 1, 1, 1, 0] }}
-              transition={{ duration: 3.6, times: [0, 0.08, 0.42, 0.58, 0.92, 1], ease: [0.4, 0, 0.2, 1] }}
+              transition={{ type: "tween", duration: 3.6, times: [0, 0.08, 0.42, 0.58, 0.92, 1], ease: [0.4, 0, 0.2, 1] }}
             >
               <circle cx="64" cy="52" r="9" fill="var(--bg, #080808)" />
               <circle cx="64" cy="52" r="5" fill="var(--signal, currentColor)" />
@@ -94,34 +93,34 @@ export default function DataInstrument() {
               d="m213 76 75-48" stroke="var(--signal, currentColor)" strokeWidth="2.5"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: [0, 1], opacity: [0, 1, 1, 0] }}
-              transition={{ delay: 1.15, duration: 1.2, ease: "easeInOut" }}
+              transition={{ type: "tween", delay: 1.15, duration: 1.2, ease: "easeInOut" }}
             />
             <motion.circle
               cx="248" cy="53" stroke="var(--signal, currentColor)" strokeWidth="1.5"
               initial={{ opacity: 0 }}
               animate={{ r: [5, 22], opacity: [0, 0.85, 0] }}
-              transition={{ delay: 1.4, duration: 0.85 }}
+              transition={{ type: "tween", delay: 1.4, duration: 0.85 }}
             />
             <motion.rect
               x="442" y="42" width="30" height="32" rx="2"
               fill="var(--signal, currentColor)"
               initial={{ opacity: 0 }}
               animate={{ opacity: [0, 0.42, 0] }}
-              transition={{ delay: 2.95, duration: 0.65 }}
+              transition={{ type: "tween", delay: 2.95, duration: 0.65 }}
             />
             <motion.path
               d="m450 58 5 5 10-12" stroke="var(--signal, currentColor)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
               initial={{ pathLength: 0 }} animate={{ pathLength: [0, 1] }}
-              transition={{ delay: 2.95, duration: 0.65, ease: "easeOut" }}
+              transition={{ type: "tween", delay: 2.95, duration: 0.65, ease: "easeOut" }}
             />
           </g>
         )}
       </svg>
       <div className="instrument-labels" aria-hidden="true">
         {["01 / prepare", "02 / train", "03 / build"].map((label, index) => (
-          <motion.span key={`${label}-${run}`} initial={false}
-            animate={run > 0 && inView && !reduced ? { y: [0, -3, 0], opacity: [0.55, 1, 1] } : { y: 0, opacity: 1 }}
-            transition={{ duration: reduced ? 0 : 0.6, delay: reduced ? 0 : index * 1.4, ease: "easeOut" }}>{label}</motion.span>
+          <motion.span key={`${label}-${run}`} initial={playing ? { y: 0, opacity: 0.55 } : false}
+            animate={playing ? { y: [0, -3, 0], opacity: [0.55, 1, 1] } : { y: 0, opacity: 1 }}
+            transition={{ type: "tween", duration: playing ? 0.6 : 0, delay: playing ? index * 1.4 : 0, ease: "easeOut" }}>{label}</motion.span>
         ))}
       </div>
       <p id={descriptionId} className="instrument-description">A conceptual illustration of a data record moving through a model into an application.</p>

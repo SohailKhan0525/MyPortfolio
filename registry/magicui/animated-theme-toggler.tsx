@@ -31,7 +31,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
-import { motion, useReducedMotion, type HTMLMotionProps } from "motion/react";
+import { motion, type HTMLMotionProps } from "motion/react";
 import { Moon, Sun } from "@phosphor-icons/react";
 import "./animated-theme-toggler.css";
 
@@ -188,12 +188,30 @@ export function AnimatedThemeToggler({
   const transitioning = useRef(false);
   const transitionRef = useRef<ViewTransition | null>(null);
   const animationRef = useRef<Animation | null>(null);
+  const transitionGeneration = useRef(0);
+  const pendingApplyRef = useRef<(() => void) | null>(null);
   const fallbackTimer = useRef<number | null>(null);
   const mounted = useRef(true);
   const [busy, setBusy] = useState(false);
   const [iconRun, setIconRun] = useState(0);
-  const systemReduced = useReducedMotion();
-  const reduced = reduceMotion ?? systemReduced === true;
+  const [systemReduced, setSystemReduced] = useState(false);
+  const reduced = reduceMotion ?? systemReduced;
+  const reducedRef = useRef(reduced);
+  reducedRef.current = reduced;
+
+  useEffect(() => {
+    if (reduceMotion !== undefined) return;
+    // Keep standalone registry usage live too; the app passes its shared value.
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setSystemReduced(preference.matches);
+    update();
+    if (preference.addEventListener) preference.addEventListener("change", update);
+    else preference.addListener(update);
+    return () => {
+      if (preference.removeEventListener) preference.removeEventListener("change", update);
+      else preference.removeListener(update);
+    };
+  }, [reduceMotion]);
 
   useEffect(() => { themeRef.current = activeTheme; }, [activeTheme]);
 
@@ -204,6 +222,26 @@ export function AnimatedThemeToggler({
     root.style.removeProperty("--magicui-theme-toggle-vt-duration");
     root.style.removeProperty("--magicui-theme-vt-clip-from");
   }, []);
+
+  useEffect(() => {
+    if (!reduced) return;
+    // Invalidate callbacks before skipping the native transition: ready/finished
+    // may resolve later, after the preference has changed or a new toggle starts.
+    transitionGeneration.current += 1;
+    const transition = transitionRef.current;
+    transitionRef.current = null;
+    animationRef.current?.cancel();
+    animationRef.current = null;
+    pendingApplyRef.current?.();
+    pendingApplyRef.current = null;
+    transition?.skipTransition();
+    if (fallbackTimer.current !== null) window.clearTimeout(fallbackTimer.current);
+    fallbackTimer.current = null;
+    transitioning.current = false;
+    clearStyles();
+    setBusy(false);
+    setIconRun(0);
+  }, [reduced, clearStyles]);
 
   useEffect(() => {
     mounted.current = true;
@@ -217,6 +255,8 @@ export function AnimatedThemeToggler({
     }
     return () => {
       mounted.current = false;
+      transitionGeneration.current += 1;
+      pendingApplyRef.current = null;
       if (fallbackTimer.current !== null) window.clearTimeout(fallbackTimer.current);
       transitionRef.current?.skipTransition();
       animationRef.current?.cancel();
@@ -244,7 +284,7 @@ export function AnimatedThemeToggler({
       }
     };
     const playIcon = () => {
-      if (mounted.current) setIconRun(run => run + 1);
+      if (mounted.current && !reducedRef.current) setIconRun(run => run + 1);
     };
     const fallback = () => {
       if (!reduced) root.dataset.magicuiThemeFallback = "active";
@@ -272,12 +312,16 @@ export function AnimatedThemeToggler({
     root.dataset.magicuiThemeVt = "active";
     root.style.setProperty("--magicui-theme-toggle-vt-duration", `${duration}ms`);
     root.style.setProperty("--magicui-theme-vt-clip-from", clipPath[0]);
+    const generation = ++transitionGeneration.current;
+    pendingApplyRef.current = applyTheme;
     transitioning.current = true;
     setBusy(true);
     const cleanup = () => {
+      if (generation !== transitionGeneration.current) return;
       animationRef.current?.cancel();
       animationRef.current = null;
       transitionRef.current = null;
+      pendingApplyRef.current = null;
       transitioning.current = false;
       clearStyles();
       if (mounted.current) {
@@ -291,7 +335,7 @@ export function AnimatedThemeToggler({
       transitionRef.current = transition;
       transition.finished.finally(cleanup).catch(() => {});
       transition.ready.then(() => {
-        if (!mounted.current || transitionRef.current !== transition) return;
+        if (!mounted.current || reducedRef.current || generation !== transitionGeneration.current || transitionRef.current !== transition) return;
         animationRef.current = root.animate(
           { clipPath },
           {
@@ -303,6 +347,7 @@ export function AnimatedThemeToggler({
         );
       }).catch(() => {
         // Some mobile browsers expose the API but cannot capture this document.
+        if (generation !== transitionGeneration.current) return;
         transition.skipTransition();
         applyTheme();
       });
@@ -320,14 +365,15 @@ export function AnimatedThemeToggler({
       aria-busy={busy}
       title={`Switch to ${activeTheme === "dark" ? "light" : "dark"} mode`}
       data-theme-state={activeTheme}
+      data-reduced-motion={reduced}
       data-sound
       onClick={event => { onClick?.(event); if (!event.defaultPrevented) toggleTheme(); }}
-      whileTap={reduced ? undefined : { scale: 0.88 }}
-      whileHover={reduced ? undefined : { scale: 1.06 }}
-      transition={{ type: "spring", stiffness: 420, damping: 28 }}
+      whileTap={reduced ? { scale: 1 } : { scale: 0.88 }}
+      whileHover={reduced ? { scale: 1 } : { scale: 1.06 }}
+      transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 28 }}
     >
-      <motion.span key={`${activeTheme}-${iconRun}`} className="magicui-theme-icon" aria-hidden="true"
-        initial={iconRun === 0 ? false : { opacity: 0.3, rotate: reduced ? 0 : -90, scale: reduced ? 1 : 0.7 }}
+      <motion.span key={`${activeTheme}-${iconRun}-${reduced}`} className="magicui-theme-icon" aria-hidden="true"
+        initial={reduced || iconRun === 0 ? false : { opacity: 0.3, rotate: -90, scale: 0.7 }}
         animate={{ opacity: 1, rotate: 0, scale: 1 }}
         transition={{ duration: reduced ? 0.15 : 0.45, ease: [0.22, 1, 0.36, 1] }}
       >

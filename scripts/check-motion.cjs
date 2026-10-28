@@ -52,7 +52,7 @@ const intersect = (target, visible) => {
   observer.callback([{ target, isIntersecting: visible, intersectionRatio: visible ? 1 : 0 }]);
 };
 require.extensions[".css"] = () => {};
-require.extensions[".tsx"] = (module, filename) => {
+require.extensions[".ts"] = require.extensions[".tsx"] = (module, filename) => {
   const { outputText } = ts.transpileModule(fs.readFileSync(filename, "utf8"), {
     compilerOptions: {
       module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX,
@@ -73,13 +73,13 @@ const DataInstrument = require(path.join(repository, "app/DataInstrument.tsx")).
 const wait = duration => new Promise(resolve => setTimeout(resolve, duration));
 
 function TransformProbe() {
-  const { ready } = usePortfolioMotion();
+  const { ready, reduced } = usePortfolioMotion();
   const [target, setTarget] = useState(100);
   return React.createElement(motion.button, {
     id: "transform-probe", type: "button", initial: false,
     animate: { x: ready ? target : 0 },
-    transition: { type: "tween", duration: 0.7, ease: "linear" },
-    onClick: () => setTarget(200),
+    transition: { type: "tween", duration: reduced ? 0 : 0.7, ease: "linear" },
+    onClick: () => setTarget(current => current + 100),
   }, "Motion probe");
 }
 function MotionValueProbe() {
@@ -141,9 +141,8 @@ const translation = id => {
     // Crucially this is the default House illustration mounted BEFORE readiness,
     // not a newly selected/remounted project that would hide the hydration bug.
     const drawing = document.querySelector(".project-drawing");
-    const houseGroup = drawing.querySelector("g");
     const illustrationY = () => {
-      const transform = houseGroup.style.transform;
+      const transform = drawing.querySelector("g").style.transform;
       if (!transform || transform === "none") return 0;
       const match = transform.match(/translateY\(([-\d.]+)px\)/);
       assert(match, `Expected the House arrival translation, got ${transform}`);
@@ -163,16 +162,87 @@ const translation = id => {
     const replayY = illustrationY();
     assert(replayY > 0 && replayY < 12,
       `The same mounted illustration must replay after leaving/returning, got y=${replayY}`);
+    // Both scenes replay while still in view; no scroll or tap is needed.
+    const firstHouse = drawing.querySelector("g");
+    const firstRecord = instrument.querySelector('circle[cx="64"][r="9"]');
+    await act(async () => wait(6750));
+    await act(async () => wait(100));
+    assert.notEqual(drawing.querySelector("g"), firstHouse, "The project must start another visible cycle");
+    assert.notEqual(instrument.querySelector('circle[cx="64"][r="9"]'), firstRecord, "The hero trace must repeat while visible");
+    const repeatedY = illustrationY();
+    assert(repeatedY > 0 && repeatedY < 12, `The repeated project cycle must interpolate, got y=${repeatedY}`);
+
+    const clickControl = label => {
+      const button = document.querySelector(`button[aria-label="${label}"]`);
+      assert(button, `Missing illustration control: ${label}`);
+      button.click();
+    };
+    await act(async () => {
+      clickControl("Pause project illustration animation");
+      clickControl("Pause data record animation");
+    });
+    await act(async () => wait(32));
+    assert.equal(illustrationY(), 0, "Pausing settles the complete project drawing");
+    assert(!instrument.querySelector('circle[cx="64"][r="9"]'), "Pausing removes the moving hero overlay");
+    await act(async () => {
+      clickControl("Resume project illustration animation");
+      clickControl("Resume data record animation");
+    });
+    await act(async () => wait(100));
+    assert(illustrationY() > 0, "Resuming restarts the drawing");
+
+    // Android's setting can change while Chrome keeps this page mounted.
+    const probeNode = document.getElementById("transform-probe");
+    const changePreference = async reduced => act(async () => {
+      media.matches = reduced;
+      for (const callback of listeners) callback(media);
+    });
+    await changePreference(true);
+    await act(async () => wait(32));
+    assert.equal(document.documentElement.dataset.motion, "reduced");
+    assert.equal(illustrationY(), 0, "A live OS change stops the project's spatial movement");
+    assert(!instrument.querySelector('circle[cx="64"][r="9"]'), "Reduced motion stops the hero trace immediately");
+    assert.equal(document.getElementById("transform-probe"), probeNode, "Preference changes must not remount page content");
+    await changePreference(false);
+    await act(async () => wait(100));
+    assert.equal(document.documentElement.dataset.motion, "full");
+    assert(illustrationY() > 0 && illustrationY() < 12, "Turning reduction off restores spatial movement without reload");
+    assert(instrument.querySelector('circle[cx="64"][r="9"]'), "The hero trace resumes with full motion");
+    await act(async () => probeNode.click());
+    await act(async () => wait(100));
+    assert(translation("transform-probe") > 200 && translation("transform-probe") < 295,
+      "State survives preference changes and subsequent interactions interpolate");
+
+    const visibility = async hidden => act(async () => {
+      Object.defineProperty(document, "visibilityState", { configurable: true, value: hidden ? "hidden" : "visible" });
+      document.dispatchEvent(new dom.window.Event("visibilitychange"));
+    });
+    await visibility(true);
+    await act(async () => wait(32));
+    assert(!instrument.querySelector('circle[cx="64"][r="9"]'), "Hidden tabs stop the recurring hero animation");
+    assert.equal(illustrationY(), 0, "Hidden tabs settle the project drawing");
+    await visibility(false);
+    await act(async () => wait(100));
+    assert(illustrationY() > 0, "Returning to Chrome starts a new visible drawing cycle");
+    await act(async () => { intersect(drawing, false); intersect(instrument, false); });
+    await act(async () => wait(32));
+    assert(!instrument.querySelector('circle[cx="64"][r="9"]'), "Offscreen illustrations stop playback");
+    assert.equal(illustrationY(), 0);
+
+    // Also cover a fresh load with Android Remove animations already enabled.
     await act(async () => root.unmount());
     root = undefined;
-
-    media.matches = true;
-    for (const callback of listeners) callback(media);
+    await changePreference(true);
     root = createRoot(document.getElementById("root"));
     await act(async () => root.render(application()));
     await act(async () => wait(100));
-    assert.equal(translation("transform-probe"), 100, "Device reduced-motion setting skips spatial interpolation");
-    console.log("PASS: readable SSR, legacy pause migration, actual intermediate hydration transform, MotionValue interpolation, interaction motion, initial project SVG movement and viewport replay, visible hero keyframe sequence, and device reduced motion.");
+    assert.equal(translation("transform-probe"), 100, "Initial device preference skips spatial interpolation");
+    await changePreference(false);
+    await act(async () => document.getElementById("transform-probe").click());
+    await act(async () => wait(100));
+    assert(translation("transform-probe") > 100 && translation("transform-probe") < 195,
+      "A component first mounted under reduced motion can animate after a live setting change");
+    console.log("PASS: readable SSR, legacy pause migration, intermediate hydration and interaction transforms, MotionValues, repeated visible project/hero cycles, pause/resume, viewport and tab visibility, and live reduced-motion changes in both directions without remounting.");
   } finally {
     if (root) await act(async () => root.unmount());
     dom.window.close();
