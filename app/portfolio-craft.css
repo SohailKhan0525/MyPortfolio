@@ -90,7 +90,7 @@ h2 { font-size: clamp(28px, 3vw, 40px); font-weight: 500; line-height: 1.15; let
 .ai-card-title strong { font-size: 24px; line-height: 1.3; font-weight: 500; }
 .ai-card-title small { margin-top: 4px; font-size: 13px; }
 .ai-status { background: none; font: 400 13px/1.5 var(--font-body); text-align: right; }
-.ai-card-body-inner { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px 48px; padding: 0 48px 32px 64px; }
+.ai-card-body-inner { max-width: none; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px 48px; padding: 0 48px 32px 64px; }
 .ai-card-body-inner > p, .ai-why p { margin: 0; font-size: 15px; line-height: 1.8; max-width: none; }
 .ai-why { margin: 0; align-items: flex-start; gap: 12px; }
 .ai-why > svg { margin-top: 5px; flex: none; }
