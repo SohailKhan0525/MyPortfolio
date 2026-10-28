@@ -102,7 +102,7 @@ h2 { font-size: clamp(28px, 3vw, 40px); font-weight: 500; line-height: 1.15; let
 .activity-card { padding: 28px; border-radius: var(--craft-radius); background: none; }
 .activity-head h3 { font-size: 22px; }
 .activity-stats { margin-block: 24px; padding: 0; gap: 24px; }
-.activity-stats > div { padding: 0; }
+.activity-stats > div { padding: 0; background: none; }
 .activity-stats strong { font: 500 28px/1.2 var(--font-body); }
 .activity-stats span { font-size: 12px; }
 .journey-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
@@ -120,6 +120,7 @@ h2 { font-size: clamp(28px, 3vw, 40px); font-weight: 500; line-height: 1.15; let
 .contact-actions { margin-top: 0; justify-content: flex-start; gap: 12px; }
 .contact-email { width: 100%; font-size: clamp(17px, 2vw, 23px); line-height: 1.5; overflow-wrap: anywhere; margin-bottom: 8px; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 6px; }
 .vs-card { border-radius: var(--craft-radius); background: none; padding: 28px; }
+.vs-grid { background: none; gap: 24px; }
 .vs-stat { padding: 0; border: 0; background: none; border-radius: 0; }
 .vs-stat strong { font-family: var(--font-body); font-weight: 500; }
 .site-footer { width: min(calc(100% - 64px), var(--craft-measure)) !important; padding-top: 32px !important; }
