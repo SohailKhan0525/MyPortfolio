@@ -12,6 +12,7 @@ import ClickSound from "./ClickSound";
 import ChromeEffects from "./ChromeEffects";
 import PortfolioMotionProvider from "./MotionPreferences";
 import "./motion-system.css";
+import "./scroll-performance.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mohdzaheeruddin0525.vercel.app"),

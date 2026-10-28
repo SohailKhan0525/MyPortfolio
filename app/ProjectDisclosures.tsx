@@ -3,9 +3,9 @@
 import * as Accordion from "@radix-ui/react-accordion";
 import { Brain, CaretDown } from "@phosphor-icons/react";
 import { motion, useAnimationControls } from "motion/react";
-import { useEffect, useState, type ReactNode } from "react";
-import { Reveal } from "./MotionElements";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { usePortfolioMotion } from "./MotionPreferences";
+import "./sticky-projects.css";
 
 type ProjectRecord = {
   readonly id: string;
@@ -16,6 +16,65 @@ type ProjectRecord = {
   readonly why: string;
   readonly stack: readonly string[];
 };
+
+type StickyLayout = { mode: "cards" | "headings" | "flow"; tops: number[] };
+
+/** Native sticky positions do the scrolling. Measure intrinsic content only when
+ * it changes; observing the animated height would cause a layout read per frame. */
+function useStickyProjects(count: number) {
+  const stack = useRef<HTMLDivElement>(null);
+  const [layout, setLayout] = useState<StickyLayout>({ mode: "headings", tops: [] });
+
+  useEffect(() => {
+    const root = stack.current;
+    if (!root) return;
+    const cards = Array.from(root.querySelectorAll<HTMLElement>(".ai-card"));
+    const siteHeader = document.querySelector<HTMLElement>(".site-header");
+    let frame = 0;
+
+    const measure = () => {
+      frame = 0;
+      const viewport = window.visualViewport?.height ?? window.innerHeight;
+      const configuredTop = parseFloat(getComputedStyle(root).getPropertyValue("--portfolio-sticky-top")) || 96;
+      const baseTop = Math.max(configuredTop, (siteHeader?.getBoundingClientRect().height ?? 0) + 12);
+      const sizes = cards.map(card => ({
+        head: card.querySelector<HTMLElement>(".ai-record-heading")?.getBoundingClientRect().height ?? 0,
+        // Include closed bodies so opening a disclosure never changes the pin mode.
+        body: card.querySelector<HTMLElement>(".ai-card-body-inner")?.getBoundingClientRect().height ?? 0,
+      }));
+      let nextTop = baseTop;
+      const tops = sizes.map(({ head }) => {
+        const top = nextTop;
+        nextTop += head + 8;
+        return top;
+      });
+      const mode = sizes.every(({ head, body }, index) => tops[index] + head + body + 24 <= viewport)
+        ? "cards"
+        : sizes.every(({ head }) => baseTop + head + 80 <= viewport) ? "headings" : "flow";
+      const positions = mode === "cards" ? tops : sizes.map(() => baseTop);
+      setLayout(previous => previous.mode === mode && previous.tops.length === positions.length
+        && previous.tops.every((top, index) => top === positions[index])
+        ? previous : { mode, tops: positions });
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(measure);
+    };
+    schedule();
+    const observer = new ResizeObserver(schedule);
+    for (const element of root.querySelectorAll(".ai-record-heading, .ai-card-body-inner")) observer.observe(element);
+    if (siteHeader) observer.observe(siteHeader);
+    window.addEventListener("resize", schedule, { passive: true });
+    window.visualViewport?.addEventListener("resize", schedule, { passive: true });
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("resize", schedule);
+      window.visualViewport?.removeEventListener("resize", schedule);
+    };
+  }, [count]);
+
+  return { stack, layout };
+}
 
 /** A preference change must also stop a disclosure already in motion. */
 function DisclosureBody({ id, open, reduced, children }: {
@@ -47,6 +106,7 @@ function DisclosureBody({ id, open, reduced, children }: {
 
 export default function ProjectDisclosures({ items }: { items: readonly ProjectRecord[] }) {
   const [expanded, setExpanded] = useState<string[]>(["loopproof"]);
+  const { stack, layout } = useStickyProjects(items.length);
   const { reduced } = usePortfolioMotion();
   const ease = [0.22, 1, 0.36, 1] as const;
   const reveal = (open: boolean, order: number) => ({
@@ -56,14 +116,17 @@ export default function ProjectDisclosures({ items }: { items: readonly ProjectR
   });
 
   return (
-      <Accordion.Root type="multiple" value={expanded} onValueChange={setExpanded} className="ai-era-grid">
+      <Accordion.Root ref={stack} type="multiple" value={expanded} onValueChange={setExpanded}
+        className="ai-era-grid ai-project-stack" data-sticky-mode={layout.mode}>
         {items.map((item, index) => {
           const open = expanded.includes(item.id);
           const bodyId = `ai-body-${item.id}`;
           return (
-            <Reveal key={item.id}>
-              <Accordion.Item value={item.id} asChild>
-                <article className="ai-card surface">
+              <Accordion.Item key={item.id} value={item.id} asChild>
+                <article className="ai-card surface" style={{
+                  "--ai-pin-top": layout.tops[index] === undefined ? "var(--portfolio-sticky-top)" : `${layout.tops[index]}px`,
+                  "--ai-stack-order": index + 1,
+                } as CSSProperties}>
                   <Accordion.Header className="ai-record-heading">
                     <Accordion.Trigger className="ai-card-head" data-sound aria-controls={bodyId}>
                       <span className="ai-card-index">0{index + 1}</span>
@@ -85,7 +148,6 @@ export default function ProjectDisclosures({ items }: { items: readonly ProjectR
                   </DisclosureBody>
                 </article>
               </Accordion.Item>
-            </Reveal>
           );
         })}
       </Accordion.Root>

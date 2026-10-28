@@ -191,6 +191,18 @@ const translation = id => {
     await act(async () => wait(100));
     assert(illustrationY() > 0, "Resuming restarts the drawing");
 
+    // Native scrolling gets the frame budget; decorative SVG cycles wait for idle.
+    await act(async () => {
+      for (let i = 0; i < 40; i++) window.dispatchEvent(new dom.window.Event("scroll"));
+    });
+    await act(async () => wait(32));
+    assert(!instrument.querySelector('circle[cx="64"][r="9"]'), "Scrolling suspends the recurring hero overlay");
+    assert.equal(illustrationY(), 0, "Scrolling settles the project drawing");
+    await act(async () => wait(180));
+    await act(async () => wait(100));
+    assert(instrument.querySelector('circle[cx="64"][r="9"]'), "The hero resumes after native scrolling settles");
+    assert(illustrationY() > 0, "The project starts a fresh cycle after scroll idle");
+
     // Android's setting can change while Chrome keeps this page mounted.
     const probeNode = document.getElementById("transform-probe");
     const changePreference = async reduced => act(async () => {
@@ -242,7 +254,7 @@ const translation = id => {
     await act(async () => wait(100));
     assert(translation("transform-probe") > 100 && translation("transform-probe") < 195,
       "A component first mounted under reduced motion can animate after a live setting change");
-    console.log("PASS: readable SSR, legacy pause migration, intermediate hydration and interaction transforms, MotionValues, repeated visible project/hero cycles, pause/resume, viewport and tab visibility, and live reduced-motion changes in both directions without remounting.");
+    console.log("PASS: readable SSR, legacy pause migration, intermediate hydration and interaction transforms, MotionValues, repeated visible project/hero cycles, pause/resume, scroll-idle playback, viewport and tab visibility, and live reduced-motion changes in both directions without remounting.");
   } finally {
     if (root) await act(async () => root.unmount());
     dom.window.close();

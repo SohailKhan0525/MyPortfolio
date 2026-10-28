@@ -1,0 +1,7 @@
+/* Hallmark · 2026-10-28 · native scrolling, bounded motion work.
+ * Critique: a permanently promoted page layer wastes memory while scrolling. */
+.page-transition { will-change: auto; filter: none; }
+/* A full project panel must fit below the header before it can remain pinned. */
+@media (max-height: 48rem) {
+  .project-detail-reveal { position: static; }
+}

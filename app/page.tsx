@@ -2,17 +2,16 @@
 
 import { AnimatePresence, LayoutGroup, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
-import Link from "next/link";
 import LiveStats from "./LiveStats";
 import ProjectDisclosures from "./ProjectDisclosures";
 import DataInstrument from "./DataInstrument";
 import ProjectIllustration from "./ProjectIllustration";
 import LearningJourney from "./LearningJourney";
-import ThemeToggle from "./ThemeToggle";
+import PortfolioHeader from "./PortfolioHeader";
 import UnderpageFooter from "./UnderpageFooter";
 import { usePortfolioMotion } from "./MotionPreferences";
 import { AnimatedHeading, AnimatedMetric, CopyLabel, MotionButton, MotionLink, MotionSection, Reveal } from "./MotionElements";
-import { ArrowDown, ArrowUpRight, Briefcase, Check, Code, GithubLogo, LinkedinLogo, List, PaperPlaneTilt, Sparkle, X } from "@phosphor-icons/react";
+import { ArrowDown, ArrowUpRight, Briefcase, Check, Code, GithubLogo, LinkedinLogo, PaperPlaneTilt, Sparkle } from "@phosphor-icons/react";
 
 type Contribution = { date: string; count: number; level: 0 | 1 | 2 | 3 | 4 };
 
@@ -218,12 +217,9 @@ function Terminal() {
 
 export default function Home() {
   const { reduced } = usePortfolioMotion();
-  const menuRef = useRef<HTMLButtonElement>(null);
   const detailRef = useRef<HTMLElement>(null);
-  const [mobile, setMobile] = useState(false);
   const [active, setActive] = useState(0);
   const [copied, setCopied] = useState(false);
-  const [currentSection, setCurrentSection] = useState("");
   const email = "sohailkhannnn.0525@gmail.com";
   const linkedin = "https://www.linkedin.com/in/mohd-zaheer-uddin-166b3b356/";
 
@@ -233,21 +229,12 @@ export default function Home() {
     catch { window.location.href = `mailto:${email}`; }
   };
 
-  const nav = [["Work", "#work"], ["AI Era", "#ai-era"], ["About", "#about"], ["Journey", "#journey"], ["Skills", "#skills"], ["Resume", "/resume"], ["Contact", "#contact"]];
-  useEffect(() => {
-    const observer = new IntersectionObserver(entries => {
-      const visible = entries.find(entry => entry.isIntersecting);
-      if (visible) setCurrentSection(`#${visible.target.id}`);
-    }, { rootMargin: "-15% 0px -65% 0px" });
-    document.querySelectorAll("main section[id]").forEach(section => observer.observe(section));
-    return () => observer.disconnect();
-  }, []);
   const project = projects[active];
 
   return (
     <div className="site-shell">
       <div className="portfolio-foreground">
-      <header className="site-header" onKeyDown={e => { if (e.key === "Escape" && mobile) { setMobile(false); menuRef.current?.focus(); } }}><Link href="#top" className="brand" data-sound onClick={() => setMobile(false)}><span className="brand-mark">Q</span><span>Mohd Zaheer Uddin</span></Link><nav className={`desktop-nav ${mobile ? "mobile-visible" : ""}`} id="primary-navigation" aria-label="Primary navigation">{nav.map(([label, href]) => <Link key={label} href={href} className="nav-link" aria-current={currentSection === href ? "location" : undefined} data-sound onClick={() => setMobile(false)}>{label}{currentSection === href && <motion.span className="nav-current" layoutId="navigation-current" transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 380, damping: 32 }} />}</Link>)}</nav><div className="header-actions"><ThemeToggle /><motion.button whileTap={reduced ? undefined : { scale: 0.92 }} ref={menuRef} className="mobile-menu-button" aria-controls="primary-navigation" data-sound type="button" onClick={() => setMobile(v => !v)} aria-expanded={mobile} aria-label="Toggle navigation"><AnimatePresence mode="wait" initial={false}><motion.span key={String(mobile)} initial={reduced ? false : { opacity: 0, rotate: -45 }} animate={{ opacity: 1, rotate: 0 }} exit={{ opacity: 0, rotate: reduced ? 0 : 45 }} transition={{ type: "tween", duration: reduced ? 0 : 0.16 }}>{mobile ? <X size={20} /> : <List size={20} />}</motion.span></AnimatePresence></motion.button></div></header>
+      <PortfolioHeader />
       <a className="skip-link" href="#top">Skip to content</a><main id="top">
         <MotionSection id="intro" className="hero section-pad"><div className="hero-copy"><AnimatedHeading>I build Python apps and machine learning projects.</AnimatedHeading><Reveal delay={0.16}><p className="hero-description">I’m a CSIT undergraduate learning through datasets, models, and working apps.</p></Reveal><Reveal delay={0.24}><div className="hero-actions"><MotionLink className="button button-primary" data-sound href="#work">See the work <ArrowDown size={17} /></MotionLink><MotionButton className="text-button" data-sound type="button" onClick={copyEmail}><CopyLabel copied={copied}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={16} /> : <PaperPlaneTilt size={16} />}</CopyLabel></MotionButton></div></Reveal><Reveal delay={0.32}><div className="proof-row"><span>7 projects</span><span>Python + ML focus</span><span>Open to internships</span></div></Reveal><DataInstrument /></div><Reveal className="hero-art" delay={0.16}><Terminal /><p className="hero-note">Try <b>help</b>, <b>projects</b>, <b>skills</b>, or <b>about</b>.</p></Reveal></MotionSection>
         <MotionSection id="work" className="section-pad section-block"><Reveal className="section-heading" sequence><div><h2>Selected projects</h2></div><p>Select a project to see the app and its source code.</p></Reveal><div className="work-layout"><LayoutGroup id="project-selection"><div className="project-list">{projects.map((p, i) => <Reveal key={p[0]} delay={Math.min(i * 0.055, 0.22)}><motion.button key={p[0]} type="button" className={`project-row ${active === i ? "active" : ""}`} data-sound aria-pressed={active === i} aria-controls="project-detail" onClick={() => { setActive(i); if (window.matchMedia("(max-width: 60rem)").matches) requestAnimationFrame(() => detailRef.current?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" })); }} whileHover={reduced ? undefined : { x: 3 }} whileTap={reduced ? undefined : { scale: 0.985 }}>{active === i && <motion.span className="project-selection" layoutId="selected-project" transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 430, damping: 40 }} aria-hidden="true" />}<span className="project-number">{p[0]}</span><span className="project-name"><strong>{p[1]}</strong><small>{p[2]}</small></span><ArrowUpRight className="project-arrow" size={17} /></motion.button></Reveal>)}</div></LayoutGroup><Reveal className="project-detail-reveal"><article ref={detailRef} id="project-detail" aria-live="polite" className="project-detail surface"><motion.div key={project[0]} className="project-detail-content" initial={reduced ? false : { y: 14, opacity: 0.65 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: reduced ? 0 : 0.4, ease: [0.22, 1, 0.36, 1] }}><div><div className="detail-top"><span>{project[2]}</span><span className="detail-number">{project[0]} / 07</span></div><figure className="project-illustration"><ProjectIllustration index={active} /><figcaption>Concept study · {project[2]}</figcaption></figure><h3>{project[1]}</h3><p>{project[3]}</p><div className="stack-row">{project[4].map(x => <span key={x}>{x}</span>)}</div></div><div className="detail-actions"><MotionLink className="button button-primary" data-sound href={project[5]} target="_blank" rel="noreferrer">Open project <ArrowUpRight size={16} /></MotionLink><MotionLink className="button button-secondary" data-sound href={project[6]} target="_blank" rel="noreferrer"><GithubLogo size={17} /> Source</MotionLink></div></motion.div></article></Reveal></div></MotionSection>

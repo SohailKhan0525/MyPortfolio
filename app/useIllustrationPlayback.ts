@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { usePortfolioMotion } from "./MotionPreferences";
+import { useScrollActivity } from "./useScrollActivity";
 
 /** Replay a short study only while someone can see it. Pausing settles the art. */
 export function useIllustrationPlayback(inView: boolean, cycleMs = 6400, subjectKey = 0) {
   const { ready, reduced } = usePortfolioMotion();
+  const scrolling = useScrollActivity();
   const [pageVisible, setPageVisible] = useState(false);
   const [paused, setPaused] = useState(false);
   const [run, setRun] = useState(0);
@@ -17,7 +19,9 @@ export function useIllustrationPlayback(inView: boolean, cycleMs = 6400, subject
     return () => document.removeEventListener("visibilitychange", update);
   }, []);
 
-  const active = ready && !reduced && inView && pageVisible && !paused;
+  // Keep native scrolling free of SVG geometry updates and scene remounts.
+  // The complete diagram remains visible, then animates once scrolling settles.
+  const active = ready && !reduced && inView && pageVisible && !paused && !scrolling;
   useEffect(() => {
     if (!active) return;
     setRun(current => current + 1);

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import BrandMark from "./BrandMark";
 import { motion, useScroll, useTransform } from "motion/react";
 import { useEffect, useRef, useState, type FocusEvent } from "react";
 import { usePortfolioMotion } from "./MotionPreferences";
@@ -77,7 +78,7 @@ export default function UnderpageFooter({ linkedin }: { linkedin: string }) {
       <motion.div className="underpage-footer-content" style={{ y: enabled && !focused ? lift : 0 }}>
         <div className="footer-main">
           <div className="footer-brand">
-            <span className="brand-mark">Q</span>
+            <BrandMark />
             <div><strong>Mohd Zaheer Uddin</strong><span>ML &amp; Data Science with Python</span></div>
           </div>
           <div className="footer-links">

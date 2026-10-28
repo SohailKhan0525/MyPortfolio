@@ -1,0 +1,30 @@
+/* Hallmark · 2026-10-28 · supplied Qofeno symbol, original theme.
+ * Critique: replace the placeholder letter with the actual brand artwork. */
+.brand-mark.qofeno-mark {
+  --brand-art-size: 55px;
+  position: relative;
+  display: inline-block;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 40px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--text);
+}
+.brand-mark.qofeno-mark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  -webkit-mask: url("/qofeno-symbol.png") center / var(--brand-art-size) no-repeat;
+  mask: url("/qofeno-symbol.png") center / var(--brand-art-size) no-repeat;
+}
+.underpage-footer .footer-brand .brand-mark.qofeno-mark {
+  --brand-art-size: 60px;
+  flex-basis: 44px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  color: var(--signal);
+}
