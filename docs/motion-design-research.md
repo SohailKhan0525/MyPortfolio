@@ -62,6 +62,17 @@ and a static timeline. Keep the keyboard-operated terminal and disclosure semant
 - Hallmark static audit: the existing resume `Projects` heading is still flagged
   by rule 54. It is the semantic section heading, not a redundant eyebrow; it is
   retained. Legacy stylesheet warnings remain where later styles override them.
-- Production build and interactive browser verification: pending the preview build.
+- Vercel production-mode preview build: passed.
+- Browser layouts: checked at 320, 375, 414, 768, 1024, 1280, 1440 and 1920px
+  frame widths (the browser's scrollbar reduces content width by 15px); no
+  horizontal overflow. Dark and light themes checked.
+- All seven project selections display their matching illustration, title and
+  source destination. Mobile selection scrolls the detail into view.
+- Terminal submission, autocomplete and Tab escape checked. Mobile menu Escape
+  handling and AI disclosure Enter/Space operation checked.
+- Independent visual review: enlarged the mobile replay control text and confined
+  terminal exit animation to its scrollable output region.
+- Reduced-motion branches reviewed in source; this browser does not expose media
+  emulation, so an emulated reduced-motion run is not claimed.
 
 No frame-rate, Lighthouse or Core Web Vitals score is claimed from source review.

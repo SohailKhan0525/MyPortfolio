@@ -21,6 +21,7 @@ html[data-theme="light"] {
 .hero-terminal-real { border-color: var(--line-strong); }
 .terminal-status i { background: var(--signal); }
 .terminal-boot b, .terminal-prompt { color: var(--signal); }
+.terminal-history { position: relative; }
 .terminal-form:focus-within { border-color: var(--signal); }
 .terminal-submit:not(:disabled) { color: var(--bg); background: var(--signal); }
 .terminal-submit:not(:disabled):hover { background: var(--text); }
