@@ -1,0 +1,87 @@
+/* Hallmark · checked: 2026-10-28 · existing portfolio, illustration + motion pass.
+ * The user's requested illustrations use real project subjects. All source copy remains.
+ * One visible-by-default hero settle; finite vector traces; native scrolling. */
+:root {
+  --signal: #a3d8bc;
+  --signal-soft: #182820;
+  --text2: #c2c6c3;
+  --motion-ease: cubic-bezier(.22, 1, .36, 1);
+}
+html[data-theme="light"] {
+  --signal: #276446;
+  --signal-soft: #e4eee7;
+  --text2: #414a44;
+}
+.scroll-progress { background: var(--signal); }
+.hero { padding-block: 56px; gap: 56px; align-items: center; }
+.hero h1 { font-size: clamp(40px, 4.25vw, 58px); }
+.hero-description { margin-top: 24px; }
+.hero-actions { margin-top: 24px; }
+.proof-row { margin-top: 28px; }
+.hero-terminal-real { border-color: var(--line-strong); }
+.terminal-status i { background: var(--signal); }
+.terminal-boot b, .terminal-prompt { color: var(--signal); }
+.terminal-form:focus-within { border-color: var(--signal); }
+.terminal-submit:not(:disabled) { color: var(--bg); background: var(--signal); }
+.terminal-submit:not(:disabled):hover { background: var(--text); }
+.terminal-submit svg { transition: transform 180ms var(--motion-ease); }
+.terminal-submit:not(:disabled):hover svg { transform: translate(2px, -2px); }
+.terminal-chip:hover { border-color: var(--signal); color: var(--text); }
+.button, .text-button, .nav-link { transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms var(--motion-ease); }
+.nav-current { background: var(--signal); }
+.project-selection { background: var(--surface); border-left-color: var(--signal); }
+.project-row.active .project-number, .project-row.active .project-arrow { color: var(--signal); }
+.project-row.active .project-arrow { transform: translate(2px, -2px); }
+.project-arrow { transition: transform 220ms var(--motion-ease), color 180ms ease; }
+.project-detail { padding: 24px 28px 28px; min-height: 580px; background: var(--surface); }
+.project-detail-content { min-height: 528px; gap: 28px; }
+.detail-top { font-size: 12px; color: var(--muted); }
+.detail-number { font: 400 12px/1.5 var(--font-code); color: var(--muted); letter-spacing: 0; }
+.project-illustration { margin: 24px -12px 0; }
+.project-illustration > svg { display: block; width: 100%; height: auto; overflow: visible; }
+.project-illustration figcaption { margin: 12px 12px 0; color: var(--muted); font: 400 12px/1.5 var(--font-body); }
+.project-detail h3 { margin-top: 24px; font-size: clamp(26px, 2.5vw, 34px); max-width: 22ch; }
+.project-detail p { margin-top: 16px; }
+.project-detail .stack-row { margin-top: 20px; }
+.project-detail .detail-actions { gap: 12px; flex-wrap: wrap; }
+.ai-card-title strong { transition: color 180ms ease; }
+.ai-card-head:hover .ai-card-title strong, .ai-card[data-state="open"] .ai-card-index { color: var(--signal); }
+.ai-card-head { transition: background-color 180ms ease; }
+.ai-caret { border: 1px solid var(--line); width: 28px; height: 28px; border-radius: 50%; }
+.ai-card[data-state="open"] .ai-caret { border-color: var(--signal); color: var(--signal); }
+.contact-email { text-decoration-color: var(--line-strong); transition: color 180ms ease, text-decoration-color 180ms ease; }
+.contact-email:hover { color: var(--signal); text-decoration-color: currentColor; }
+.vs-dot { animation: none; background: var(--signal); box-shadow: none; }
+.vs-bars i.is-today { background: var(--signal); }
+.contribution-grid .level-4, .activity-legend .level-4 { background: var(--signal); }
+@media (max-width: 64rem) {
+  .desktop-nav.mobile-visible { transform-origin: top right; animation: navigation-enter 220ms var(--motion-ease); }
+}
+@keyframes navigation-enter { from { opacity: .85; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 60rem) {
+  .hero { gap: 40px; }
+  .hero h1 { max-width: 20ch; }
+  .hero-copy { max-width: 680px; }
+  .hero-art { max-width: 760px; }
+  .project-detail, .project-detail-content { min-height: 0; }
+  .project-illustration { max-width: 640px; margin-inline: auto; }
+  .project-detail h3 { max-width: none; }
+}
+@media (max-width: 40rem) {
+  .hero { gap: 32px; }
+  .proof-row { margin-top: 24px; gap: 8px 16px !important; }
+  .hero-actions .button { min-height: 48px !important; border-radius: 4px !important; font-size: 14px; }
+  .hero-terminal-real { border-radius: 8px !important; box-shadow: none !important; }
+  .project-drawing text { display: none; }
+  .project-detail { padding: 20px; }
+  .project-illustration { margin: 20px -12px 0; }
+  .project-illustration figcaption { margin-top: 8px; font-size: 10px; }
+  .project-detail h3 { font-size: 27px; margin-top: 20px; }
+  .project-detail p { font-size: 15px; }
+  .detail-actions .button { padding-inline: 12px; font-size: 13px; }
+  .ai-caret { width: 24px; height: 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-copy, .desktop-nav.mobile-visible, .project-detail-content, .project-arrow { transform: none !important; }
+  .desktop-nav.mobile-visible { animation: none; }
+}
