@@ -1,5 +1,6 @@
 /* Hallmark · 2026-10-28 · native sticky project reading, original content.
- * Critique: repeated entrances compete with scrolling; pin readable records instead. */
+ * Critique: pin each record's heading without overlapping the next record or
+ * reserving empty card space. The article's natural end releases its own heading. */
 :root { --portfolio-sticky-top: 96px; }
 .ai-project-stack {
   position: relative;
@@ -7,11 +8,9 @@
   display: block;
   border-top: 0;
 }
-.ai-project-stack[data-sticky-mode="cards"] { padding-bottom: clamp(64px, 16svh, 144px); }
 .ai-project-stack > .ai-card,
 .ai-project-stack > .ai-card:hover {
   position: relative;
-  z-index: var(--ai-stack-order);
   overflow: visible;
   background: var(--bg);
   border-top: 1px solid var(--line);
@@ -26,10 +25,6 @@
   scroll-margin-top: calc(var(--ai-pin-top) + 16px);
 }
 .ai-project-stack .ai-card-head { scroll-margin-top: calc(var(--ai-pin-top) + 16px); }
-.ai-project-stack[data-sticky-mode="cards"] > .ai-card {
-  position: sticky;
-  top: var(--ai-pin-top);
-}
 .ai-project-stack[data-sticky-mode="headings"] .ai-record-heading {
   position: sticky;
   top: var(--ai-pin-top);
@@ -39,7 +34,6 @@
   .ai-project-stack > .ai-card { margin-bottom: 16px; }
 }
 @media print {
-  .ai-project-stack[data-sticky-mode] { padding-bottom: 0; }
   .ai-project-stack[data-sticky-mode] > .ai-card,
   .ai-project-stack[data-sticky-mode] .ai-record-heading { position: static; }
 }

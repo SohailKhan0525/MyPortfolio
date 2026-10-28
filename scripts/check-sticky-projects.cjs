@@ -56,8 +56,9 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
         await act(async () => root.render(React.createElement(ProjectDisclosures, { items })));
         await act(async () => wait(40));
         const stack = document.querySelector('.ai-project-stack');
-        assert.equal(stack.dataset.stickyMode, 'cards');
-        assert.deepEqual([...stack.querySelectorAll('.ai-card')].map(x => x.style.getPropertyValue('--ai-pin-top')), ['96px', '204px', '312px']);
+        assert.equal(stack.dataset.stickyMode, 'headings', 'Desktop records use native pinned headings');
+        assert.equal(stack.style.getPropertyValue('--ai-pin-top'), '96px');
+        assert([...stack.children].every(card => !card.style.height && !card.style.minHeight), 'Cards retain natural content heights');
         assert.equal(stack.children.length, 3, 'Direct cards have no transformed reveal wrapper');
         for (const observer of observers)
             for (const target of observer.targets)
@@ -73,7 +74,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
         await act(async () => window.dispatchEvent(new dom.window.Event('resize')));
         await act(async () => wait(40));
         assert.equal(stack.dataset.stickyMode, 'headings', 'Tall mobile content uses pinned headings and natural page scrolling');
-        assert.deepEqual([...stack.querySelectorAll('.ai-card')].map(x => x.style.getPropertyValue('--ai-pin-top')), ['88px', '88px', '88px']);
+        assert.equal(stack.style.getPropertyValue('--ai-pin-top'), '88px');
         const triggers = [...stack.querySelectorAll('.ai-card-head')];
         await act(async () => triggers[1].click());
         await act(async () => wait(40));
@@ -91,7 +92,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
             assert(stack.textContent.includes(item.blurb));
             assert(stack.textContent.includes(item.why));
         }
-        console.log('PASS: desktop sticky offsets, mobile tall-content pinned-heading fallback, short-screen flow, direct card structure, all original content, Radix expansion/keyboard navigation, and zero scroll-driven JS layout reads. CSS sticky positioning requires production browser verification.');
+        console.log('PASS: desktop and mobile pinned headings, natural card heights, short-screen flow, original content, Radix expansion/keyboard navigation, and zero scroll-driven JS layout reads. CSS sticky boundaries require production browser verification.');
     }
     finally {
         await act(async () => root.unmount());

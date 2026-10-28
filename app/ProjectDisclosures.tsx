@@ -17,18 +17,18 @@ type ProjectRecord = {
   readonly stack: readonly string[];
 };
 
-type StickyLayout = { mode: "cards" | "headings" | "flow"; tops: number[] };
+type StickyLayout = { mode: "headings" | "flow"; top: number | null };
 
 /** Native sticky positions do the scrolling. Measure intrinsic content only when
  * it changes; observing the animated height would cause a layout read per frame. */
 function useStickyProjects(count: number) {
   const stack = useRef<HTMLDivElement>(null);
-  const [layout, setLayout] = useState<StickyLayout>({ mode: "headings", tops: [] });
+  const [layout, setLayout] = useState<StickyLayout>({ mode: "headings", top: null });
 
   useEffect(() => {
     const root = stack.current;
     if (!root) return;
-    const cards = Array.from(root.querySelectorAll<HTMLElement>(".ai-card"));
+    const headings = Array.from(root.querySelectorAll<HTMLElement>(".ai-record-heading"));
     const siteHeader = document.querySelector<HTMLElement>(".site-header");
     let frame = 0;
 
@@ -37,31 +37,17 @@ function useStickyProjects(count: number) {
       const viewport = window.visualViewport?.height ?? window.innerHeight;
       const configuredTop = parseFloat(getComputedStyle(root).getPropertyValue("--portfolio-sticky-top")) || 96;
       const baseTop = Math.max(configuredTop, (siteHeader?.getBoundingClientRect().height ?? 0) + 12);
-      const sizes = cards.map(card => ({
-        head: card.querySelector<HTMLElement>(".ai-record-heading")?.getBoundingClientRect().height ?? 0,
-        // Include closed bodies so opening a disclosure never changes the pin mode.
-        body: card.querySelector<HTMLElement>(".ai-card-body-inner")?.getBoundingClientRect().height ?? 0,
-      }));
-      let nextTop = baseTop;
-      const tops = sizes.map(({ head }) => {
-        const top = nextTop;
-        nextTop += head + 8;
-        return top;
-      });
-      const mode = sizes.every(({ head, body }, index) => tops[index] + head + body + 24 <= viewport)
-        ? "cards"
-        : sizes.every(({ head }) => baseTop + head + 80 <= viewport) ? "headings" : "flow";
-      const positions = mode === "cards" ? tops : sizes.map(() => baseTop);
-      setLayout(previous => previous.mode === mode && previous.tops.length === positions.length
-        && previous.tops.every((top, index) => top === positions[index])
-        ? previous : { mode, tops: positions });
+      const mode = headings.every(heading => baseTop + heading.getBoundingClientRect().height + 80 <= viewport)
+        ? "headings" : "flow";
+      setLayout(previous => previous.mode === mode && previous.top === baseTop
+        ? previous : { mode, top: baseTop });
     };
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(measure);
     };
     schedule();
     const observer = new ResizeObserver(schedule);
-    for (const element of root.querySelectorAll(".ai-record-heading, .ai-card-body-inner")) observer.observe(element);
+    for (const heading of headings) observer.observe(heading);
     if (siteHeader) observer.observe(siteHeader);
     window.addEventListener("resize", schedule, { passive: true });
     window.visualViewport?.addEventListener("resize", schedule, { passive: true });
@@ -117,16 +103,14 @@ export default function ProjectDisclosures({ items }: { items: readonly ProjectR
 
   return (
       <Accordion.Root ref={stack} type="multiple" value={expanded} onValueChange={setExpanded}
-        className="ai-era-grid ai-project-stack" data-sticky-mode={layout.mode}>
+        className="ai-era-grid ai-project-stack" data-sticky-mode={layout.mode}
+        style={{ "--ai-pin-top": layout.top === null ? "var(--portfolio-sticky-top)" : `${layout.top}px` } as CSSProperties}>
         {items.map((item, index) => {
           const open = expanded.includes(item.id);
           const bodyId = `ai-body-${item.id}`;
           return (
               <Accordion.Item key={item.id} value={item.id} asChild>
-                <article className="ai-card surface" style={{
-                  "--ai-pin-top": layout.tops[index] === undefined ? "var(--portfolio-sticky-top)" : `${layout.tops[index]}px`,
-                  "--ai-stack-order": index + 1,
-                } as CSSProperties}>
+                <article className="ai-card surface">
                   <Accordion.Header className="ai-record-heading">
                     <Accordion.Trigger className="ai-card-head" data-sound aria-controls={bodyId}>
                       <span className="ai-card-index">0{index + 1}</span>
