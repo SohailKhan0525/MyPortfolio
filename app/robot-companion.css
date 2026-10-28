@@ -1,15 +1,15 @@
-/* Keep placement before responsive overrides: a later desktop column assignment
-   would create an implicit second column in the one-column mobile hero. */
-.hero.hero-with-companion { row-gap: 0; }
-.hero-with-companion > .hero-copy { grid-column: 1; grid-row: 1 / span 2; min-width: 0; }
-.hero-with-companion > .robot-companion { grid-column: 2; grid-row: 1; align-self: end; }
-.hero-with-companion > .hero-art { grid-column: 2; grid-row: 2; align-self: start; min-width: 0; }
+/* The companion is portaled to body. Hero content keeps its two-column layout. */
+.hero-with-companion > .hero-copy { grid-column: 1; grid-row: 1; min-width: 0; }
+.hero-with-companion > .hero-art { grid-column: 2; grid-row: 1; min-width: 0; }
 
 .robot-companion {
-  --robot-frame-height: 252px;
-  position: relative;
-  width: 100%;
-  max-width: 100%;
+  --robot-frame-height: 208px;
+  position: fixed;
+  right: max(12px, env(safe-area-inset-right, 0px));
+  bottom: max(8px, env(safe-area-inset-bottom, 0px));
+  z-index: 30;
+  width: 240px;
+  max-width: calc(100vw - 24px);
   height: var(--robot-frame-height);
   margin: 0;
   overflow: hidden;
@@ -17,6 +17,11 @@
   contain: layout paint;
   pointer-events: none;
   user-select: none;
+}
+
+/* Canvas wrappers must also let taps, swipes and links pass through. */
+.robot-companion * {
+  pointer-events: none !important;
 }
 
 .robot-canvas,
@@ -52,16 +57,17 @@
 }
 
 @media (max-width: 60rem) {
-  /* Keep the automatic hello visible before the long hero copy on phones. */
+  /* The mobile menu takes priority over decorative content in its viewport. */
+  body:has(.desktop-nav.mobile-visible) .robot-companion { opacity: 0; }
+  /* No empty robot row: headline first, terminal second on phones/tablets. */
   .hero.hero-with-companion {
     grid-template-columns: minmax(0, 1fr) !important;
     row-gap: 28px;
     padding-top: 32px;
     padding-bottom: 48px;
   }
-  .hero-with-companion > .robot-companion { grid-column: 1; grid-row: 1; --robot-frame-height: 244px; }
-  .hero-with-companion > .hero-copy { grid-column: 1; grid-row: 2; max-width: 680px; }
-  .hero-with-companion > .hero-art { grid-column: 1; grid-row: 3; width: 100%; }
+  .hero-with-companion > .hero-copy { grid-column: 1; grid-row: 1; max-width: 680px; }
+  .hero-with-companion > .hero-art { grid-column: 1; grid-row: 2; width: 100%; }
 }
 
 @media (max-width: 40rem) {
@@ -71,7 +77,13 @@
     padding-bottom: 48px !important;
     gap: 24px !important;
   }
-  .hero-with-companion > .robot-companion { --robot-frame-height: 236px; }
+  .robot-companion {
+    --robot-frame-height: 176px;
+    width: 200px;
+    right: max(4px, env(safe-area-inset-right, 0px));
+    bottom: max(4px, env(safe-area-inset-bottom, 0px));
+    max-width: calc(100vw - 8px);
+  }
   .hero-with-companion h1 {
     font-size: clamp(34px, 9.2vw, 46px) !important;
     line-height: 1.08 !important;
@@ -87,8 +99,11 @@
   .hero-with-companion .hero-note { line-height: 1.6; }
 }
 
-@media print {
-  .robot-companion .robot-canvas { display: none; }
-  .robot-companion .robot-poster { opacity: 1; visibility: visible; }
+/* Keep the desktop companion compact in short landscape windows too. */
+@media (max-height: 30rem) {
+  .robot-companion { --robot-frame-height: 140px; width: 160px; }
 }
 
+@media print {
+  .robot-companion { display: none; }
+}

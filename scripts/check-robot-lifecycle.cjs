@@ -1,5 +1,5 @@
 /*
- * Real React, motion preferences, and shared scroll activity, with only the heavy
+ * Real React, body portals, and motion preferences, with only the heavy
  * WebGL scene replaced by a lifecycle probe. Geometry/framing require the rig
  * regression and a browser; this check deliberately does not claim GPU coverage.
  *
@@ -16,7 +16,7 @@ const dependency = name => require(process.env.PORTFOLIO_TEST_DEPS
   ? path.join(process.env.PORTFOLIO_TEST_DEPS, name) : name);
 const { JSDOM } = dependency("jsdom");
 const ts = dependency("typescript");
-const dom = new JSDOM('<!doctype html><html><body><div id="root"></div></body></html>', {
+const dom = new JSDOM('<!doctype html><html><body><div id="root" style="transform:translateY(0);filter:opacity(1)"></div></body></html>', {
   url: "https://portfolio.test/", pretendToBeVisual: true,
 });
 for (const name of ["window", "document", "HTMLElement", "SVGElement", "Element", "Node", "NodeList", "EventTarget", "AbortController", "AbortSignal", "localStorage"]) {
@@ -77,12 +77,7 @@ global.IntersectionObserver = window.IntersectionObserver = class {
   unobserve(target) { this.targets.delete(target); }
   disconnect() { this.targets.clear(); observations.delete(this); }
 };
-const intersect = (preload, ratio) => {
-  const observer = [...observations].find(item => Boolean(item.options.rootMargin) === preload);
-  assert(observer, `Missing ${preload ? "preload" : "visibility"} observer`);
-  const target = [...observer.targets][0];
-  observer.callback([{ target, isIntersecting: ratio > 0, intersectionRatio: ratio }]);
-};
+
 
 require.extensions[".css"] = () => {};
 require.extensions[".ts"] = require.extensions[".tsx"] = (module, filename) => {
@@ -95,13 +90,15 @@ require.extensions[".ts"] = require.extensions[".tsx"] = (module, filename) => {
 };
 const React = requireApp("react");
 const { act } = React;
-const { createRoot } = requireApp("react-dom/client");
+const { createRoot, hydrateRoot } = requireApp("react-dom/client");
 const { renderToString } = requireApp("react-dom/server");
 let sceneMounts = 0;
 let sceneUnmounts = 0;
 let sceneProps;
+let sceneRenders = 0;
 function SceneProbe(props) {
   sceneProps = props;
+  sceneRenders++;
   React.useEffect(() => {
     sceneMounts++;
     return () => { sceneUnmounts++; };
@@ -119,7 +116,6 @@ Module._load = function (name, parent, main) {
 const Provider = requireApp(path.join(repository, "app/MotionPreferences.tsx")).default;
 const RobotCompanion = requireApp(path.join(repository, "app/RobotCompanion.tsx")).default;
 const application = () => React.createElement(Provider, null, React.createElement(RobotCompanion));
-const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 const motionPreference = reduced => {
   media.matches = reduced;
   for (const callback of mediaListeners) callback({ matches: reduced });
@@ -129,42 +125,43 @@ const motionPreference = reduced => {
   let root;
   try {
     const server = renderToString(application());
-    assert(server.includes('class="robot-companion"'), "SSR reserves the robot's layout");
+    assert(!server.includes('class="robot-companion"'), "SSR must not put a floating companion inside the hero layout");
     assert(!server.includes("<img"), "SSR must not flash a different robot image before the 3D model");
-    assert(server.includes('data-loaded="false"'), "SSR reserves an unrevealed stage");
-    assert(server.includes('data-failed="false"'), "Fallback is reserved for a real renderer failure");
     assert(!server.includes("scene-probe"), "SSR does not render the WebGL scene");
     assert(!server.includes("<button"), "Robot has no manual controls");
-    root = createRoot(document.getElementById("root"));
-    await act(async () => root.render(application()));
+    document.getElementById("root").innerHTML = server;
+    const hydrationErrors = [];
+    await act(async () => {
+      root = hydrateRoot(document.getElementById("root"), application(), {
+        onRecoverableError: error => hydrationErrors.push(error),
+      });
+    });
+    assert.deepEqual(hydrationErrors, [], "The client-only body portal introduces no hydration mismatch");
     const host = document.querySelector(".robot-companion");
-    assert.equal(sceneMounts, 0, "An offscreen hero does not load the scene eagerly");
+    assert(host, "Hydration mounts the floating stage");
+    assert.equal(host.parentElement, document.body, "Portal escapes transformed page ancestors so fixed really follows the viewport");
+    assert.equal(document.getElementById("root").querySelector(".robot-companion"), null, "No obsolete hero slot or second robot remains");
+    assert.equal(sceneMounts, 1, "The fixed, onscreen companion loads automatically after hydration");
     assert.equal(host.dataset.active, "false");
     assert.equal(host.querySelector("img"), null, "Hydration cannot introduce the old loading poster");
-    assert.equal(scrollListeners.size, 1, "Robot joins one shared scroll subscription");
-
-    await act(async () => intersect(true, 1));
-    assert.equal(sceneMounts, 1, "Approaching the viewport loads the scene once");
-    assert.equal(sceneProps.active, false, "Preloading alone does not start its story offscreen");
-    await act(async () => intersect(false, 0.1));
-    assert.equal(sceneProps.active, false, "A barely visible edge does not consume animation frames");
-    await act(async () => intersect(false, 1));
+    assert.equal(scrollListeners.size, 0, "Scrolling does not subscribe the fixed companion to pause/resume work");
+    assert.equal(observations.size, 0, "A fixed companion does not depend on a scrolled-away hero intersection");
     assert.equal(sceneProps.active, false, "The greeting waits until a complete model frame is ready");
     assert.equal(host.dataset.loaded, "false");
     assert.equal(host.querySelector("img"), null, "A slow model load cannot flash a mismatched face or pose");
     await act(async () => sceneProps.onReady());
     assert.equal(host.dataset.loaded, "true");
-    assert.equal(sceneProps.active, true, "Visible, ready robot starts automatically without interaction");
+    assert.equal(sceneProps.active, true, "Ready robot starts automatically without interaction");
     assert.equal(host.querySelector("img"), null, "The live scene never swaps from an unrelated poster");
 
     const mountedScene = document.querySelector(".scene-probe");
+    const renderedBeforeScroll = sceneRenders;
     await act(async () => {
       for (let i = 0; i < 40; i++) window.dispatchEvent(new dom.window.Event("scroll"));
     });
-    assert.equal(sceneProps.active, false, "Native scrolling gets the frame budget");
-    assert.equal(host.dataset.loaded, "true", "Pause retains the rendered robot");
-    await act(async () => wait(200));
-    assert.equal(sceneProps.active, true, "Robot resumes after scrolling settles");
+    assert.equal(sceneProps.active, true, "Robot continues its autonomous story during native scrolling");
+    assert.equal(host.dataset.loaded, "true", "Scrolling retains the rendered robot");
+    assert.equal(sceneRenders, renderedBeforeScroll, "Scroll events cause no React updates to the companion");
     assert.equal(document.querySelector(".scene-probe"), mountedScene, "Scrolling must not recreate the expensive scene");
     assert.equal(sceneMounts, 1);
 
@@ -177,10 +174,6 @@ const motionPreference = reduced => {
       pageHidden = false;
       document.dispatchEvent(new dom.window.Event("visibilitychange"));
     });
-    assert.equal(sceneProps.active, true);
-    await act(async () => intersect(false, 0));
-    assert.equal(sceneProps.active, false, "Offscreen robot stops animation");
-    await act(async () => intersect(false, 1));
     assert.equal(sceneProps.active, true);
 
     await act(async () => motionPreference(true));
@@ -216,7 +209,6 @@ const motionPreference = reduced => {
     await act(async () => root.unmount());
     root = createRoot(document.getElementById("root"));
     await act(async () => root.render(application()));
-    await act(async () => { intersect(true, 1); intersect(false, 1); });
     const pendingHost = document.querySelector(".robot-companion");
     const pendingReady = sceneProps.onReady;
     assert.equal(sceneProps.active, false, "The second greeting is still waiting for warmup");
@@ -230,13 +222,14 @@ const motionPreference = reduced => {
     assert.equal(pendingHost.querySelector("img.robot-poster"), pendingFallback);
     assert.equal(sceneMounts, 2);
     assert.equal(sceneUnmounts, 2);
-    console.log("PASS: reserved SSR/loading without poster flash, readiness-gated automatic greeting, client-only lazy scene, shared passive scroll pause/resume, offscreen/hidden pause, live reduced motion, stable scene identity, error-only fallback, late readiness protection and no controls. WebGL geometry is tested separately.");
+    console.log("PASS: hydration-safe body portal outside transformed ancestors, no hero slot or loading poster flash, readiness-gated automatic greeting, uninterrupted scrolling without subscriptions/React rerenders, hidden-tab pause, live reduced motion, stable scene identity, error-only fallback, late readiness protection and no controls. WebGL geometry is tested separately.");
   } finally {
     if (root) await act(async () => root.unmount());
-    assert.equal(scrollListeners.size, 0, "Unmount removes the shared scroll listener");
+    assert.equal(scrollListeners.size, 0, "No companion scroll subscriptions remain");
     assert.equal(visibilityListeners.size, 0, "Unmount removes the visibility listener");
-    assert.equal(observations.size, 0, "Unmount disconnects both viewport observers");
+    assert.equal(observations.size, 0, "No obsolete hero intersection observers remain");
     assert.equal(mediaListeners.size, 0, "Unmount releases the motion preference subscription");
+    assert.equal(document.querySelector(".robot-companion"), null, "Unmount removes the body portal as well as its scene");
     Module._load = load;
     dom.window.close();
   }

@@ -77,9 +77,12 @@ try {
   if (qaFlag >= 0) {
     const qaDirectory = path.resolve(process.argv[qaFlag + 1] ?? "");
     await mkdir(qaDirectory, { recursive: true });
+    const qaRenders = new Map();
     async function labeledFrame(label) {
       const labelSvg = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="480" height="28"><text x="240" y="20" text-anchor="middle" fill="#dddddd" font-family="sans-serif" font-size="15">${label}</text></svg>`);
-      return sharp(await render(480, 240)).flatten({ background: "#080808" })
+      const frame = await render(480, 240);
+      qaRenders.set(label, frame);
+      return sharp(frame).flatten({ background: "#080808" })
         .extend({ top: 0, bottom: 28, left: 0, right: 0, background: "#080808" })
         .composite([{ input: labelSvg, top: 240, left: 0 }]).png().toBuffer();
     }
@@ -110,6 +113,29 @@ try {
       expressions.push(await labeledFrame(expression));
     }
     await sheet(expressions, 4, "minty-refined-expressions-qa.png");
+    // Real CSS-pixel companion samples, not enlarged faces. Reproject the same
+    // transparent render by cropping its empty margins; camera aim is unchanged.
+    for (const [width, height, background, suffix] of [
+      [200, 176, "#080808", "mobile-dark"], [200, 176, "#f7f7f4", "mobile-light"],
+      [240, 208, "#080808", "desktop-dark"], [160, 140, "#080808", "landscape-dark"],
+    ]) {
+      const zoom = Math.min(height / 3.1, width / 4.1);
+      const scaledHeight = Math.round(zoom * 3.1);
+      const scaledWidth = scaledHeight * 2;
+      const compact = [];
+      for (const expression of ["smile", "neutral", "cry", "angry", "sleepy", "dizzy", "confused"]) {
+        const label = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="24"><text x="${width / 2}" y="17" text-anchor="middle" fill="${background === "#080808" ? "#ddd" : "#333"}" font-family="sans-serif" font-size="12">${expression}</text></svg>`);
+        const resized = await sharp(qaRenders.get(expression)).resize(scaledWidth, scaledHeight).png().toBuffer();
+        const cropped = await sharp(resized).extract({ left: Math.floor((scaledWidth - width) / 2), top: 0, width, height: scaledHeight })
+          .extend({ top: Math.floor((height - scaledHeight) / 2), bottom: Math.ceil((height - scaledHeight) / 2), left: 0, right: 0, background: { r: 0, g: 0, b: 0, alpha: 0 } })
+          .flatten({ background }).extend({ bottom: 24, top: 0, left: 0, right: 0, background })
+          .composite([{ input: label, top: height, left: 0 }]).png().toBuffer();
+        compact.push(cropped);
+      }
+      await sharp({ create: { width: width * 4, height: (height + 24) * 2, channels: 4, background } })
+        .composite(compact.map((input, i) => ({ input, left: i % 4 * width, top: Math.floor(i / 4) * (height + 24) })))
+        .png().toFile(path.join(qaDirectory, `minty-expressions-${suffix}.png`));
+    }
     console.log(`Rendered runtime-pose QA sheets to ${qaDirectory}`);
   }
 } finally {

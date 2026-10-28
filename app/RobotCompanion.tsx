@@ -1,9 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { Component, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { Component, useCallback, useEffect, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { usePortfolioMotion } from "./MotionPreferences";
-import { useScrollActivity } from "./useScrollActivity";
 import "./robot-companion.css";
 
 // Three and its renderer stay out of the portfolio's initial JavaScript bundle.
@@ -17,11 +17,8 @@ class RobotBoundary extends Component<{ children: ReactNode; onError: () => void
 }
 
 export default function RobotCompanion() {
-  const host = useRef<HTMLElement>(null);
   const { ready, reduced } = usePortfolioMotion();
-  const scrolling = useScrollActivity();
-  const [nearby, setNearby] = useState(false);
-  const [visible, setVisible] = useState(false);
+  const [portalHost, setPortalHost] = useState<HTMLElement | null>(null);
   const [pageVisible, setPageVisible] = useState(true);
   const [status, setStatus] = useState<"loading" | "ready" | "fallback">("loading");
   const loaded = status === "ready";
@@ -31,36 +28,26 @@ export default function RobotCompanion() {
   const onError = useCallback(() => setStatus("fallback"), []);
 
   useEffect(() => {
-    const node = host.current;
-    if (!node) return;
-    const preload = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { setNearby(true); preload.disconnect(); }
-    }, { rootMargin: "160px" });
-    const visibility = new IntersectionObserver(([entry]) => {
-      setVisible(entry.isIntersecting && entry.intersectionRatio >= 0.15);
-    }, { threshold: [0, 0.15] });
+    // Escape the page's transforms, clipping and stacking contexts. A fixed
+    // companion belongs to the viewport, even while the hero scrolls away.
+    setPortalHost(document.body);
     const onVisibility = () => setPageVisible(!document.hidden);
-    preload.observe(node);
-    visibility.observe(node);
     onVisibility();
     document.addEventListener("visibilitychange", onVisibility);
-    return () => {
-      preload.disconnect();
-      visibility.disconnect();
-      document.removeEventListener("visibilitychange", onVisibility);
-    };
+    return () => document.removeEventListener("visibilitychange", onVisibility);
   }, []);
 
-  const active = loaded && ready && !reduced && visible && pageVisible && !scrolling && !failed;
+  const active = loaded && ready && !reduced && pageVisible;
+  if (!portalHost) return null;
 
-  return <figure ref={host} className="robot-companion" role="img"
+  return createPortal(<figure className="robot-companion" role="img"
     aria-label="Minty, a small mint-colored robot companion. It waves, explores, and occasionally takes a playful tumble."
     data-active={active} data-reduced={reduced} data-loaded={loaded} data-failed={failed} aria-busy={status === "loading"}>
-    {/* Reserve the stage while loading, then reveal the actual prepared model.
+    {/* Keep the fixed stage transparent until the actual model is prepared.
         Never swap an unrelated still face/pose for the moving robot on reload. */}
     {failed && <img className="robot-poster" src="/models/minty-robot-still.webp" width="640" height="320" alt="" aria-hidden="true" />}
-    {ready && nearby && !failed && <RobotBoundary onError={onError}>
+    {ready && !failed && <RobotBoundary onError={onError}>
       <RobotScene active={active} reduced={reduced} onReady={onReady} onError={onError} />
     </RobotBoundary>}
-  </figure>;
+  </figure>, portalHost);
 }

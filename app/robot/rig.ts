@@ -102,8 +102,8 @@ export function createRobotRig(source: Group) {
   sourceClone.traverse((object: Object3D) => {
     if (!(object instanceof Mesh)) return;
     const name = normalizeName(object.name);
-    // Only the original face drawing is replaced; the supplied curved screen stays.
-    if (isFaceFeature(name)) return;
+    // Replace the face drawing and fixed brow-like reflection; retain the curved screen.
+    if (isFaceFeature(name) || name === "visorupperreflection") return;
     let parent = body;
     let pivot = BODY_PIVOT;
     if (BASE_NAMES.includes(name)) { parent = root; pivot = new Vector3(); }

@@ -247,12 +247,11 @@ function setTarget(animator: RobotAnimator) {
       target.headYaw = direction * 0.06 * weight;
       target.leftArm = -0.26 * weight;
       target.rightArm = 0.26 * weight;
-      target.eyeOpen = 1 - 0.32 * weight;
       break;
     case "sleepy":
+      // The face owns heavy lids; preserve the independent blink envelope.
       target.headPitch = 0.32 * weight;
       target.headTilt = direction * 0.16 * weight;
-      target.eyeOpen = 1 - 0.82 * weight;
       target.bodyY *= 0.4;
       break;
     case "stumble":

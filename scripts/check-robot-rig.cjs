@@ -55,7 +55,7 @@ async function run() {
     const sceneSource = fs.readFileSync(path.join(base, 'app/robot/RobotScene.tsx'), 'utf8');
     const frameHeight = Number(sceneSource.match(/size\.height\s*\/\s*([\d.]+)/)[1]);
     const frameWidth = Number(sceneSource.match(/size\.width\s*\/\s*([\d.]+)/)[1]);
-    const viewports = [[212, 236], [280, 236], [335, 236], [350, 236], [704, 244], [564, 252]];
+    const viewports = [[240, 208], [200, 176], [160, 140], [212, 236]];
     const cameras = viewports.map(([width, height]) => {
       const zoom = Math.min(height / frameHeight, width / frameWidth);
       const camera = new OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, 0.1, 40);

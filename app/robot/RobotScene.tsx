@@ -99,7 +99,7 @@ function Robot({ active, reduced, onReady, onError }: Props) {
       return;
     }
     if (active && !reduced) {
-      // The first resumed frame must not advance by time spent offscreen/scrolling.
+      // The first resumed frame must not advance by time spent in a hidden tab.
       const pose = stepRobotAnimator(animator, wasActive.current ? Math.min(delta, 0.05) : 0);
       rig.applyPose(pose);
       wasActive.current = true;
