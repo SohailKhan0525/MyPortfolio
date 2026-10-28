@@ -23,10 +23,12 @@ export default function RobotCompanion() {
   const [nearby, setNearby] = useState(false);
   const [visible, setVisible] = useState(false);
   const [pageVisible, setPageVisible] = useState(true);
-  const [loaded, setLoaded] = useState(false);
-  const [failed, setFailed] = useState(false);
-  const onReady = useCallback(() => setLoaded(true), []);
-  const onError = useCallback(() => setFailed(true), []);
+  const [status, setStatus] = useState<"loading" | "ready" | "fallback">("loading");
+  const loaded = status === "ready";
+  const failed = status === "fallback";
+  // A late GPU callback must never replace an error fallback after unmount.
+  const onReady = useCallback(() => setStatus(current => current === "fallback" ? current : "ready"), []);
+  const onError = useCallback(() => setStatus("fallback"), []);
 
   useEffect(() => {
     const node = host.current;
@@ -49,14 +51,14 @@ export default function RobotCompanion() {
     };
   }, []);
 
-  const active = ready && !reduced && visible && pageVisible && !scrolling && !failed;
+  const active = loaded && ready && !reduced && visible && pageVisible && !scrolling && !failed;
 
   return <figure ref={host} className="robot-companion" role="img"
     aria-label="Minty, a small mint-colored robot companion. It waves, explores, and occasionally takes a playful tumble."
-    data-active={active} data-reduced={reduced} data-loaded={loaded && !failed}>
-    {/* A render of the supplied GLB also covers slow connections and unavailable WebGL. */}
-    {/* eslint-disable-next-line @next/next/no-img-element */}
-    <img className="robot-poster" src="/models/minty-robot-poster.webp" width="640" height="320" alt="" aria-hidden="true" />
+    data-active={active} data-reduced={reduced} data-loaded={loaded} data-failed={failed} aria-busy={status === "loading"}>
+    {/* Reserve the stage while loading, then reveal the actual prepared model.
+        Never swap an unrelated still face/pose for the moving robot on reload. */}
+    {failed && <img className="robot-poster" src="/models/minty-robot-still.webp" width="640" height="320" alt="" aria-hidden="true" />}
     {ready && nearby && !failed && <RobotBoundary onError={onError}>
       <RobotScene active={active} reduced={reduced} onReady={onReady} onError={onError} />
     </RobotBoundary>}

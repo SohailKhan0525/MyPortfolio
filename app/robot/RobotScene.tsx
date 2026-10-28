@@ -16,9 +16,11 @@ function Robot({ active, reduced, onReady, onError }: Props) {
     model.applyPose(animator.pose);
     return model;
   }, [scene, animator]);
-  const { gl, invalidate, camera, size } = useThree();
+  const { gl, invalidate, camera, size, scene: world } = useThree();
   const lastState = useRef("");
-  const firstFrame = useRef(true);
+  const prepared = useRef(false);
+  const warmFrames = useRef(0);
+  const announced = useRef(false);
   const readyFrame = useRef<number | null>(null);
   const wasActive = useRef(false);
 
@@ -42,6 +44,26 @@ function Robot({ active, reduced, onReady, onError }: Props) {
   }, [gl, onError]);
 
   useEffect(() => {
+    let cancelled = false;
+    prepared.current = false;
+    warmFrames.current = 0;
+    announced.current = false;
+    // Compile with the final lighting before exposing the canvas. The neutral
+    // smile stays still through preparation; the greeting starts after reveal.
+    gl.compileAsync(world, camera).then(() => {
+      if (cancelled) return;
+      prepared.current = true;
+      invalidate();
+    }).catch(() => { if (!cancelled) onError(); });
+    return () => {
+      cancelled = true;
+      prepared.current = false;
+      if (readyFrame.current !== null) cancelAnimationFrame(readyFrame.current);
+      readyFrame.current = null;
+    };
+  }, [gl, world, camera, rig, invalidate, onError]);
+
+  useEffect(() => {
     if (reduced) {
       rig.applyPose(settleRobotAnimator(animator));
       gl.domElement.dataset.robotState = "resting";
@@ -61,6 +83,21 @@ function Robot({ active, reduced, onReady, onError }: Props) {
   }, [rig]);
 
   useFrame((_, delta) => {
+    if (!prepared.current) return;
+    if (!announced.current) {
+      // Two completed frames settle camera sizing and upload geometry before
+      // the DOM fades in. Demand mode needs an explicit second invalidation.
+      warmFrames.current++;
+      if (warmFrames.current < 2) invalidate();
+      else if (readyFrame.current === null) {
+        readyFrame.current = requestAnimationFrame(() => {
+          readyFrame.current = null;
+          announced.current = true;
+          onReady();
+        });
+      }
+      return;
+    }
     if (active && !reduced) {
       // The first resumed frame must not advance by time spent offscreen/scrolling.
       const pose = stepRobotAnimator(animator, wasActive.current ? Math.min(delta, 0.05) : 0);
@@ -70,11 +107,6 @@ function Robot({ active, reduced, onReady, onError }: Props) {
         lastState.current = animator.state;
         gl.domElement.dataset.robotState = animator.state;
       }
-    }
-    if (firstFrame.current) {
-      firstFrame.current = false;
-      // Notify after a model frame has actually reached the renderer.
-      readyFrame.current = requestAnimationFrame(onReady);
     }
   });
 

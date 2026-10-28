@@ -14,9 +14,12 @@ character, remote model service, controls, or sound was added.
   once, converts Z-up to Y-up, and adds neck and shoulder pivots. The source's
   raised left paddle is brought into a relaxed rest pose. The supplied body,
   head, visor and plinth remain the actual model.
-- `face.ts` replaces only the original static face features with small unlit mesh
-  strokes. Expression layers crossfade; eyelid scaling supplies blinking without
-  uploading textures every frame.
+- `face.ts` replaces only the original static face features with one morphing
+  face: filled eyes, small catchlights, brows, tears and a curved mouth. Shared
+  expression parameters interpolate on stable geometries, avoiding duplicate
+  faces and overlapping translucent stroke discs. Eyelids close around the
+  same eye centers, and catchlights disappear while closed. No face textures are
+  uploaded during animation.
 - `behavior.ts` owns one body state at a time. Startup is greeting (2.4s), pause
   (2s), blink, spin, dizzy wobble, fall, down, and slow recovery. Idle actions then
   choose randomized timings and include looks, tilts, smiles, crying, anger,
@@ -31,6 +34,11 @@ character, remote model service, controls, or sound was added.
 
 ## Rendering lifecycle
 
+Reload reserves the stage without displaying a different static face. The scene
+prepares its shaders with `compileAsync`, renders two quiet frames, then signals
+readiness after rendering. Only then does the actual model fade in and begin its
+greeting. Late callbacks cannot replace an error fallback after unmount.
+
 The canvas switches between continuous and on-demand rendering. It pauses while
 the page scrolls, leaves the viewport, or the tab is hidden, preserving animation
 time so it cannot skip ahead on return. The existing shared passive scroll hook
@@ -41,9 +49,20 @@ engine, environment-map download, or animation controls.
 The existing live reduced-motion provider selects an upright, smiling still pose.
 Switching that preference on during a fall settles the robot immediately;
 switching it off resumes quiet autonomous idle rather than restarting the fall.
-A transparent poster rendered offline from the supplied GLB covers loading,
-unavailable WebGL and context loss. The figure has one stable accessible label;
-expressions are decorative and do not generate live announcements.
+A transparent still appears only if WebGL/model rendering fails. It is rendered
+from the same runtime rig, initial smile, and camera as the animated robot,
+rather than the original GLB's baked expression. Its responsive scale follows
+the camera projection. The figure has one stable accessible label; expressions
+are decorative and do not generate live announcements.
+
+## Hero layout
+
+Desktop grid placement precedes the responsive overrides. Below the existing
+60rem tablet breakpoint, the robot, copy and terminal each explicitly occupy
+column one; no implicit second column can compress phone text. Scoped mobile
+rules provide 20px phone gutters, wrapping actions, compact top padding and
+24px vertical gaps. Reserved stages are 236px on phones, 244px on tablets and
+252px on desktop. All original hero copy, terminal and remaining sections stay.
 
 ## Checks
 
@@ -51,15 +70,22 @@ expressions are decorative and do not generate live announcements.
 nonconflicting randomized actions, pose continuity, pause behavior, and bounded
 spins over 30 simulated minutes. `scripts/check-robot-lifecycle.cjs` uses actual
 React and the shared preference/scroll hooks, mocking only the heavy scene, to
-verify SSR, lazy loading, playback gates, reduction changes, cleanup, fallback,
-and the absence of controls. `scripts/check-robot-rig.cjs` uses the actual GLB and
-Three geometry to check preservation, shoulder pivots, floor contact and camera
-bounds. These are not claims of physical-phone frame-rate testing.
+verify SSR without a loading-image flash, lazy loading, playback gates, reduction
+changes, cleanup, error-only fallback and the absence of controls.
+`scripts/check-robot-scene.cjs` exercises the real scene with a controlled
+renderer boundary to verify shader readiness, two-frame reveal, failure and
+Strict Mode cancellation. `scripts/check-robot-layout.cjs` checks the actual CSS
+cascade at ten phone/tablet/desktop widths in both stylesheet bundle orders.
+`scripts/check-robot-rig.cjs` uses the actual GLB and Three geometry to check
+preservation, shoulder pivots, floor contact, camera bounds, every expression
+transition, face winding and stable geometry. Offline renders check appearance.
+These are not claims of physical-phone frame-rate or GPU-pixel testing.
 
 Run with test-only `jsdom@26.1.0` and `typescript@5.9.3` available through
 `PORTFOLIO_TEST_DEPS`, following the setup comments in each test. The poster can
-be regenerated with `node scripts/render-robot-poster.mjs` using Three and the
-Sharp dependency already available through Next.
+be regenerated on Node 22.13+ with `node scripts/render-robot-poster.mjs` using
+Three and the Sharp dependency already available through Next. Add `--qa-dir`
+with a scratch path to render startup and expression contact sheets.
 
 ## References consulted
 
@@ -70,3 +96,7 @@ Sharp dependency already available through Next.
   per-frame React state, geometry reuse and lifecycle costs.
 - https://r3f.docs.pmnd.rs/api/canvas — fallback, DPR, resize and renderer options.
 - https://threejs.org/docs/pages/GLTFLoader.html — glTF loading and ownership.
+- https://threejs.org/docs/pages/WebGLRenderer.html — asynchronous shader
+  preparation and the limits of transparent-object sorting.
+- https://threejs.org/docs/pages/MeshBasicMaterial.html — unlit screen features.
+- https://threejs.org/docs/pages/ShapeGeometry.html — filled polygonal features.

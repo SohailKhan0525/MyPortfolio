@@ -130,8 +130,9 @@ const motionPreference = reduced => {
   try {
     const server = renderToString(application());
     assert(server.includes('class="robot-companion"'), "SSR reserves the robot's layout");
-    assert(server.includes("/models/minty-robot-poster.webp"), "SSR includes the actual-model poster");
-    assert(server.includes('width="640" height="320"'), "Poster has intrinsic dimensions before hydration");
+    assert(!server.includes("<img"), "SSR must not flash a different robot image before the 3D model");
+    assert(server.includes('data-loaded="false"'), "SSR reserves an unrevealed stage");
+    assert(server.includes('data-failed="false"'), "Fallback is reserved for a real renderer failure");
     assert(!server.includes("scene-probe"), "SSR does not render the WebGL scene");
     assert(!server.includes("<button"), "Robot has no manual controls");
     root = createRoot(document.getElementById("root"));
@@ -139,6 +140,7 @@ const motionPreference = reduced => {
     const host = document.querySelector(".robot-companion");
     assert.equal(sceneMounts, 0, "An offscreen hero does not load the scene eagerly");
     assert.equal(host.dataset.active, "false");
+    assert.equal(host.querySelector("img"), null, "Hydration cannot introduce the old loading poster");
     assert.equal(scrollListeners.size, 1, "Robot joins one shared scroll subscription");
 
     await act(async () => intersect(true, 1));
@@ -147,10 +149,13 @@ const motionPreference = reduced => {
     await act(async () => intersect(false, 0.1));
     assert.equal(sceneProps.active, false, "A barely visible edge does not consume animation frames");
     await act(async () => intersect(false, 1));
-    assert.equal(sceneProps.active, true, "Visible robot starts without interaction");
-    assert.equal(host.dataset.loaded, "false", "Poster stays until the first rendered model frame");
+    assert.equal(sceneProps.active, false, "The greeting waits until a complete model frame is ready");
+    assert.equal(host.dataset.loaded, "false");
+    assert.equal(host.querySelector("img"), null, "A slow model load cannot flash a mismatched face or pose");
     await act(async () => sceneProps.onReady());
     assert.equal(host.dataset.loaded, "true");
+    assert.equal(sceneProps.active, true, "Visible, ready robot starts automatically without interaction");
+    assert.equal(host.querySelector("img"), null, "The live scene never swaps from an unrelated poster");
 
     const mountedScene = document.querySelector(".scene-probe");
     await act(async () => {
@@ -188,12 +193,44 @@ const motionPreference = reduced => {
     assert.equal(document.querySelector(".scene-probe"), mountedScene, "Preference changes retain the same scene");
     assert.equal(host.querySelectorAll("button, input, audio").length, 0, "No controls or sound were added");
 
+    const lateReady = sceneProps.onReady;
     await act(async () => sceneProps.onError());
     assert.equal(host.dataset.loaded, "false", "WebGL/context failure restores the supplied-model poster");
+    assert.equal(host.dataset.failed, "true");
     assert.equal(host.dataset.active, "false");
     assert.equal(document.querySelector(".scene-probe"), null);
     assert.equal(sceneUnmounts, 1, "Failed scene releases its mounted resources");
-    console.log("PASS: robot SSR poster, client-only lazy scene, autonomous entry, shared passive scroll pause/resume, offscreen/hidden pause, live reduced motion, stable scene identity, fallback and no controls. WebGL geometry is tested separately.");
+    const fallback = host.querySelector("img.robot-poster");
+    assert(fallback, "A real renderer failure supplies a static robot instead of an empty stage");
+    assert.equal(fallback.getAttribute("src"), "/models/minty-robot-still.webp", "Fallback uses the updated rig and face");
+    assert.equal(fallback.getAttribute("width"), "640");
+    assert.equal(fallback.getAttribute("height"), "320");
+    await act(async () => lateReady());
+    assert.equal(host.dataset.loaded, "false", "Late warmup completion cannot reveal a failed canvas");
+    assert.equal(host.dataset.active, "false", "Late readiness cannot restart a failed renderer");
+    assert.equal(host.querySelector("img.robot-poster"), fallback, "Late readiness retains the same fallback");
+    assert.equal(sceneMounts, 1, "Failure does not trigger repeated renderer creation");
+
+    // Also exercise failure before readiness, when an outstanding shader warmup
+    // may still complete after the scene has already been removed.
+    await act(async () => root.unmount());
+    root = createRoot(document.getElementById("root"));
+    await act(async () => root.render(application()));
+    await act(async () => { intersect(true, 1); intersect(false, 1); });
+    const pendingHost = document.querySelector(".robot-companion");
+    const pendingReady = sceneProps.onReady;
+    assert.equal(sceneProps.active, false, "The second greeting is still waiting for warmup");
+    assert.equal(pendingHost.querySelector("img"), null);
+    await act(async () => sceneProps.onError());
+    const pendingFallback = pendingHost.querySelector("img.robot-poster");
+    assert(pendingFallback, "Initial renderer failure also receives the static robot");
+    await act(async () => pendingReady());
+    assert.equal(pendingHost.dataset.loaded, "false");
+    assert.equal(pendingHost.dataset.active, "false");
+    assert.equal(pendingHost.querySelector("img.robot-poster"), pendingFallback);
+    assert.equal(sceneMounts, 2);
+    assert.equal(sceneUnmounts, 2);
+    console.log("PASS: reserved SSR/loading without poster flash, readiness-gated automatic greeting, client-only lazy scene, shared passive scroll pause/resume, offscreen/hidden pause, live reduced motion, stable scene identity, error-only fallback, late readiness protection and no controls. WebGL geometry is tested separately.");
   } finally {
     if (root) await act(async () => root.unmount());
     assert.equal(scrollListeners.size, 0, "Unmount removes the shared scroll listener");

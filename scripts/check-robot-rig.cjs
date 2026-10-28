@@ -55,7 +55,7 @@ async function run() {
     const sceneSource = fs.readFileSync(path.join(base, 'app/robot/RobotScene.tsx'), 'utf8');
     const frameHeight = Number(sceneSource.match(/size\.height\s*\/\s*([\d.]+)/)[1]);
     const frameWidth = Number(sceneSource.match(/size\.width\s*\/\s*([\d.]+)/)[1]);
-    const viewports = [[212, 216], [292, 216], [564, 232]];
+    const viewports = [[212, 236], [280, 236], [335, 236], [350, 236], [704, 244], [564, 252]];
     const cameras = viewports.map(([width, height]) => {
       const zoom = Math.min(height / frameHeight, width / frameWidth);
       const camera = new OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, 0.1, 40);
@@ -116,13 +116,49 @@ async function run() {
     }
 
     const pose = settleRobotAnimator(createRobotAnimator());
-    for (const expression of ['neutral', 'smile', 'cry', 'angry', 'sleepy', 'dizzy', 'confused']) {
+    const faceMeshes = [];
+    rig.face.traverse(object => { if (object instanceof Mesh) faceMeshes.push(object); });
+    const geometryIdentities = faceMeshes.map(mesh => mesh.geometry);
+    const eyeGroup = rig.face.getObjectByName('Minty eyes');
+    const leftEye = rig.face.getObjectByName('Minty left eye').children[0];
+    const featureSignatures = new Set();
+    const assertFaceContours = () => {
+      for (const mesh of faceMeshes) {
+        const geometry = mesh.geometry;
+        const positions = geometry.attributes.position;
+        const index = geometry.index;
+        for (let i = 0; i < positions.count; i++) {
+          assert.ok(Number.isFinite(positions.getX(i)) && Number.isFinite(positions.getY(i)) && Number.isFinite(positions.getZ(i)), 'Face contours stay finite');
+        }
+        // Front-face winding matters in WebGL even when an offline SVG renderer
+        // would draw both sides. All triangles must face toward the visitor.
+        for (let i = 0; i < index.count; i += 3) {
+          const a = index.getX(i), b = index.getX(i + 1), c = index.getX(i + 2);
+          const area = (positions.getX(b) - positions.getX(a)) * (positions.getY(c) - positions.getY(a))
+            - (positions.getY(b) - positions.getY(a)) * (positions.getX(c) - positions.getX(a));
+          assert.ok(area >= -1e-9, `Face triangles have consistent front-facing winding (${area})`);
+        }
+      }
+    };
+    const expressions = ['neutral', 'smile', 'cry', 'angry', 'sleepy', 'dizzy', 'confused'];
+    for (const expression of expressions) {
       rig.applyPose({ ...pose, expression, expressionFrom: expression, expressionMix: 1 });
-      assert.equal(rig.face.children.filter(layer => layer.visible).length, 1);
+      assertFaceContours();
+      featureSignatures.add(hash(Buffer.from(leftEye.geometry.attributes.position.array.buffer)) + ':' + rig.face.getObjectByName('Minty mouth').position.y);
+      assert.equal(eyeGroup.children.length, 2, 'Every expression keeps one pair of eyes');
     }
-    rig.applyPose({ ...pose, expression: 'cry', expressionFrom: 'smile', expressionMix: 0.5, eyeOpen: 0.04 });
-    assert.equal(rig.face.children.filter(layer => layer.visible).length, 2, 'Expressions crossfade without conflicting full-strength faces');
-    for (const layer of rig.face.children.filter(layer => layer.visible)) assert.equal(layer.children[0].scale.y, 0.04, 'Blinking composes with both expression layers');
+    assert.equal(featureSignatures.size, expressions.length, 'Every expression has a distinct eye/mouth configuration');
+    for (const from of expressions) {
+      for (const expression of expressions) {
+        for (let step = 0; step <= 8; step++) {
+          rig.applyPose({ ...pose, expression, expressionFrom: from, expressionMix: step / 8, eyeOpen: 0.04 });
+          assertFaceContours();
+          assert.equal(eyeGroup.scale.y, 0.055, 'Blinking closes the same two eyes about their fixed centers');
+          assert.deepEqual(faceMeshes.map(mesh => mesh.geometry), geometryIdentities, 'Expression changes reuse all geometries instead of layering duplicate faces');
+          for (const eye of eyeGroup.children) assert.equal(eye.children[1].visible, false, 'Closed lids do not leave floating catchlights');
+        }
+      }
+    }
 
     const rootChildren = rig.root.children.length;
     rig.dispose();
