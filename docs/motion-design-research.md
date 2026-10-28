@@ -153,3 +153,12 @@ The theme control now imports the user-requested `AnimatedThemeToggler` from `@/
 The footer now sits underneath the opaque foreground page. A normal-flow marker drives `useScroll` opacity from 0 to 1 as the footer is uncovered, with a small content lift and drawing rule. Keeping the marker separate from the sticky element avoids measuring sticky coordinates. Size and viewport changes are measured; when the footer cannot fit in a short viewport it becomes normal flow. Keyboard focus reveals the footer and brings its natural position into view. Reduced-motion and no-script rendering stay readable. All footer text and destinations are preserved.
 
 TypeScript, data/section/footer preservation checks, and the focused Motion regression pass. A separate actual-Motion DOM test with simulated footer geometry measured opacity 0 / 0.5 / 1 and lift 28 / 14 / 0px at the start, middle and end of uncovering. Keyboard reveal, short-viewport fallback and readable SSR also passed; browser sticky layout is checked after deployment. Hallmark's retained resume-heading false positive and legacy theme fallback exception are unchanged. Production verification follows the authorized direct-main push, with no temporary preview deployment.
+
+
+### Production verification of this correction
+
+The direct-main production build completed successfully. Live Chrome checks confirmed the Magic UI circular reveal starts from the actual button, changes both themes, and cleans up its transition state. The footer was sticky at the bottom, faded to about 0.805 while partly covered, and reached opacity 1 when fully uncovered. Keyboard focus on its links uncovered it and retained visible focus. No application-origin console warnings/errors were observed.
+
+The hero record was checked using computed, rendered styles during playback: its opacity was about 0.707 and its position was partway along the route. An inline `style.opacity` of 0 was misleading because native Web Animations updates the rendered value without rewriting that inline style. A separate global-spring hypothesis was tested and rejected; it is not the cause. The permanent regression now also checks a visible, intermediate hero-record frame. The verified startup-policy defect remains the confirmed correction.
+
+The user's device is Chrome on Android. A physical Android session was not available, and its device reduced-motion setting remains unknown; production browser checks and simulated-DOM regressions are not described as a physical-device test.

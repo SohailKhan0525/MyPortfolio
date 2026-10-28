@@ -69,6 +69,7 @@ const { renderToString } = require("react-dom/server");
 const { animate, motion, useMotionValue } = require("motion/react");
 const { default: PortfolioMotionProvider, usePortfolioMotion } = require(path.join(repository, "app/MotionPreferences.tsx"));
 const ProjectIllustration = require(path.join(repository, "app/ProjectIllustration.tsx")).default;
+const DataInstrument = require(path.join(repository, "app/DataInstrument.tsx")).default;
 const wait = duration => new Promise(resolve => setTimeout(resolve, duration));
 
 function TransformProbe() {
@@ -94,7 +95,7 @@ function MotionValueProbe() {
 }
 const application = () => React.createElement(PortfolioMotionProvider, null,
   React.createElement(TransformProbe), React.createElement(MotionValueProbe),
-  React.createElement(ProjectIllustration, { index: 0 }));
+  React.createElement(ProjectIllustration, { index: 0 }), React.createElement(DataInstrument));
 const translation = id => {
   const value = document.getElementById(id).style.transform;
   if (!value || value === "none") return 0;
@@ -126,6 +127,17 @@ const translation = id => {
     await act(async () => wait(100));
     const interactionX = translation("transform-probe");
     assert(interactionX > 100 && interactionX < 195, "Subsequent interaction also animates");
+    const instrument = document.querySelector(".data-instrument");
+    await act(async () => intersect(instrument, true));
+    await act(async () => wait(600));
+    const record = instrument.querySelector('circle[cx="64"][r="9"]')?.closest("g");
+    assert(record, "The hero record sequence must mount after viewport entry");
+    const recordOpacity = Number(record.style.opacity);
+    assert(recordOpacity > 0.5,
+      `The moving hero record must be visible mid-sequence (got ${recordOpacity})`);
+    const recordX = Number(record.style.transform.match(/translateX\(([-\d.]+)px\)/)?.[1]);
+    assert(recordX > 0 && recordX < 368, `The visible hero record must be moving along its route, got x=${recordX}`);
+
     // Crucially this is the default House illustration mounted BEFORE readiness,
     // not a newly selected/remounted project that would hide the hydration bug.
     const drawing = document.querySelector(".project-drawing");
@@ -160,7 +172,7 @@ const translation = id => {
     await act(async () => root.render(application()));
     await act(async () => wait(100));
     assert.equal(translation("transform-probe"), 100, "Device reduced-motion setting skips spatial interpolation");
-    console.log("PASS: readable SSR, legacy pause migration, actual intermediate hydration transform, MotionValue interpolation, interaction motion, initial project SVG movement and viewport replay, and device reduced motion.");
+    console.log("PASS: readable SSR, legacy pause migration, actual intermediate hydration transform, MotionValue interpolation, interaction motion, initial project SVG movement and viewport replay, visible hero keyframe sequence, and device reduced motion.");
   } finally {
     if (root) await act(async () => root.unmount());
     dom.window.close();
