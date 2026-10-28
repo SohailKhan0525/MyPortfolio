@@ -1,7 +1,8 @@
 "use client";
 
-import { motion, useAnimate, useInView, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
-import { useEffect, useRef } from "react";
+import { motion, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
+import { useRef } from "react";
+import { Reveal } from "./MotionElements";
 import { usePortfolioMotion } from "./MotionPreferences";
 import "./learning-journey.css";
 
@@ -19,36 +20,20 @@ function LearningStop({ milestone, index, progress, reduced }: {
   reduced: boolean;
 }) {
   const [number, title, description] = milestone;
-  const item = useRef<HTMLLIElement>(null);
-  const [copy, animateCopy] = useAnimate<HTMLDivElement>();
-  const inView = useInView(item, { once: true, amount: 0.5 });
   const threshold = index / (milestones.length - 1);
   const activation = useTransform(progress, [Math.max(0, threshold - 0.12), Math.max(0.1, threshold)], [0, 1]);
   const scale = useTransform(activation, [0, 0.55, 1], [1, 1.08, 1]);
 
-  useEffect(() => {
-    if (!copy.current || (!inView && !reduced)) return;
-    // Start from complete server-rendered content; motion is an enhancement.
-    const animation = reduced
-      ? animateCopy(copy.current, { opacity: 1, y: 0 }, { duration: 0 })
-      : animateCopy(copy.current, { opacity: [0.66, 1], y: [14, 0] }, {
-        delay: index * 0.06,
-        duration: 0.55,
-        ease: [0.22, 1, 0.36, 1],
-      });
-    return () => animation.stop();
-  }, [animateCopy, copy, inView, index, reduced]);
-
   return (
-    <li className="learning-stop" ref={item}>
+    <li className="learning-stop">
       <motion.span className="learning-node" style={{ scale: reduced ? 1 : scale }} aria-hidden="true">
         <motion.span className="learning-node-fill" style={{ opacity: reduced ? 1 : activation }} />
         <span className="learning-node-number">{number}</span>
       </motion.span>
-      <div className="learning-copy" ref={copy}>
+      <Reveal className="learning-copy" sequence>
         <h3>{title}</h3>
         <p>{description}</p>
-      </div>
+      </Reveal>
     </li>
   );
 }

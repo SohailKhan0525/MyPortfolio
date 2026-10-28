@@ -110,3 +110,31 @@ Pre-push checks: TypeScript and whitespace checks passed; project/skill/AI recor
 section order and link destinations match the previous main. Independent source
 review found no blocking preservation or reduced-motion issues. Live verification
 follows the direct production deployment; no temporary preview is created.
+
+
+## Mobile-visible motion correction
+
+The follow-up asks for visibly stronger animation throughout the original portfolio and removal of the navbar playback button. No sections, project data, milestones, destinations, or terminal commands are removed. No preview deployment is used.
+
+### Diagnosis and implementation
+
+- The old `portfolio-motion=reduced` storage value could silently keep a visitor paused across reloads. Remove the navbar control and migrate away that key. Device reduced-motion preference still takes precedence.
+- A parent `work-layout`/`about-grid` reveal started both columns together; on a narrow screen the lower column could finish below the viewport. Every project row, detail panel, About block, AI article, milestone and skill now observes its own stable wrapper.
+- Reveals replay on re-entry. They use an 850ms opacity/32px translation with bounded stagger; the observer itself does not move, preventing scroll-boundary retrigger flicker. Server-rendered content is readable before JavaScript runs.
+- Each section boundary draws with native scroll progress through a Motion spring. Native page scrolling remains untouched.
+- The mobile stylesheet hid spans inside the old theme button. A separate 64×44px control uses a spring thumb, sun rays and crescent mask. A short surface color transition replaces the root View Transition snapshots which obscured the icon. Rapid taps preserve the latest state and clear the settling timer.
+- Every project drawing now has its own finite 2.5–3.8s sequence: regression points and fit, seismic rings and wave, heart and feature flow, record indexing, classification groups, a vault wheel and ledger, or a file tree. The hero record trace is 3.6s. They replay on viewport re-entry without requiring hover. SVG transforms use the correct view-box coordinate system.
+- Terminal controls also use spring tap feedback. Existing disclosure height transitions, selection layout transitions, copy confirmation and real statistic counters remain.
+
+Motion is the existing renderer for this work. Adding GSAP to drive these same properties would add a second scheduler without enabling a needed interaction. The change uses the relevant free Motion primitives, not every mutually exclusive demo or paid Motion+ component.
+
+### Verification
+
+- TypeScript check and whitespace/diff checks.
+- Automated React + DOM regression exercise: visible server output, removal of a stored pause value, independent viewport entry, replay on return, stationary observation wrapper, animated theme switching, rapid taps, theme persistence and reduced-motion rendering. IntersectionObserver is simulated; this is not a physical-device or browser-layout test.
+- Exact data comparisons preserve project/skill/AI arrays, all journey milestones, seven main section IDs/order and link destinations.
+- Independent source review caught and resolved the observer-edge issue and SVG transform origins. Radix's descendant collection still supports keyboard navigation through the new reveal wrappers.
+- Hallmark static scan retains the existing resume heading false positive (rule 54) and legacy pure-white fallback REFLEX (rule 7b). The former is a real section heading; the latter is overridden by the established theme. Neither justifies deleting content or restyling the site. User-requested repeatable motion and existing bounded accordion height animation are deliberate exceptions to Hallmark's default restraint. Browser verification uses the supported browser interface, rather than Hallmark's external rendering script.
+- Live production verification follows the direct `main` push. Mobile scroll timing and toggle behavior are covered by source review and the regression exercise; a physical-phone test remains outside this environment.
+
+Sources: [Motion scroll animations](https://motion.dev/docs/react-scroll-animations), [useInView](https://motion.dev/docs/react-use-in-view), [hover/touch behavior](https://motion.dev/docs/react-hover-animation), and [motion components](https://motion.dev/docs/react-motion-component).

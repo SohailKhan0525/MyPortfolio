@@ -1,53 +1,65 @@
 "use client";
 
-import { AnimatePresence, animate as animateValue, motion, stagger, useAnimate, useInView, useMotionValue, useTransform, type HTMLMotionProps } from "motion/react";
+import { AnimatePresence, animate as animateValue, motion, stagger, useAnimate, useInView, useMotionValue, useScroll, useSpring, useTransform, type HTMLMotionProps } from "motion/react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { usePortfolioMotion } from "./MotionPreferences";
 
 export const easeOut = [0.22, 1, 0.36, 1] as const;
 
-/** The server renders the finished content. Motion only begins after it is visible. */
+/** Observe the actual visible block, not an ancestor containing a mobile stack.
+ * Content remains readable before hydration, on exit, and with reduced motion. */
 export function Reveal({ children, delay = 0, className = "", sequence = false }: {
   children: ReactNode; delay?: number; className?: string; sequence?: boolean;
 }) {
   const [scope, animate] = useAnimate<HTMLDivElement>();
-  const inView = useInView(scope, { once: true, amount: 0.12 });
-  const played = useRef(false);
-  const { reduced } = usePortfolioMotion();
+  const inView = useInView(scope, { amount: "some", margin: "0px 0px -48px 0px" });
+  const { reduced, ready } = usePortfolioMotion();
 
   useEffect(() => {
     const node = scope.current;
-    if (!node) return;
-    const targets = sequence ? Array.from(node.children) : [node];
-    if (reduced) {
+    if (!node || !ready) return;
+    // Observe the stationary wrapper and move only its children. Moving the
+    // observed node itself can retrigger IntersectionObserver at a scroll edge.
+    const targets = Array.from(node.children);
+    if (reduced || !inView) {
       animate(targets, { opacity: 1, y: 0 }, { duration: 0 });
       return;
     }
-    if (!inView || played.current) return;
-    played.current = true;
-    const controls = animate(targets, { opacity: [0.6, 1], y: [22, 0] }, {
-      duration: 0.65, delay: sequence ? stagger(0.065, { startDelay: delay }) : delay, ease: easeOut,
+    const controls = animate(targets, { opacity: [0.12, 1], y: [32, 0] }, {
+      duration: 0.85, delay: sequence ? stagger(0.09, { startDelay: delay }) : delay, ease: easeOut,
     });
     return () => controls.stop();
-  }, [inView, reduced, sequence, delay, animate, scope]);
+  }, [inView, reduced, ready, sequence, delay, animate, scope]);
 
-  return <div ref={scope} className={`motion-reveal ${className}`}>{children}</div>;
+  return <div ref={scope} className={`motion-reveal ${className}`}>
+    {sequence ? children : <div className="motion-reveal-content">{children}</div>}
+  </div>;
+}
+
+/** The rule follows native scrolling; it also works without a mouse or hover. */
+export function MotionSection({ children, ...props }: Omit<HTMLMotionProps<"section">, "children"> & { children: ReactNode }) {
+  const target = useRef<HTMLElement>(null);
+  const { reduced } = usePortfolioMotion();
+  const { scrollYProgress } = useScroll({ target, offset: ["start 92%", "start 30%"] });
+  const progress = useSpring(scrollYProgress, { stiffness: 160, damping: 32, restDelta: 0.001 });
+  return <motion.section {...props} ref={target}>
+    {props.className?.includes("section-block") && <span className="section-rule" aria-hidden="true"><motion.span style={{ scaleX: reduced ? 1 : progress }} /></span>}
+    {children}
+  </motion.section>;
 }
 
 export function AnimatedHeading({ children }: { children: string }) {
   const [scope, animate] = useAnimate<HTMLHeadingElement>();
-  const { reduced } = usePortfolioMotion();
-  const played = useRef(false);
+  const inView = useInView(scope, { amount: 0.2 });
+  const { reduced, ready } = usePortfolioMotion();
   useEffect(() => {
-    if (!scope.current) return;
-    if (reduced) { animate(".hero-word", { y: 0, opacity: 1, rotateX: 0 }, { duration: 0 }); return; }
-    if (played.current) return;
-    played.current = true;
-    const controls = animate(".hero-word", { y: [18, 0], opacity: [0.65, 1], rotateX: [12, 0] }, {
-      duration: 0.65, delay: stagger(0.035), ease: easeOut,
+    if (!scope.current || !ready) return;
+    if (reduced || !inView) { animate(".hero-word", { y: 0, opacity: 1, rotateX: 0 }, { duration: 0 }); return; }
+    const controls = animate(".hero-word", { y: [32, 0], opacity: [0.1, 1], rotateX: [20, 0] }, {
+      duration: 0.85, delay: stagger(0.055), ease: easeOut,
     });
     return () => controls.stop();
-  }, [reduced, animate, scope]);
+  }, [inView, reduced, ready, animate, scope]);
   return <h1 ref={scope} aria-label={children}>{children.split(" ").map((word, i, words) =>
     <span key={`${word}-${i}`} aria-hidden="true"><span className="hero-word">{word}</span>{i < words.length - 1 ? " " : ""}</span>
   )}</h1>;

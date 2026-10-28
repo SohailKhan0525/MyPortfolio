@@ -1,8 +1,12 @@
-/* A coordinated motion system; all content has a readable, static server render. */
+/* Hallmark · 2026-10-28 · existing system; repeatable, viewport-led motion.
+ * Critique: mobile stacks completed their entrances before becoming visible. */
 .hero-word { display: inline-block; transform-origin: 50% 90%; }
-.motion-toggle { min-width: 44px; min-height: 44px; border-radius: 4px; background: transparent; }
-.motion-toggle[aria-pressed="true"] { color: var(--signal); }
-.motion-toggle[aria-disabled="true"] { cursor: default; }
+.section-block { position: relative; border-top-color: transparent; }
+.section-rule { position: absolute; top: -1px; left: 0; right: 0; height: 1px; background: var(--line); pointer-events: none; }
+.section-rule > span { display: block; width: 100%; height: 100%; background: var(--signal); transform-origin: left center; }
+.project-detail-reveal { min-width: 0; position: sticky; top: 104px; }
+.project-detail-reveal .project-detail { position: static; }
+.project-list .motion-reveal { min-width: 0; }
 .copy-label, .copy-label > span { display: inline-flex; align-items: center; gap: 8px; }
 .copy-label { min-width: 98px; justify-content: center; }
 .metric-accessible { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
@@ -31,4 +35,7 @@ html[data-motion="reduced"] .project-row {
 @media (max-width: 40rem) {
   .header-actions { gap: 4px; }
   .hero-word { letter-spacing: inherit; }
+}
+@media (max-width: 60rem) {
+  .project-detail-reveal { position: static; }
 }
