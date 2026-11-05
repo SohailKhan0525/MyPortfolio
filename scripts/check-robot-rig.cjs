@@ -44,13 +44,30 @@ async function run() {
     assert.equal(rig.leftArm.children.length, 2, 'Left paddle and mint inset pivot together');
     assert.equal(rig.rightArm.children.length, 2, 'Right paddle and mint trim pivot together');
     const sourceGeometrySet = new Set(sourceMeshes.map(mesh => mesh.geometry));
+    const sourceNameSet = new Set(sourceMeshes.map(mesh => mesh.name));
+    const physicalMaterials = new Set();
+    const finishes = new Map();
     rig.root.traverse(object => {
       if (!(object instanceof Mesh)) return;
       assert.ok(!sourceGeometrySet.has(object.geometry), 'Rig owns its cloned geometries');
-      if (!object.name) return; // Expression strokes are unlit and need no normals.
+      if (!sourceNameSet.has(object.name)) {
+        assert.ok(object.material.isMeshBasicMaterial, 'Screen features use unlit materials');
+        return;
+      }
       assert.ok(object.geometry.attributes.normal, 'Rounded source meshes have vertex normals');
       assert.equal(object.castShadow, false);
+      finishes.set(object.material.name, object.material);
+      if (object.material.isMeshPhysicalMaterial) physicalMaterials.add(object.material);
     });
+    assert.equal(physicalMaterials.size, 1, 'Only the visor uses a physical material');
+    const visor = [...physicalMaterials][0];
+    assert.equal(visor.name, 'Deep glossy curved screen');
+    assert.equal(visor.transmission, 0, 'No refraction pass is needed for the screen');
+    assert.equal(visor.clearcoat, 0.22);
+    assert.notEqual(finishes.get('One-piece sculpted pebble body').roughness,
+      finishes.get('Left mint actuator gasket').roughness, 'Satin shell differs from soft gaskets');
+    assert.ok(finishes.get('Neck axis silver bearing').metalness > finishes.get('One-piece sculpted pebble body').metalness,
+      'Metal bearings differ from the ceramic shell');
 
     const sceneSource = fs.readFileSync(path.join(base, 'app/robot/RobotScene.tsx'), 'utf8');
     const frameHeight = Number(sceneSource.match(/size\.height\s*\/\s*([\d.]+)/)[1]);

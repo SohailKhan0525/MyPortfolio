@@ -4,6 +4,7 @@ import {
   Material,
   Matrix4,
   Mesh,
+  MeshPhysicalMaterial,
   MeshStandardMaterial,
   Object3D,
   Vector3,
@@ -89,11 +90,60 @@ export function createRobotRig(source: Group) {
   const cloneMaterial = (sourceMaterial: Material) => {
     let material = materialCopies.get(sourceMaterial);
     if (!material) {
-      material = sourceMaterial.clone();
-      if (material instanceof MeshStandardMaterial) {
-        material.flatShading = false;
-        // Keep the actual model's mint/white materials and quiet emissive LEDs.
-        material.emissiveIntensity = Math.min(material.emissiveIntensity, 0.65);
+      const name = normalizeName(sourceMaterial.name);
+      if (sourceMaterial instanceof MeshStandardMaterial) {
+        // Material separation gives the existing sculpture a manufactured finish.
+        // Only the visor pays for a physical clearcoat shader; there is no second
+        // transparent glass shell, refraction pass or per-frame material creation.
+        if (name === "deepglossycurvedscreen") {
+          const visor = new MeshPhysicalMaterial();
+          MeshStandardMaterial.prototype.copy.call(visor, sourceMaterial);
+          visor.color.set("#071713");
+          visor.roughness = 0.24;
+          visor.metalness = 0.08;
+          visor.clearcoat = 0.22;
+          visor.clearcoatRoughness = 0.24;
+          visor.reflectivity = 0.35;
+          visor.envMapIntensity = 0.28;
+          material = visor;
+        } else {
+          const finish = sourceMaterial.clone();
+          finish.envMapIntensity = 0.65;
+          if (name.includes("visorseal") || name.includes("opening") || name.includes("slot") || name.includes("speakerslit")) {
+            finish.color.set("#1c2e2b");
+            finish.roughness = 0.62;
+            finish.metalness = 0;
+            finish.envMapIntensity = 0.3;
+          } else if (name.includes("bearing") || name.includes("axis") || name.includes("pivot") || name === "microphonerim" || name.endsWith("headswivel")) {
+            finish.color.set("#97b6af");
+            finish.roughness = 0.3;
+            finish.metalness = 0.72;
+            finish.envMapIntensity = 0.85;
+          } else if (name.includes("gasket") || name === "mintcollar") {
+            finish.color.set("#3b7464");
+            finish.roughness = 0.68;
+            finish.metalness = 0;
+            finish.envMapIntensity = 0.3;
+          } else if (name.includes("mint") || name.includes("chestbadge")) {
+            finish.color.set(name.includes("chestbadge") ? "#71c9b0" : "#a4d7c6");
+            finish.roughness = 0.4;
+            finish.metalness = 0.02;
+            finish.envMapIntensity = 0.55;
+          } else if (name.includes("plinth") || name === "insetbasetop") {
+            finish.color.set("#dfe8e1");
+            finish.roughness = 0.42;
+            finish.metalness = 0;
+          } else if (name.includes("body") || name.includes("head") || name.includes("paddle") || name.includes("cover")) {
+            finish.color.set("#e9f0ea");
+            finish.roughness = 0.29;
+            finish.metalness = 0.025;
+          }
+          material = finish;
+        }
+        (material as MeshStandardMaterial).flatShading = false;
+        (material as MeshStandardMaterial).emissiveIntensity = Math.min(sourceMaterial.emissiveIntensity, 0.2);
+      } else {
+        material = sourceMaterial.clone();
       }
       materialCopies.set(sourceMaterial, material);
     }

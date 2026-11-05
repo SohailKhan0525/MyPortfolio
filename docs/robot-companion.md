@@ -15,20 +15,24 @@ character, remote model service, controls, or sound was added.
   raised left paddle is brought into a relaxed rest pose. The supplied body,
   head, visor and plinth remain the actual model. Only the small upper visor
   reflection is omitted at runtime because it resembled an extra eyebrow.
-- `face.ts` replaces only the original static face features with one morphing
-  face: larger capsule eyes, happy crescents, distinct angry/sleepy lids, small
-  catchlights, brows, tears, restrained blush and a thicker curved mouth. Shared
-  expression parameters interpolate on stable geometries, avoiding duplicate
-  faces and overlapping translucent stroke discs. Eyelids close around the
-  same eye centers, and catchlights disappear while closed. Mood geometry owns
-  the heavy lids, avoiding a second pose-level squash that made them disappear.
-  No face textures are
-  uploaded during animation.
+- The November quality pass separates pearl satin shells, soft mint insets,
+  matte gaskets, metallic bearings and a dark coated visor. Only the visor uses
+  `MeshPhysicalMaterial`; there is no extra glass shell or refraction pass.
+- `face.ts` supplies one morphing face. The friendly smile has open eyes, dark
+  inset pupils and small catchlights, so eye contact and blinking remain readable.
+  Pupils move inside the same eye contour and are clipped geometrically to its
+  aperture. Closed lids hide pupils and glints. Brows, asymmetric lids, mouth
+  shape, moving tears and restrained cheek color distinguish the seven emotions.
+  The sleepy mouth opens and closes with the yawn; crying includes a slight lip
+  tremble. Geometry and materials are reused; no face textures are uploaded during
+  animation.
 - `behavior.ts` owns one body state at a time. Startup is greeting (2.4s), pause
   (2s), blink, spin, dizzy wobble, fall, down, and slow recovery. Idle actions then
   choose randomized timings and include looks, tilts, smiles, crying, anger,
-  tiredness, waves, spins and stumbles. A composed eyelid envelope provides random
-  blinking after the intro. Frame deltas advance a bounded, reusable pose object;
+  tiredness, waves, spins and stumbles. Faster eye movements lead head turns;
+  blinks close quickly and reopen softly. Subtle sobs, brief bracing and a gradual
+  yawn coordinate each mood with the body. The facial clock stops with the scene.
+  Frame deltas advance a bounded, reusable pose object;
   no React state updates occur per animation frame.
 - The body uses a small support hull sampled once from the original geometry to
   meet the floor during the fall. The arms fold safely instead of forcing the
@@ -49,16 +53,27 @@ The canvas switches between continuous and on-demand rendering. It keeps playing
 while scrolling through every section; the companion has no scroll listener or
 intersection observer. It pauses when the tab is hidden, preserving animation
 time so it cannot skip ahead on return. Canvas scroll measurements are disabled;
-resize is still observed. DPR is capped at 1.35, with no shadows, postprocessing, physics
-engine, environment-map download, or animation controls.
+resize is still observed. The backing buffer starts at DPR 2, replacing the old
+1.35 cap. Two consecutive slow two-second playback windows can lower it to 1.5,
+then 1.25 after a cooldown. Warmup and hidden-tab gaps do not count. Quality only
+steps down, so it cannot oscillate. React updates occur only at those tier changes.
+
+A 128px PMREM generated once from Three's built-in room supplies broad studio
+reflections, with a warm key, cool fill and mint rim. It is prepared before shader
+warmup. The capture scene, generator and generated target have explicit cleanup.
+There are no shadow maps, postprocessing, physics engine, environment-map
+downloads or animation controls. At the 240×208 desktop stage, DPR 2 is a 480×416
+backing buffer: sharper small-format rendering, not a literal 3840×2160 canvas.
 
 The existing live reduced-motion provider selects an upright, smiling still pose.
 Switching that preference on during a fall settles the robot immediately;
 switching it off resumes quiet autonomous idle rather than restarting the fall.
-A transparent still appears only if WebGL/model rendering fails. It is rendered
-from the same runtime rig, initial smile, and camera as the animated robot,
-rather than the original GLB's baked expression. Its responsive scale follows
-the camera projection. The figure has one stable accessible label; expressions
+A transparent still appears only if WebGL/model rendering fails. Blender Cycles
+renders an export of the same runtime rig, initial smile and camera projection.
+The served 1280×640 WebP uses soft studio lighting and replaces the previous SVG
+renderer's faceted shading approximation. It is an error-only static fallback,
+not an image displayed before model loading. Its responsive scale follows the
+camera projection. The figure has one stable accessible label; expressions
 are decorative and do not generate live announcements.
 
 ## Fixed placement and hero layout
@@ -92,13 +107,16 @@ stylesheet bundle orders, including safe areas, menu priority and touch passthro
 `scripts/check-robot-rig.cjs` uses the actual GLB and Three geometry to check
 preservation, shoulder pivots, floor contact, camera bounds, every expression
 transition, face winding and stable geometry. Offline renders check appearance.
-These are not claims of physical-phone frame-rate or GPU-pixel testing.
+`check-robot-quality.cjs` tests sustained-pressure adaptation, warmup, pause,
+cooldown and bounded resolution. These are not claims of physical-phone frame
+rate or live WebGL-pixel testing.
 
 Run with test-only `jsdom@26.1.0` and `typescript@5.9.3` available through
 `PORTFOLIO_TEST_DEPS`, following the setup comments in each test. The poster can
 be regenerated on Node 22.13+ with `node scripts/render-robot-poster.mjs` using
-Three and the Sharp dependency already available through Next. Add `--qa-dir`
-with a scratch path to render startup and expression contact sheets.
+Three, Sharp (already available through Next), and Blender for the offline Cycles
+render. Blender is a local authoring tool, not a website or Vercel dependency.
+Add `--qa-dir` with a scratch path for startup and expression contact sheets.
 
 ## References consulted
 
@@ -113,6 +131,14 @@ with a scratch path to render startup and expression contact sheets.
   preparation and the limits of transparent-object sorting.
 - https://threejs.org/docs/pages/MeshBasicMaterial.html — unlit screen features.
 - https://threejs.org/docs/pages/ShapeGeometry.html — filled polygonal features.
+- https://threejs.org/docs/pages/MeshPhysicalMaterial.html — selective clearcoat,
+  environment lighting and per-pixel costs.
+- https://threejs.org/docs/pages/RoomEnvironment.html — local studio lighting
+  without an HDR download.
+- https://la.disneyresearch.com/publication/modeling-and-animating-eye-blinks/ —
+  asymmetric blink dynamics and complete eyelid closure.
+- https://www.animationmentor.com/blog/blink-for-a-reason-acting-advice-from-ilm-lead-animator-shawn-kelly/
+  — gaze, head turns and emotional intent informing facial timing.
 - https://react.dev/reference/react-dom/createPortal — preserve React context while
   placing the viewport companion outside transformed page containers.
 - https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/position —

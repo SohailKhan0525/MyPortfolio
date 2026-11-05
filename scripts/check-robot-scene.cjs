@@ -32,7 +32,8 @@ const React = requireApp("react");
 const { act } = React;
 const { createRoot } = requireApp("react-dom/client");
 const jsxRuntime = requireApp("react/jsx-runtime");
-const { Group, OrthographicCamera } = requireApp("three");
+const Three = requireApp("three");
+const { Group, Scene, Texture, OrthographicCamera } = Three;
 const loaderScene = new Group();
 let frame;
 let canvasProps;
@@ -43,6 +44,28 @@ let poseApplications = 0;
 let lastPose;
 let disposals = 0;
 let compileCalls = [];
+const studios = [];
+const generators = [];
+const environmentTargets = [];
+const dprChanges = [];
+let failEnvironment = false;
+class Studio {
+  constructor() { this.disposals = 0; studios.push(this); }
+  dispose() { this.disposals++; }
+}
+class Prefilter {
+  constructor(renderer) { assert.equal(renderer, state.gl); this.disposals = 0; generators.push(this); }
+  fromScene(studio, sigma, near, far, options) {
+    assert.equal(studio.disposals, 0, "Capture scene is alive during prefiltering");
+    assert.equal(options.size, 128, "Environment budget is bounded");
+    assert(sigma > 0 && near > 0 && far > near);
+    if (failEnvironment) throw new Error("Environment prefilter failed");
+    const target = { texture: new Texture(), disposals: 0, dispose() { this.disposals++; } };
+    environmentTargets.push(target);
+    return target;
+  }
+  dispose() { this.disposals++; }
+}
 const canvas = document.createElement("canvas");
 const contextListeners = new Set();
 const addListener = canvas.addEventListener.bind(canvas);
@@ -61,16 +84,19 @@ const state = {
     compileAsync(world, camera) {
       assert.equal(world, state.scene, "Compile includes the actual scene lighting");
       assert.equal(camera, state.camera, "Compile uses the fitted camera");
+      assert.equal(world.environment, environmentTargets.at(-1).texture, "Environment exists before shader preparation");
+      assert.equal(world.environmentIntensity, 0.55);
       return new Promise((resolve, reject) => compileCalls.push({ resolve, reject }));
     },
   },
   invalidate: () => { invalidations++; },
   camera: new OrthographicCamera(),
   size: { width: 292, height: 216 },
-  scene: new Group(),
+  scene: new Scene(),
 };
 const mockFiber = {
   Canvas(props) {
+    if (canvasProps && canvasProps.dpr !== props.dpr) dprChanges.push(props.dpr);
     canvasProps = props;
     // Lights/primitive are renderer host nodes. Only mount the React subtree.
     return React.createElement(React.Fragment, null,
@@ -94,6 +120,8 @@ const load = Module._load;
 Module._load = function(name, parent, main) {
   if (name === "@react-three/fiber") return mockFiber;
   if (name === "three/addons/loaders/GLTFLoader.js") return { GLTFLoader: class {} };
+  if (name === "three/addons/environments/RoomEnvironment.js") return { RoomEnvironment: Studio };
+  if (name === "three" && parent?.filename.endsWith("RobotScene.tsx")) return { ...Three, PMREMGenerator: Prefilter };
   if (name === "./rig" && parent?.filename.endsWith("RobotScene.tsx")) return {
     createRobotRig() {
       return {
@@ -141,6 +169,13 @@ const unmount = async () => { await act(async () => root.unmount()); root = unde
     await mount();
     assert.equal(canvasProps.frameloop, "demand", "An unrevealed model cannot run continuously");
     assert.equal(canvasProps.resize.scroll, false, "Scroll does not trigger canvas layout measurement");
+    assert.equal(canvasProps.dpr, 2, "Crisp 2x initial buffer without a 4K canvas");
+    assert.equal(canvasProps.gl.antialias, true);
+    assert.equal(canvasProps.gl.toneMapping, Three.ACESFilmicToneMapping);
+    assert.equal(canvasProps.gl.outputColorSpace, Three.SRGBColorSpace);
+    assert.equal(studios[0].disposals, 1, "Capture geometry is released after environment generation");
+    assert.equal(generators[0].disposals, 1, "Temporary prefilter resources are released");
+    assert.equal(environmentTargets[0].disposals, 0, "Environment remains alive during playback");
     assert.equal(compileCalls.length, 1);
     const staticPose = { ...lastPose };
     const initialApplications = poseApplications;
@@ -181,10 +216,23 @@ const unmount = async () => { await act(async () => root.unmount()); root = unde
     assert.equal(lastPose.expression, "smile");
     assert.equal(canvas.dataset.robotState, "resting");
     assert.equal(compileCalls.length, 1, "Playback gates do not recompile the scene");
+    assert.equal(dprChanges.length, 0, "Warmup, hidden time and reduced pose never lower quality");
+    await render({ reduced: false, active: true });
+    await tick(10);
+    for (let i = 0; i < 180; i++) await tick(1 / 30);
+    assert.deepEqual(dprChanges, [1.5], "Sustained slow active frames lower DPR once");
+    assert.equal(canvasProps.dpr, 1.5, "Selected tier is persisted in the Canvas prop for Fiber configuration");
+    await render({ active: false });
+    for (let i = 0; i < 40; i++) await tick(1);
+    assert.deepEqual(dprChanges, [1.5], "Inactive frames cannot use the quality budget");
+    assert.equal(canvasProps.dpr, 1.5, "Visibility changes cannot restore the higher DPR");
     await unmount();
     assert.equal(contextListeners.size, 0);
     assert.equal(pendingRAF.size, 0);
     assert(disposals > 0);
+    assert.equal(state.scene.environment, null, "Environment ownership restores the previous scene state");
+    assert.equal(state.scene.environmentIntensity, 1);
+    assert.equal(environmentTargets[0].disposals, 1);
 
     const priorReady = readyCalls;
     await mount();
@@ -215,6 +263,16 @@ const unmount = async () => { await act(async () => root.unmount()); root = unde
     assert.equal(errors, 2);
     await unmount();
 
+    const beforeFailedEnvironment = compileCalls.length;
+    failEnvironment = true;
+    await mount();
+    assert.equal(errors, 3, "Synchronous environment failure selects fallback");
+    assert.equal(compileCalls.length, beforeFailedEnvironment, "No partial environment is compiled");
+    assert.equal(studios.at(-1).disposals, 1);
+    assert.equal(generators.at(-1).disposals, 1);
+    await unmount();
+    failEnvironment = false;
+
     const strictStart = compileCalls.length;
     await mount(true);
     assert.equal(compileCalls.length, strictStart + 2, "Strict Mode rehearses mount cleanup");
@@ -228,7 +286,11 @@ const unmount = async () => { await act(async () => root.unmount()); root = unde
     await flushRAF();
     assert.equal(readyCalls, priorReady + 1, "The live Strict Mode warmup announces exactly once");
     await unmount();
-    console.log("PASS: real RobotScene shader warmup ordering, two-frame reveal, hidden greeting prevention, paused-clock resume, reduced pose, compile/context failures, RAF cancellation and Strict Mode cleanup. Renderer hooks are controlled; GPU pixels are not tested here.");
+    assert(studios.every(resource => resource.disposals === 1), "Every studio is disposed exactly once");
+    assert(generators.every(resource => resource.disposals === 1), "Every generator is disposed exactly once");
+    assert(environmentTargets.every(resource => resource.disposals === 1), "Every owned environment is disposed exactly once, including Strict Mode");
+    assert.equal(state.scene.environment, null);
+    console.log("PASS: real RobotScene environment-before-compile ordering, bounded studio ownership/disposal, 2x antialiasing, sustained active-frame DPR adaptation, two-frame reveal, hidden greeting prevention, paused-clock resume, reduced pose, environment/compile/context failures, RAF cancellation and Strict Mode cleanup. Renderer hooks are controlled; GPU pixels are not tested here.");
   } finally {
     if (root) await unmount();
     Module._load = load;

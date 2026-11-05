@@ -20,6 +20,10 @@ export interface RobotPose {
   eyeOpen: number;
   gazeX: number;
   gazeY: number;
+  /** Active-only clock for tears and other small facial secondary motion. */
+  faceTime: number;
+  /** Emotion acting strength, independent of the transition between expressions. */
+  expressionIntensity: number;
   expression: RobotExpression;
   expressionFrom: RobotExpression;
   expressionMix: number;
@@ -41,10 +45,14 @@ export interface RobotAnimator {
   lastAction: RobotState;
   nextBlink: number;
   blinkElapsed: number;
+  nextGaze: number;
+  focusX: number;
+  focusY: number;
 }
 
 const TURN = Math.PI * 2;
 const FALL_ROLL = 1.36;
+const BLINK_DURATION = 0.24;
 const STARTUP_STATES: readonly RobotState[] = ["greeting", "hello-pause", "blink", "spin", "dizzy", "fall", "down", "recover"];
 const STARTUP_DURATIONS = [2.4, 2, 0.3, 1.5, 1.35, 0.7, 1.8, 2.1] as const;
 const POSE_KEYS = ["bodyRoll", "bodyYaw", "bodyY", "bodyX", "headYaw", "headTilt", "headPitch", "leftArm", "rightArm", "eyeOpen", "gazeX", "gazeY"] as const;
@@ -54,8 +62,16 @@ const smooth = (value: number) => { const x = clamp01(value); return x * x * x *
 const envelope = (elapsed: number, duration: number, edge = 0.5) => smooth(elapsed / edge) * smooth((duration - elapsed) / edge);
 const sample = (animator: RobotAnimator, min: number, max: number) => min + clamp01(animator.random()) * (max - min);
 
+// A fast lid drop, short closed beat and softer reopening reads as a blink,
+// rather than a mechanical sine-wave squash. The scripted blink keeps its 0.3s slot.
+const blinkAperture = (progress: number) => {
+  const phase = clamp01(progress);
+  return phase < 0.28 ? 1 - smooth(phase / 0.28)
+    : phase < 0.39 ? 0 : smooth((phase - 0.39) / 0.61);
+};
+
 function createPose(): RobotPose {
-  return { bodyRoll: 0, bodyYaw: 0, bodyY: 0, bodyX: 0, headYaw: 0, headTilt: 0, headPitch: 0, leftArm: 0, rightArm: 0, eyeOpen: 1, gazeX: 0, gazeY: 0, expression: "smile", expressionFrom: "smile", expressionMix: 1 };
+  return { bodyRoll: 0, bodyYaw: 0, bodyY: 0, bodyX: 0, headYaw: 0, headTilt: 0, headPitch: 0, leftArm: 0, rightArm: 0, eyeOpen: 1, gazeX: 0, gazeY: 0, faceTime: 0, expressionIntensity: 1, expression: "smile", expressionFrom: "smile", expressionMix: 1 };
 }
 
 export function createRobotAnimator(random: () => number = Math.random): RobotAnimator {
@@ -64,6 +80,7 @@ export function createRobotAnimator(random: () => number = Math.random): RobotAn
     state: "greeting", elapsed: 0, duration: STARTUP_DURATIONS[0], time: 0,
     startupPhase: 0, yawBase: 0, spinDirection: 1, direction: 1,
     lookDirection: 0, lastAction: "idle", nextBlink: 3.4, blinkElapsed: -1,
+    nextGaze: 2.2, focusX: 0, focusY: 0,
   };
 }
 
@@ -115,6 +132,7 @@ function next(animator: RobotAnimator) {
     // The scripted blink follows the full two-second hello pause. Ambient
     // blinking starts only after the entire greeting/fall/recovery has finished.
     animator.nextBlink = animator.time + sample(animator, 2.4, 6.2);
+    animator.nextGaze = animator.time + sample(animator, 1.2, 2.6);
   }
   animator.startupPhase = STARTUP_STATES.length;
   if (animator.state === "idle") {
@@ -150,17 +168,23 @@ function setTarget(animator: RobotAnimator) {
   target.leftArm = -0.035 + Math.sin(time * 1.1) * 0.02;
   target.rightArm = 0.035 - Math.sin(time * 1.1) * 0.02;
   target.eyeOpen = 1;
-  target.gazeX = 0;
-  target.gazeY = 0;
+  target.gazeX = animator.startupPhase >= STARTUP_STATES.length ? animator.focusX : 0;
+  target.gazeY = animator.startupPhase >= STARTUP_STATES.length ? animator.focusY : 0;
+  target.expressionIntensity = 1;
 
   switch (animator.state) {
     case "greeting": case "wave": {
       const wave = envelope(elapsed, animator.duration, 0.42);
-      target.rightArm = wave * (1.94 + Math.sin(elapsed * 11) * 0.3);
+      target.rightArm = wave * (1.94 + Math.sin(elapsed * 9) * 0.24);
       target.leftArm = -0.12 * wave;
       target.headYaw = 0;
       target.headTilt = -0.1 * wave;
+      // Eye contact precedes the wave; a tiny nod follows the shoulder motion.
+      target.headPitch = -0.055 * envelope(elapsed, 0.7, 0.22)
+        + Math.sin(elapsed * 4 - 0.45) * 0.025 * wave;
       target.bodyRoll = -0.04 * wave;
+      target.gazeX = 0;
+      target.gazeY = 0.08 * wave;
       break;
     }
     case "hello-pause":
@@ -168,7 +192,7 @@ function setTarget(animator: RobotAnimator) {
       target.headTilt = 0.04;
       break;
     case "blink":
-      target.eyeOpen = 1 - Math.sin(Math.PI * progress) ** 2;
+      target.eyeOpen = blinkAperture(progress);
       break;
     case "spin":
       target.bodyYaw = animator.yawBase + animator.spinDirection * TURN * smooth(progress);
@@ -222,10 +246,16 @@ function setTarget(animator: RobotAnimator) {
       target.rightArm = 0.95 * remaining;
       break;
     }
-    case "look":
-      target.headYaw = animator.lookDirection * 0.48 * weight;
-      target.gazeX = animator.lookDirection * 0.4 * weight;
+    case "look": {
+      // Eyes acquire a target first. The head follows a fraction later and
+      // settles more slowly; both return before the next body action begins.
+      const eyeWeight = smooth(elapsed / 0.12) * smooth((animator.duration - elapsed) / 0.5);
+      const headWeight = smooth((elapsed - 0.12) / 0.46) * smooth((animator.duration - elapsed) / 0.38);
+      target.headYaw = animator.lookDirection * 0.44 * headWeight;
+      target.gazeX = animator.lookDirection * 0.72 * eyeWeight;
+      target.gazeY = 0.08 * eyeWeight;
       break;
+    }
     case "tilt":
       target.headTilt = direction * 0.25 * weight;
       target.bodyRoll = -direction * 0.035 * weight;
@@ -235,25 +265,45 @@ function setTarget(animator: RobotAnimator) {
       target.headTilt = direction * 0.1 * weight;
       target.eyeOpen = 1 - 0.15 * weight;
       break;
-    case "cry":
-      target.headPitch = 0.18 * weight;
-      target.headTilt = direction * 0.08 * weight;
-      target.leftArm = -0.15 * weight;
-      target.rightArm = 0.15 * weight;
-      target.gazeY = -0.2 * weight;
+    case "cry": {
+      const sob = Math.max(0, Math.sin(elapsed * 5.4)) ** 4 * weight;
+      target.headPitch = (0.16 + 0.025 * sob) * weight;
+      target.headTilt = direction * 0.07 * weight;
+      target.bodyY += 0.009 * sob;
+      target.leftArm = (-0.14 - 0.025 * sob) * weight;
+      target.rightArm = (0.14 + 0.025 * sob) * weight;
+      target.gazeX = direction * 0.1 * weight;
+      target.gazeY = -0.4 * weight;
+      target.expressionIntensity = 0.55 + 0.45 * (0.65 * weight + 0.35 * sob);
       break;
-    case "angry":
-      target.headPitch = 0.12 * weight;
-      target.headYaw = direction * 0.06 * weight;
-      target.leftArm = -0.26 * weight;
-      target.rightArm = 0.26 * weight;
+    }
+    case "angry": {
+      const brace = envelope(elapsed - 0.25, 0.9, 0.25) * weight;
+      target.headPitch = (0.09 + 0.035 * brace) * weight;
+      target.headYaw = direction * 0.05 * weight;
+      target.bodyRoll = direction * 0.018 * weight;
+      target.bodyY *= 1 - 0.3 * brace;
+      target.leftArm = -(0.2 + 0.06 * brace) * weight;
+      target.rightArm = (0.2 + 0.06 * brace) * weight;
+      target.gazeX = 0;
+      target.gazeY = -0.12 * weight;
+      target.expressionIntensity = 0.65 + 0.35 * brace;
       break;
-    case "sleepy":
+    }
+    case "sleepy": {
+      const yawn = Math.sin(Math.PI * clamp01((progress - 0.12) / 0.75)) ** 2;
+      const nod = smooth(progress / 0.55) * smooth((1 - progress) / 0.3);
       // The face owns heavy lids; preserve the independent blink envelope.
-      target.headPitch = 0.32 * weight;
-      target.headTilt = direction * 0.16 * weight;
-      target.bodyY *= 0.4;
+      target.headPitch = 0.29 * nod - 0.05 * yawn;
+      target.headTilt = direction * 0.12 * weight;
+      target.bodyY = target.bodyY * 0.4 + 0.008 * yawn;
+      target.leftArm = -0.045;
+      target.rightArm = 0.045;
+      target.gazeX = 0;
+      target.gazeY = -0.2 * weight;
+      target.expressionIntensity = yawn;
       break;
+    }
     case "stumble":
       target.bodyRoll = direction * Math.sin(progress * Math.PI * 4) * 0.22 * weight;
       target.bodyX = direction * Math.sin(progress * Math.PI * 2) * 0.07 * weight;
@@ -264,12 +314,12 @@ function setTarget(animator: RobotAnimator) {
   }
 
   if (animator.blinkElapsed >= 0 && animator.state !== "blink" && animator.state !== "fall") {
-    target.eyeOpen *= 1 - Math.sin(Math.PI * clamp01(animator.blinkElapsed / 0.18)) ** 2;
+    target.eyeOpen *= blinkAperture(animator.blinkElapsed / BLINK_DURATION);
   }
   target.eyeOpen = Math.max(0.035, target.eyeOpen);
 }
 
-/** Advance only while visible, in motion mode, and not scrolling. No frame allocations. */
+/** Advance only while the scene is active. No timers or per-frame allocations. */
 export function stepRobotAnimator(animator: RobotAnimator, deltaSeconds: number): RobotPose {
   if (!Number.isFinite(deltaSeconds) || deltaSeconds <= 0) return animator.pose;
   // A backgrounded or stalled frame must never skip the greeting or recovery.
@@ -283,12 +333,17 @@ export function stepRobotAnimator(animator: RobotAnimator, deltaSeconds: number)
   }
   if (animator.blinkElapsed >= 0) {
     animator.blinkElapsed += delta;
-    if (animator.blinkElapsed >= 0.18) {
+    if (animator.blinkElapsed >= BLINK_DURATION) {
       animator.blinkElapsed = -1;
       animator.nextBlink = animator.time + sample(animator, 2.4, 6.2);
     }
   } else if (animator.startupPhase >= STARTUP_STATES.length && animator.time >= animator.nextBlink) {
     animator.blinkElapsed = 0;
+  }
+  if (animator.startupPhase >= STARTUP_STATES.length && animator.time >= animator.nextGaze) {
+    animator.focusX = sample(animator, -0.3, 0.3);
+    animator.focusY = sample(animator, -0.12, 0.16);
+    animator.nextGaze = animator.time + sample(animator, 1.4, 3.4);
   }
 
   setTarget(animator);
@@ -297,11 +352,15 @@ export function stepRobotAnimator(animator: RobotAnimator, deltaSeconds: number)
   const bodyBlend = 1 - Math.exp(-13 * delta);
   const headBlend = 1 - Math.exp(-10 * delta);
   const eyelidBlend = 1 - Math.exp(-48 * delta);
+  const gazeBlend = 1 - Math.exp(-32 * delta);
   for (const key of POSE_KEYS) {
-    const blend = key === "eyeOpen" ? eyelidBlend : key.startsWith("head") || key.startsWith("gaze") ? headBlend : bodyBlend;
+    const blend = key === "eyeOpen" ? eyelidBlend : key.startsWith("gaze") ? gazeBlend : key.startsWith("head") ? headBlend : bodyBlend;
     pose[key] += (target[key] - pose[key]) * blend;
   }
   pose.expressionMix = Math.min(1, pose.expressionMix + delta / 0.32);
+  pose.expressionIntensity += (target.expressionIntensity - pose.expressionIntensity) * headBlend;
+  pose.faceTime += delta;
+  target.faceTime = pose.faceTime;
   return pose;
 }
 
@@ -311,9 +370,13 @@ export function settleRobotAnimator(animator: RobotAnimator): RobotPose {
   animator.yawBase = 0;
   animator.blinkElapsed = -1;
   animator.nextBlink = animator.time + sample(animator, 2.4, 6.2);
+  animator.nextGaze = animator.time + sample(animator, 1.2, 2.6);
+  animator.focusX = animator.focusY = 0;
   enter(animator, "idle", sample(animator, 2.8, 6.8));
   for (const key of POSE_KEYS) animator.pose[key] = animator.target[key] = key === "eyeOpen" ? 1 : 0;
   animator.pose.expression = animator.pose.expressionFrom = "smile";
   animator.pose.expressionMix = 1;
+  animator.pose.faceTime = animator.target.faceTime = 0;
+  animator.pose.expressionIntensity = animator.target.expressionIntensity = 1;
   return animator.pose;
 }
