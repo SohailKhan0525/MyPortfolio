@@ -11,10 +11,12 @@ import "./portfolio-motion.css";
 import ClickSound from "./ClickSound";
 import ChromeEffects from "./ChromeEffects";
 import PortfolioMotionProvider from "./MotionPreferences";
+import SmoothScroll from "./SmoothScroll";
 import { DEFAULT_THEME, THEME_COLORS, themeBootstrapScript } from "./theme-preference";
 import "./motion-system.css";
 import "./scroll-performance.css";
 import "./portfolio-refinement.css";
+import "./motion-choreography.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mohdzaheeruddin0525.vercel.app"),
@@ -42,6 +44,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body dir="ltr">
         <ClickSound />
         <PortfolioMotionProvider>
+          <SmoothScroll />
           <ChromeEffects />
           {children}
         </PortfolioMotionProvider>

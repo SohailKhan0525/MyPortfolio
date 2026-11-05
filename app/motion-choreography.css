@@ -1,0 +1,23 @@
+/* Motion uses short, bounded sequences; content remains readable without JS. */
+.section-title-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: .1em;
+  margin-bottom: -.1em;
+}
+.section-title-word { display: inline-block; }
+.section-heading-copy { max-width: 48ch; }
+.section-heading-copy p { margin: 0; font-size: 15px; line-height: 1.75; }
+.section-rule > span { width: 96px; background: var(--signal); }
+.section-title { line-height: 1.18; }
+@media (max-width: 60rem) {
+  .section-heading-copy { max-width: 60ch; }
+}
+html[data-motion="reduced"] .section-title-word { transform: none !important; opacity: 1 !important; }
+@media (prefers-reduced-motion: reduce) {
+  .section-title-word { transform: none !important; opacity: 1 !important; }
+}
+@media print {
+  .section-title-word, .route-heading-arrival { transform: none !important; opacity: 1 !important; }
+}

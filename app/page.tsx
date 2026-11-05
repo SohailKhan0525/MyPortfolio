@@ -10,8 +10,9 @@ import LearningJourney from "./LearningJourney";
 import PortfolioHeader from "./PortfolioHeader";
 import RobotCompanion from "./RobotCompanion";
 import UnderpageFooter from "./UnderpageFooter";
+import { scrollToPortfolioSection } from "./portfolio-scroll";
 import { usePortfolioMotion } from "./MotionPreferences";
-import { AnimatedHeading, AnimatedMetric, CopyLabel, MotionButton, MotionLink, MotionSection, Reveal } from "./MotionElements";
+import { AnimatedHeading, AnimatedMetric, CopyLabel, MotionButton, MotionLink, MotionSection, Reveal, SectionHeading } from "./MotionElements";
 import { ArrowDown, ArrowUpRight, Briefcase, Check, Code, GithubLogo, LinkedinLogo, PaperPlaneTilt, Sparkle } from "@phosphor-icons/react";
 
 type Contribution = { date: string; count: number; level: 0 | 1 | 2 | 3 | 4 };
@@ -91,7 +92,7 @@ function Contributions() {
     return n;
   }, [days]);
   return (
-    <Reveal className="surface activity-card" sequence>
+    <Reveal className="surface activity-card" sequence variant="panel">
       <div className="activity-head">
         <div>
 
@@ -164,7 +165,7 @@ function Terminal() {
     setHistory(h => [...h, `$ ${value.trim()}`, ...output(cmd)].slice(-100));
     setInput("");
     setIndex(-1);
-    if (cmd === "contact") document.querySelector("#contact")?.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
+    if (cmd === "contact") scrollToPortfolioSection("contact");
   };
 
   const submit = (e: FormEvent) => {
@@ -230,14 +231,14 @@ export default function Home() {
       <RobotCompanion />
       <div className="portfolio-foreground">
       <PortfolioHeader />
-      <a className="skip-link" href="#top">Skip to content</a><main id="top">
-        <MotionSection id="intro" className="hero hero-with-companion section-pad"><div className="hero-copy"><AnimatedHeading>I build Python apps and machine learning projects.</AnimatedHeading><Reveal delay={0.16}><p className="hero-description">I’m a CSIT undergraduate learning through datasets, models, and working apps.</p></Reveal><Reveal delay={0.24}><div className="hero-actions"><MotionLink className="button button-primary" data-sound href="#work">See the work <ArrowDown size={17} /></MotionLink><MotionButton className="text-button" data-sound type="button" onClick={copyEmail}><CopyLabel copied={copied}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={16} /> : <PaperPlaneTilt size={16} />}</CopyLabel></MotionButton></div></Reveal><Reveal delay={0.32}><div className="proof-row"><span>7 projects</span><span>Python + ML focus</span><span>Open to internships</span></div></Reveal><DataInstrument /></div><Reveal className="hero-art" delay={0.16}><Terminal /><p className="hero-note">Try <b>help</b>, <b>projects</b>, <b>skills</b>, or <b>about</b>.</p></Reveal></MotionSection>
-        <MotionSection id="work" className="section-pad section-block"><Reveal className="section-heading" sequence><div><h2>Selected projects</h2></div><p>Select a project to see the app and its source code.</p></Reveal><ProjectExplorer projects={projects} /></MotionSection>
-        <MotionSection id="ai-era" className="section-pad section-block ai-era"><Reveal className="section-heading" sequence><div><h2>Building with AI</h2></div><p>I use AI coding agents while learning the fundamentals. I write the specs, choose the architecture, and review the code. These are the products I’m working on.</p></Reveal><ProjectDisclosures items={aiEra} /></MotionSection>
-        <MotionSection id="about" className="section-pad section-block"><Reveal className="section-heading" sequence><div><h2>About me</h2></div></Reveal><div className="about-grid"><Reveal className="about-copy" sequence><p>I am a CSIT undergraduate focused on Python, machine learning, data analysis, and practical web development.</p><div className="about-facts"><span><Briefcase size={17} /> Open to internships</span><span><Code size={17} /> Python + ML</span><span><Sparkle size={17} /> Learning by building</span></div></Reveal><Contributions /></div></MotionSection>
-        <MotionSection id="journey" className="section-pad section-block"><Reveal className="section-heading" sequence><div><h2>What I’m learning</h2></div><p>From Python fundamentals to models, apps, and deployment.</p></Reveal><LearningJourney /></MotionSection>
-        <MotionSection id="skills" className="section-pad section-block"><Reveal className="section-heading" sequence><div><h2>Tools I use</h2></div><p>The languages and libraries behind these projects.</p></Reveal><div className="skills-grid">{skills.map(([name, desc], i) => <Reveal key={name} delay={i * 0.045}><article className="skill-card surface"><span className="skill-index">0{i + 1}</span><strong>{name}</strong><span>{desc}</span></article></Reveal>)}</div></MotionSection>
-        <MotionSection id="contact" className="section-pad section-block"><div className="surface contact-card"><Reveal><h2>Get in touch</h2><p>I’m open to internships and collaborations. Email me or connect on LinkedIn.</p></Reveal><Reveal className="contact-actions" sequence><MotionLink className="contact-email" href={`mailto:${email}`}>{email}</MotionLink><MotionButton className="button button-primary" data-sound type="button" onClick={copyEmail}><CopyLabel copied={copied}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={17} /> : <PaperPlaneTilt size={17} />}</CopyLabel></MotionButton><MotionLink className="button button-secondary" data-sound href={linkedin} target="_blank" rel="noreferrer"><LinkedinLogo size={17} /> LinkedIn</MotionLink><MotionLink className="button button-secondary" data-sound href="https://github.com/SohailKhan0525" target="_blank" rel="noreferrer"><GithubLogo size={17} /> GitHub</MotionLink></Reveal></div></MotionSection>
+      <a className="skip-link" href="#top">Skip to content</a><main id="top" tabIndex={-1}>
+        <MotionSection id="intro" className="hero hero-with-companion section-pad"><div className="hero-copy"><AnimatedHeading>I build Python apps and machine learning projects.</AnimatedHeading><Reveal delay={0.16}><p className="hero-description">I’m a CSIT undergraduate learning through datasets, models, and working apps.</p></Reveal><Reveal delay={0.24}><div className="hero-actions"><MotionLink className="button button-primary" data-sound href="#work">See the work <ArrowDown size={17} /></MotionLink><MotionButton className="text-button" data-sound type="button" onClick={copyEmail}><CopyLabel copied={copied}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={16} /> : <PaperPlaneTilt size={16} />}</CopyLabel></MotionButton></div></Reveal><Reveal delay={0.32}><div className="proof-row"><span>7 projects</span><span>Python + ML focus</span><span>Open to internships</span></div></Reveal><DataInstrument /></div><Reveal className="hero-art" delay={0.16} variant="panel"><Terminal /><p className="hero-note">Try <b>help</b>, <b>projects</b>, <b>skills</b>, or <b>about</b>.</p></Reveal></MotionSection>
+        <MotionSection id="work" className="section-pad section-block"><SectionHeading title="Selected projects">Select a project to see the app and its source code.</SectionHeading><ProjectExplorer projects={projects} /></MotionSection>
+        <MotionSection id="ai-era" className="section-pad section-block ai-era"><SectionHeading title="Building with AI">I use AI coding agents while learning the fundamentals. I write the specs, choose the architecture, and review the code. These are the products I’m working on.</SectionHeading><ProjectDisclosures items={aiEra} /></MotionSection>
+        <MotionSection id="about" className="section-pad section-block"><SectionHeading title="About me" /><div className="about-grid"><Reveal className="about-copy" sequence><p>I am a CSIT undergraduate focused on Python, machine learning, data analysis, and practical web development.</p><div className="about-facts"><span><Briefcase size={17} /> Open to internships</span><span><Code size={17} /> Python + ML</span><span><Sparkle size={17} /> Learning by building</span></div></Reveal><Contributions /></div></MotionSection>
+        <MotionSection id="journey" className="section-pad section-block"><SectionHeading title="What I’m learning">From Python fundamentals to models, apps, and deployment.</SectionHeading><LearningJourney /></MotionSection>
+        <MotionSection id="skills" className="section-pad section-block"><SectionHeading title="Tools I use">The languages and libraries behind these projects.</SectionHeading><div className="skills-grid">{skills.map(([name, desc], i) => <Reveal key={name} delay={i * 0.045} variant="slide"><article className="skill-card surface"><span className="skill-index">0{i + 1}</span><strong>{name}</strong><span>{desc}</span></article></Reveal>)}</div></MotionSection>
+        <MotionSection id="contact" className="section-pad section-block"><div className="surface contact-card"><Reveal variant="panel"><h2>Get in touch</h2><p>I’m open to internships and collaborations. Email me or connect on LinkedIn.</p></Reveal><Reveal className="contact-actions" sequence><MotionLink className="contact-email" href={`mailto:${email}`}>{email}</MotionLink><MotionButton className="button button-primary" data-sound type="button" onClick={copyEmail}><CopyLabel copied={copied}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={17} /> : <PaperPlaneTilt size={17} />}</CopyLabel></MotionButton><MotionLink className="button button-secondary" data-sound href={linkedin} target="_blank" rel="noreferrer"><LinkedinLogo size={17} /> LinkedIn</MotionLink><MotionLink className="button button-secondary" data-sound href="https://github.com/SohailKhan0525" target="_blank" rel="noreferrer"><GithubLogo size={17} /> GitHub</MotionLink></Reveal></div></MotionSection>
       </main>
 
       <LiveStats />

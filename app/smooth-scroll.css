@@ -1,0 +1,9 @@
+/* Lenis writes the native window scroll position. CSS smooth scrolling must
+   not add a second easing curve to imperative navigation or keyboard input. */
+html.lenis { scroll-behavior: auto !important; }
+.terminal-history,
+.project-explorer-list,
+.desktop-nav.mobile-visible { overscroll-behavior: contain; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+}

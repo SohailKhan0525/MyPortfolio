@@ -1,0 +1,20 @@
+/* Motion owns the menu surface and link transforms. The existing media rules
+   still own layout, so neither the header nor the page is resized by the menu. */
+.site-header .navigation-surface { transform-origin: 50% 0; }
+.site-header .navigation-surface .navigation-item { display: flex; min-width: 0; }
+.site-header .navigation-surface .nav-link { display: block; }
+.site-header .navigation-surface[inert] { pointer-events: none; }
+@media (max-width: 64rem) {
+  .site-header .navigation-surface.mobile-visible { animation: none; }
+  .site-header .navigation-surface .navigation-item,
+  .site-header .navigation-surface .nav-link { width: 100%; }
+  .site-header .navigation-surface .nav-link { min-height: 44px; }
+  .site-header .navigation-surface .nav-current { inset: 12px auto 12px 2px; width: 2px; height: auto; }
+}
+html[data-motion="reduced"] .site-header .navigation-surface,
+html[data-motion="reduced"] .site-header .navigation-item { transform: none !important; }
+html[data-motion="reduced"] .site-header .navigation-surface[aria-hidden="true"] { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .site-header .navigation-surface, .site-header .navigation-item { transform: none !important; }
+  .site-header .navigation-surface[aria-hidden="true"] { display: none; }
+}

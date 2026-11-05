@@ -25,7 +25,7 @@ const scrollRequests = [];
 HTMLElement.prototype.scrollIntoView = function(options) { scrollRequests.push({ id: this.id, options }); };
 require.extensions['.css'] = () => {};
 const compilerOptions = { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2020, esModuleInterop: true };
-require.extensions['.tsx'] = (module, filename) => module._compile(ts.transpileModule(fs.readFileSync(filename, 'utf8'), { compilerOptions }).outputText, filename);
+require.extensions['.ts'] = require.extensions['.tsx'] = (module, filename) => module._compile(ts.transpileModule(fs.readFileSync(filename, 'utf8'), { compilerOptions }).outputText, filename);
 const originalLoad = Module._load;
 let soundPlays = 0;
 let soundRequests = 0;
@@ -41,7 +41,7 @@ const { act } = React;
 const { createRoot } = req('react-dom/client');
 const ClickSound = req(path.join(base, 'app/ClickSound.tsx')).default;
 const source = ts.createSourceFile('page.tsx', fs.readFileSync(path.join(base, 'app/page.tsx'), 'utf8'), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
-const includedImports = new Set(['react', 'motion/react', './MotionPreferences', './MotionElements', '@phosphor-icons/react']);
+const includedImports = new Set(['react', 'motion/react', './MotionPreferences', './MotionElements', './portfolio-scroll', '@phosphor-icons/react']);
 const declarations = source.statements.filter(statement => {
   if (ts.isImportDeclaration(statement)) return includedImports.has(statement.moduleSpecifier.text);
   if (ts.isFunctionDeclaration(statement)) return ['Terminal', 'requestClickSound'].includes(statement.name?.text);
@@ -135,7 +135,7 @@ async function run(value) { await type(value); await pressEnter(); }
     assert.equal(input().value, '', 'Returning past the newest command restores an empty prompt');
 
     await run('contact');
-    assert.deepEqual(scrollRequests, [{ id: 'contact', options: { behavior: 'auto' } }], 'Contact navigates using reduced-motion-safe scrolling');
+    assert.deepEqual(scrollRequests, [{ id: 'contact', options: { behavior: 'auto', block: 'start' } }], 'Contact navigates using reduced-motion-safe scrolling');
     await run('clear');
     await act(async () => wait(60));
     assert.equal(output().textContent, '', 'Clear empties terminal output');
