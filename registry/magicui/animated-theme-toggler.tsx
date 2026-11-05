@@ -33,10 +33,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { motion, type HTMLMotionProps } from "motion/react";
 import { Moon, Sun } from "@phosphor-icons/react";
+import { applyDocumentTheme, DEFAULT_THEME, readThemePreference, THEME_STORAGE_KEY, type Theme } from "../../app/theme-preference";
 import "./animated-theme-toggler.css";
 
 export type TransitionVariant = "circle" | "square" | "triangle" | "diamond" | "hexagon" | "rectangle" | "star";
-type Theme = "light" | "dark";
 
 interface AnimatedThemeTogglerProps extends Omit<HTMLMotionProps<"button">, "children"> {
   duration?: number;
@@ -181,7 +181,7 @@ export function AnimatedThemeToggler({
   ...props
 }: AnimatedThemeTogglerProps) {
   const isControlled = theme !== undefined;
-  const [internalTheme, setInternalTheme] = useState<Theme>("dark");
+  const [internalTheme, setInternalTheme] = useState<Theme>(DEFAULT_THEME);
   const activeTheme = theme ?? internalTheme;
   const themeRef = useRef<Theme>(activeTheme);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -246,12 +246,10 @@ export function AnimatedThemeToggler({
   useEffect(() => {
     mounted.current = true;
     if (!isControlled) {
-      let saved: string | null = null;
-      try { saved = localStorage.getItem("portfolio-theme"); } catch {}
-      const restored = saved === "light" ? "light" : "dark";
+      const restored = readThemePreference();
       themeRef.current = restored;
       setInternalTheme(restored);
-      document.documentElement.dataset.theme = restored;
+      applyDocumentTheme(restored);
     }
     return () => {
       mounted.current = false;
@@ -275,12 +273,12 @@ export function AnimatedThemeToggler({
       if (committed || !mounted.current) return;
       committed = true;
       themeRef.current = next;
-      root.dataset.theme = next;
+      applyDocumentTheme(next);
       delete root.dataset.themeDirection;
       if (isControlled) onThemeChange?.(next);
       else {
         setInternalTheme(next);
-        try { localStorage.setItem("portfolio-theme", next); } catch {}
+        try { localStorage.setItem(THEME_STORAGE_KEY, next); } catch {}
       }
     };
     const playIcon = () => {

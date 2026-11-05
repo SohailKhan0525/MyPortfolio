@@ -1,0 +1,88 @@
+/* The project index stays close to its detail on small screens. Native scrolling
+   and explicit selection leave reading position and keyboard focus in place. */
+.project-explorer { min-width: 0; }
+.project-explorer .project-explorer-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.project-explorer .project-explorer-filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.project-explorer .project-explorer-filter { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 14px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--muted); font: 500 13px/1.4 var(--font-body); cursor: pointer; transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease; touch-action: manipulation; }
+.project-explorer .project-explorer-filter > span { font: 400 11px/1.4 var(--font-code); }
+.project-explorer .project-explorer-filter[aria-pressed="true"] { background: var(--signal-soft); color: var(--signal); border-color: color-mix(in srgb, var(--signal) 22%, transparent); }
+.project-explorer .project-explorer-count { margin: 0; color: var(--muted); font: 400 12px/1.5 var(--font-code); white-space: nowrap; }
+.project-explorer .project-explorer-layout { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); align-items: start; gap: 36px; }
+.project-explorer .project-explorer-index { min-width: 0; }
+.project-explorer .project-explorer-hint { display: none; }
+.project-explorer .project-explorer-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.project-explorer .project-explorer-list > li { min-width: 0; border-bottom: 1px solid var(--line); }
+.project-explorer .project-explorer-option { display: grid; grid-template-columns: 25px minmax(0, 1fr) 20px; align-items: center; gap: 14px; width: 100%; min-height: 85px; padding: 17px 14px; border: 0; border-radius: 0; background: transparent; color: var(--text); text-align: left; cursor: pointer; transition: background-color 160ms ease, color 160ms ease; touch-action: manipulation; }
+.project-explorer .project-explorer-option[aria-pressed="true"] { background: var(--signal-soft); color: var(--signal); box-shadow: inset 3px 0 var(--signal); }
+.project-explorer .project-explorer-number { color: var(--muted); font: 400 11px/1.5 var(--font-code); }
+.project-explorer .project-explorer-name { display: grid; min-width: 0; gap: 5px; }
+.project-explorer .project-explorer-name strong { font: 500 15px/1.4 var(--font-body); overflow-wrap: anywhere; }
+.project-explorer .project-explorer-name small { color: var(--muted); font: 400 12px/1.5 var(--font-body); }
+.project-explorer .project-explorer-arrow { color: var(--muted); opacity: 0.5; transition: transform 160ms ease, color 160ms ease, opacity 160ms ease; }
+.project-explorer .project-explorer-option[aria-pressed="true"] .project-explorer-arrow { color: var(--signal); opacity: 1; }
+.project-explorer .project-explorer-detail { min-width: 0; padding: clamp(22px, 3vw, 36px); border: 1px solid var(--line); border-radius: 10px; background: var(--surface); scroll-margin-top: 110px; }
+.project-explorer .project-explorer-content { min-width: 0; }
+.project-explorer .project-explorer-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 19px; color: var(--muted); font: 400 12px/1.5 var(--font-code); }
+.project-explorer .project-explorer-meta > span:last-child { flex: none; }
+.project-explorer .project-explorer-detail h3 { margin: 0; max-width: 22ch; color: var(--text); font: 500 clamp(24px, 2.5vw, 32px)/1.14 var(--font-body); letter-spacing: -0.035em; text-wrap: balance; }
+.project-explorer .project-explorer-description { margin: 16px 0 0; max-width: 47ch; color: var(--muted); font: 400 15px/1.7 var(--font-body); }
+.project-explorer .project-explorer-stack { display: flex; flex-wrap: wrap; gap: 6px 14px; list-style: none; margin: 21px 0 0; padding: 0; color: var(--text); font: 400 11px/1.7 var(--font-code); }
+.project-explorer .project-explorer-illustration { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0 10px; min-width: 0; margin: 26px 0 24px; padding: 15px 0 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.project-explorer .project-explorer-illustration > svg { display: block; grid-column: 1 / -1; width: 100%; height: auto; overflow: visible; }
+.project-explorer .project-explorer-illustration > figcaption { grid-column: 1; grid-row: 2; min-width: 0; margin: 0; padding: 12px 0; color: var(--muted); font: 400 12px/1.5 var(--font-body); }
+.project-explorer .project-explorer-illustration .illustration-playback,
+.project-explorer .project-explorer-illustration .illustration-static { grid-column: 2; grid-row: 2; justify-self: end; min-height: 44px; margin: 0; }
+.project-explorer .project-explorer-illustration .illustration-static { display: flex; align-items: center; }
+.project-explorer .project-explorer-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.project-explorer .project-explorer-link { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 46px; padding: 12px 17px; border: 1px solid transparent; border-radius: 5px; font: 500 13px/1.4 var(--font-body); text-decoration: none; transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease; touch-action: manipulation; }
+.project-explorer .project-explorer-link-primary { color: var(--bg); background: var(--text); border-color: var(--text); }
+.project-explorer .project-explorer-link-source { color: var(--text); background: transparent; border-color: var(--line); }
+.project-explorer button:focus-visible,
+.project-explorer a:focus-visible { outline: 2px solid var(--signal); outline-offset: 4px; }
+.project-explorer .project-explorer-announcement { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.project-explorer .project-explorer-empty { padding: 32px 0; color: var(--muted); }
+@media (hover: hover) and (pointer: fine) {
+  .project-explorer .project-explorer-filter:hover { color: var(--text); background: var(--surface); }
+  .project-explorer .project-explorer-option:hover { background: var(--signal-soft); }
+  .project-explorer .project-explorer-option:hover .project-explorer-arrow { transform: translateX(3px); opacity: 1; }
+  .project-explorer .project-explorer-link-primary:hover { background: var(--signal); border-color: var(--signal); }
+  .project-explorer .project-explorer-link-source:hover { background: var(--signal-soft); border-color: var(--signal); color: var(--signal); }
+}
+/* Keep the selected study in view only when a tall desktop viewport can fit it. */
+@media (min-width: 60.0625rem) and (min-height: 56rem) {
+  .project-explorer .project-explorer-detail { position: sticky; top: 104px; }
+}
+@media (max-width: 60rem) {
+  .project-explorer .project-explorer-toolbar { margin-bottom: 18px; }
+  .project-explorer .project-explorer-layout { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .project-explorer .project-explorer-hint { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; color: var(--muted); font: 400 12px/1.5 var(--font-body); }
+  .project-explorer .project-explorer-list { display: flex; gap: 10px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scroll-padding-inline: 4px; scrollbar-width: thin; scrollbar-color: var(--line) transparent; border: 0; padding: 4px 4px 12px; margin-inline: -4px; }
+  .project-explorer .project-explorer-list > li { flex: 0 0 230px; scroll-snap-align: start; border: 0; }
+  .project-explorer .project-explorer-option { grid-template-columns: 20px minmax(0, 1fr); grid-template-rows: 1fr; align-items: start; height: 100%; min-height: 112px; padding: 16px 13px; gap: 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+  .project-explorer .project-explorer-option[aria-pressed="true"] { border-color: color-mix(in srgb, var(--signal) 55%, var(--line)); box-shadow: inset 0 -3px var(--signal); }
+  .project-explorer .project-explorer-number { padding-top: 3px; }
+  .project-explorer .project-explorer-name strong { font-size: 14px; }
+  .project-explorer .project-explorer-arrow { display: none; }
+  .project-explorer .project-explorer-detail { padding: 26px; }
+  .project-explorer .project-explorer-illustration > svg { max-width: 650px; justify-self: center; }
+}
+@media (max-width: 40rem) {
+  .project-explorer .project-explorer-toolbar { align-items: flex-start; gap: 0; }
+  .project-explorer .project-explorer-filters { gap: 4px; }
+  .project-explorer .project-explorer-filter { gap: 6px; padding-inline: 10px; font-size: 12px; }
+  .project-explorer .project-explorer-count { display: none; }
+  .project-explorer .project-explorer-list > li { flex-basis: min(230px, 80%); }
+  .project-explorer .project-explorer-detail { padding: 21px 18px; }
+  .project-explorer .project-explorer-meta { font-size: 11px; margin-bottom: 15px; }
+  .project-explorer .project-explorer-description { font-size: 14px; }
+  .project-explorer .project-explorer-stack { gap: 5px 12px; }
+  .project-explorer .project-explorer-illustration { grid-template-columns: minmax(0, 1fr); margin-top: 22px; }
+  .project-explorer .project-explorer-illustration > figcaption { grid-column: 1; grid-row: 2; padding-block: 8px 0; }
+  .project-explorer .project-explorer-illustration .illustration-playback,
+  .project-explorer .project-explorer-illustration .illustration-static { grid-column: 1; grid-row: 3; justify-self: start; }
+  .project-explorer .project-explorer-link { padding-inline: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .project-explorer button, .project-explorer a, .project-explorer .project-explorer-arrow { transition: none; }
+  .project-explorer .project-explorer-option:hover .project-explorer-arrow { transform: none; }
+}

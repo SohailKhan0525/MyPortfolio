@@ -11,8 +11,10 @@ import "./portfolio-motion.css";
 import ClickSound from "./ClickSound";
 import ChromeEffects from "./ChromeEffects";
 import PortfolioMotionProvider from "./MotionPreferences";
+import { DEFAULT_THEME, THEME_COLORS, themeBootstrapScript } from "./theme-preference";
 import "./motion-system.css";
 import "./scroll-performance.css";
+import "./portfolio-refinement.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mohdzaheeruddin0525.vercel.app"),
@@ -27,16 +29,16 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  colorScheme: "dark light",
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
-    { media: "(prefers-color-scheme: light)", color: "#f4f4f2" },
-  ],
+  colorScheme: "light dark",
+  themeColor: THEME_COLORS.light,
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" dir="ltr" suppressHydrationWarning>
+    <html lang="en" dir="ltr" data-theme={DEFAULT_THEME} style={{ colorScheme: DEFAULT_THEME }} suppressHydrationWarning>
+      <head>
+        <script id="portfolio-theme-init" dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
+      </head>
       <body dir="ltr">
         <ClickSound />
         <PortfolioMotionProvider>

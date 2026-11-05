@@ -1,0 +1,212 @@
+/* Light technical workbench. Existing content, typography and Minty retained.
+ * This final layer resolves the older portfolio's overlapping polish sheets. */
+:root,
+html[data-theme="light"] {
+  --bg: #f8f7f4;
+  --surface: #ffffff;
+  --surface-2: #efefea;
+  --surface-3: #e3e6df;
+  --text: #20251f;
+  --muted: #62695f;
+  --text2: #414a40;
+  --line: #dedfd8;
+  --line-strong: #c5cabe;
+  --signal: #276446;
+  --signal-soft: #eaf1e9;
+  --accent: #276446;
+  --shadow: rgb(28 38 24 / 7%);
+  --header-bg: #f8f7f4;
+  --panel-shadow: 0 2px 4px rgb(28 38 24 / 2%), 0 16px 40px rgb(28 38 24 / 5%);
+}
+
+html[data-theme="dark"] {
+  --bg: #080808;
+  --surface: #141714;
+  --surface-2: #1c211c;
+  --surface-3: #293029;
+  --text: #f1f3ed;
+  --muted: #a4aca0;
+  --text2: #c9d0c4;
+  --line: #2b3229;
+  --line-strong: #414c3e;
+  --signal: #a3d8bc;
+  --signal-soft: #1b2a20;
+  --accent: #a3d8bc;
+  --shadow: rgb(0 0 0 / 25%);
+  --header-bg: #080808;
+  --panel-shadow: 0 16px 40px rgb(0 0 0 / 15%);
+}
+
+.site-header { padding-block: 16px; }
+.site-header .nav-link { color: var(--muted); }
+.site-header .nav-link:hover,
+.site-header .nav-link:focus-visible,
+.site-header .nav-link[aria-current] { color: var(--text); }
+.site-header .desktop-nav { backdrop-filter: none; }
+.nav-current { height: 2px; border-radius: 2px; }
+.mobile-menu-button { background: var(--surface); }
+
+.hero.hero-with-companion { padding-block: 64px; gap: 56px; }
+.hero-with-companion h1 {
+  max-width: 17ch;
+  font-size: clamp(44px, 4.55vw, 62px);
+  font-weight: 500;
+  line-height: 1.06;
+  letter-spacing: -.05em;
+}
+.hero-with-companion .hero-description { max-width: 39ch; line-height: 1.75; }
+.hero-with-companion .hero-actions { gap: 24px; margin-top: 28px; }
+.hero-with-companion .proof-row {
+  gap: 12px 20px;
+  margin-top: 28px;
+  padding-top: 0;
+  border-top: 0;
+  color: var(--muted);
+}
+.proof-row span:last-child { display: inline-flex; align-items: center; gap: 7px; }
+.proof-row span:last-child::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--signal);
+}
+.hero-with-companion .data-instrument { margin-top: 24px; padding-top: 12px; max-width: none; }
+.hero-with-companion .instrument-description { margin: 0; }
+
+.hero-with-companion .hero-terminal-real,
+.hero-with-companion .hero-terminal-real:hover {
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--panel-shadow);
+}
+.hero-terminal-real .terminal-top,
+.hero-terminal-real .terminal-bottom { background: var(--surface); }
+.hero-terminal-real .terminal-screen {
+  background: var(--surface);
+  padding: 24px !important;
+  min-height: 354px;
+  max-height: none;
+  line-height: 1.75;
+}
+.hero-terminal-real .terminal-history { max-height: 160px; }
+.hero-terminal-real .terminal-tab { position: relative; color: var(--text); }
+.hero-terminal-real .terminal-tab::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -15px;
+  left: 0;
+  height: 2px;
+  background: var(--signal);
+}
+.hero-terminal-real .terminal-form {
+  min-height: 52px;
+  border-radius: 6px;
+  background: var(--bg);
+  box-shadow: none;
+}
+.hero-terminal-real .terminal-form:focus-within {
+  border-color: var(--signal);
+  outline: 2px solid var(--signal-soft);
+  outline-offset: 2px;
+}
+.hero-terminal-real .terminal-input::placeholder { opacity: 1; }
+.hero-terminal-real .terminal-help { margin-top: 16px; padding-top: 12px; gap: 8px; }
+.hero-terminal-real .terminal-chip {
+  min-height: 44px;
+  padding-inline: 12px;
+  border-color: transparent;
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text2);
+}
+.hero-terminal-real .terminal-chip:hover,
+.hero-terminal-real .terminal-chip:focus-visible { background: var(--signal-soft); color: var(--signal); }
+.hero-terminal-real .terminal-chip:disabled { opacity: .55; cursor: wait; }
+.hero-terminal-real .terminal-bottom { padding-block: 12px; }
+.hero-with-companion .hero-note { margin-top: 16px; color: var(--muted); }
+
+.portfolio-foreground .section-block { padding-block: 80px; }
+.section-rule > span { background: var(--line-strong); }
+.section-heading { margin-bottom: 40px; }
+.section-heading h2 { font-size: clamp(30px, 3vw, 40px); }
+.section-heading > p { color: var(--muted); line-height: 1.75; }
+.button, .text-button { min-height: 48px; }
+.button { border-radius: 6px; }
+.button-primary:hover, .button-primary:focus-visible { background: var(--signal); border-color: var(--signal); }
+.button-secondary { background: var(--surface); }
+.button-secondary:hover, .button-secondary:focus-visible { background: var(--signal-soft); border-color: var(--line-strong); }
+.button:focus-visible svg, .text-button:focus-visible svg { transform: translate(2px, -2px); }
+.hero-actions .button:focus-visible svg { transform: translateY(2px); }
+
+.about-grid { align-items: start; }
+.about-copy > p { margin-top: 0; max-width: 27ch; line-height: 1.55; }
+.about-facts { margin-top: 28px; gap: 16px 24px; }
+.about-facts svg { color: var(--signal); }
+.about-grid .activity-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 28px;
+  background: var(--surface);
+}
+.activity-head h3 { font-weight: 500; }
+.activity-stats strong { font-variant-numeric: tabular-nums; }
+.activity-head .button { flex: none; }
+.learning-journey .learning-node { background: var(--surface); }
+.learning-journey .learning-copy h3 { font-weight: 500; }
+.skills-grid .skill-card,
+.skills-grid .skill-card:hover { background: none; }
+.skills-grid .skill-card > span:last-child { color: var(--muted); }
+
+#contact .contact-card {
+  padding: 36px !important;
+  gap: 40px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+#contact .contact-card p { max-width: 38ch; line-height: 1.75; }
+#contact .contact-actions { margin-top: 0; gap: 12px; }
+#contact .contact-email { margin-bottom: 8px; overflow-wrap: anywhere; line-height: 1.5; }
+.vs-card { border-color: var(--line); background: var(--surface); }
+.vs-stat { background: var(--surface); }
+.vs-chart { background: var(--bg); }
+.underpage-footer { background: var(--surface); }
+
+@media (max-width: 64rem) {
+  .site-header .desktop-nav { border-radius: 8px; box-shadow: var(--panel-shadow); }
+}
+@media (max-width: 60rem) {
+  .hero.hero-with-companion { padding-block: 32px 56px; gap: 32px; }
+  .hero-with-companion h1 { max-width: 20ch; }
+  .hero-with-companion .hero-description { max-width: 48ch; }
+  .hero-with-companion .data-instrument { max-width: 560px; }
+  .portfolio-foreground .section-block { padding-block: 64px; }
+  .section-heading { gap: 16px; margin-bottom: 32px; }
+  .about-copy > p { max-width: 36ch; }
+}
+@media (max-width: 40rem) {
+  .site-header { width: calc(100% - 40px); padding-block: 12px; }
+  .portfolio-foreground .section-pad { width: calc(100% - 40px) !important; }
+  .portfolio-foreground .section-block { padding-block: 48px; }
+  .hero-with-companion .hero-terminal-real,
+  .hero-with-companion .hero-terminal-real:hover { border-radius: 10px !important; box-shadow: var(--panel-shadow) !important; }
+  .hero-terminal-real .terminal-screen { padding: 16px !important; min-height: 368px; }
+  .hero-terminal-real .terminal-top, .hero-terminal-real .terminal-bottom { padding-inline: 16px; }
+  .hero-terminal-real .terminal-quick { gap: 4px; }
+  .hero-terminal-real .terminal-chip { padding-inline: 10px !important; }
+  .hero-with-companion .hero-note { margin-inline: 0; }
+  .section-heading h2 { font-size: 32px; }
+  .about-grid .activity-card { padding: 20px; border-radius: 8px; }
+  .activity-head .button { align-self: flex-start; width: auto; }
+  #contact .contact-card { padding: 24px !important; gap: 24px; border-radius: 8px; }
+  #contact .contact-actions .button { padding-inline: 12px; }
+  #contact .contact-email { font-size: clamp(16px, 4.3vw, 22px); }
+  .underpage-footer-content, .underpage-footer-rule { width: calc(100% - 40px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .button:focus-visible svg, .text-button:focus-visible svg { transform: none; }
+}
