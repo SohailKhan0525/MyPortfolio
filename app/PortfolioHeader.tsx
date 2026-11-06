@@ -140,7 +140,7 @@ export default function PortfolioHeader() {
           data-sound onClick={() => closeMenu(compact)}>
           <span className="navigation-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
           <span className="navigation-link-mask"><span className="navigation-link-label">{label}</span></span>
-          <span className="navigation-arrow" aria-hidden="true">↗</span>
+          <span className="navigation-arrow" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 18 18 6M6 6h12v12" /></svg></span>
         </Link>
       </span>)}
       <span className="nav-current" aria-hidden="true" />

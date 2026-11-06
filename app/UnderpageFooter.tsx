@@ -70,15 +70,15 @@ export default function UnderpageFooter({ linkedin }: { linkedin: string }) {
           <div className="footer-links">
             <Link href="#work">Work</Link><Link href="#about">About</Link>
             <Link href="#skills">Skills</Link><Link href="#contact">Contact</Link>
-            <a href={linkedin} target="_blank" rel="noreferrer">LinkedIn ↗</a>
-            <a href="https://github.com/SohailKhan0525" target="_blank" rel="noreferrer">GitHub ↗</a>
+            <a href={linkedin} target="_blank" rel="noreferrer">LinkedIn <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ marginInlineStart: 4 }}><path d="M6 18 18 6M6 6h12v12" /></svg></a>
+            <a href="https://github.com/SohailKhan0525" target="_blank" rel="noreferrer">GitHub <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ marginInlineStart: 4 }}><path d="M6 18 18 6M6 6h12v12" /></svg></a>
           </div>
         </div>
         <div className="footer-signature" aria-hidden="true">{"ZAHEER".split("").map((letter, index) => <span className="footer-signature-mask" key={index}><span className="footer-signature-letter">{letter}</span></span>)}</div>
         <div className="footer-bottom">
           <div><span>© 2026 Mohd Zaheer Uddin.</span><span>Built with Next.js &amp; deployed on Vercel.</span></div>
           <span>Available for internships &amp; collaborations.</span>
-          <Link href="#top" className="footer-back-top">Back to top <span aria-hidden="true">↑</span></Link>
+          <Link href="#top" className="footer-back-top">Back to top <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 20V4m-7 7 7-7 7 7" /></svg></Link>
         </div>
       </div>
     </footer>
