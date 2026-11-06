@@ -1,17 +1,14 @@
 "use client";
-
-import { motion, useScroll } from "motion/react";
-
-function ScrollProgress() {
-  const { scrollYProgress } = useScroll();
-  // Match native scroll immediately instead of keeping a spring running behind it.
-  return <motion.div className="scroll-progress" style={{ scaleX: scrollYProgress }} aria-hidden="true" />;
-}
-
+import { useRef } from "react";
+import { gsap, useGSAP } from "./gsap";
+import { usePortfolioMotion } from "./MotionPreferences";
 export default function ChromeEffects() {
-  return (
-    <>
-      <ScrollProgress />
-    </>
-  );
+  const ref = useRef<HTMLDivElement>(null);
+  const { ready } = usePortfolioMotion();
+  useGSAP(() => {
+    if (!ready) return;
+    gsap.fromTo(ref.current, { scaleX: 0 }, { scaleX: 1, ease: "none",
+      scrollTrigger: { start: 0, end: "max", scrub: true, invalidateOnRefresh: true } });
+  }, { scope: ref, dependencies: [ready], revertOnUpdate: true });
+  return <div ref={ref} className="scroll-progress" aria-hidden="true" />;
 }

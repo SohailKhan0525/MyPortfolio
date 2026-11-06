@@ -1,20 +1,40 @@
-/* Motion owns the menu surface and link transforms. The existing media rules
-   still own layout, so neither the header nor the page is resized by the menu. */
-.site-header .navigation-surface { transform-origin: 50% 0; }
-.site-header .navigation-surface .navigation-item { display: flex; min-width: 0; }
-.site-header .navigation-surface .nav-link { display: block; }
+/* GSAP owns all motion; the curtain remains a semantic, keyboard-operable nav. */
+.site-header { z-index: 70; backdrop-filter: none; }
+.site-header .brand, .site-header .header-actions { position: relative; z-index: 2; }
+.site-header .navigation-surface { position: relative; display: flex; transform-origin: 50% 0; }
+.site-header .navigation-item { display: flex; min-width: 0; }
+.site-header .nav-link { display: flex; align-items: center; }
+.navigation-link-label { display: inline-block; }
+.navigation-caption, .navigation-note, .navigation-number, .navigation-arrow { display: none; }
+.site-header .nav-current { position: absolute; top: auto; right: auto; bottom: 4px; left: 0; width: 0; height: 1px; opacity: 0; background: var(--signal); pointer-events: none; }
 .site-header .navigation-surface[inert] { pointer-events: none; }
+.menu-glyph { display: flex; flex-direction: column; gap: 5px; width: 20px; }
+.menu-glyph > span { display: block; width: 20px; height: 2px; border-radius: 2px; background: currentColor; transform-origin: center; }
 @media (max-width: 64rem) {
-  .site-header .navigation-surface.mobile-visible { animation: none; }
-  .site-header .navigation-surface .navigation-item,
-  .site-header .navigation-surface .nav-link { width: 100%; }
-  .site-header .navigation-surface .nav-link { min-height: 44px; }
-  .site-header .navigation-surface .nav-current { inset: 12px auto 12px 2px; width: 2px; height: auto; }
+  .site-header .mobile-menu-button { display: grid; min-width: 44px; width: 44px; height: 44px; }
+  .site-header .navigation-surface {
+    position: fixed; z-index: 1; inset: 0; display: flex; flex-direction: column; align-items: stretch;
+    width: 100%; height: 100dvh; max-height: none; margin: 0; border: 0; border-radius: 0;
+    padding: max(96px, calc(env(safe-area-inset-top) + 80px)) max(24px, calc((100vw - 900px) / 2)) max(28px, env(safe-area-inset-bottom));
+    background: var(--bg); box-shadow: none; overflow-x: hidden; overflow-y: auto;
+    overscroll-behavior: contain; visibility: hidden; clip-path: inset(0 0 100% 0);
+  }
+  .site-header .navigation-caption { display: block; padding: 0 0 20px; color: var(--muted); font: 12px/1.5 var(--font-code); }
+  .site-header .navigation-item { flex-shrink: 0; width: 100%; border-top: 1px solid var(--line); }
+  .site-header .nav-link { display: grid; grid-template-columns: 30px minmax(0, 1fr) 28px; width: 100%; min-height: 54px; gap: 14px; padding: 8px 0; border-radius: 0; color: var(--text); }
+  .site-header .nav-link:hover, .site-header .nav-link:focus-visible { background: none; color: var(--signal); }
+  .site-header .navigation-link-mask { display: block; overflow: hidden; padding-bottom: .08em; }
+  .site-header .navigation-link-label { font-size: clamp(28px, 5.5dvh, 52px); line-height: 1.1; font-weight: 400; letter-spacing: -.04em; }
+  .site-header .navigation-number { display: block; align-self: center; color: var(--muted); font: 11px/1 var(--font-code); }
+  .site-header .navigation-arrow { display: block; font-size: 24px; font-weight: 300; }
+  .site-header .navigation-note { display: block; margin-top: 22px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+  .site-header .nav-current { display: none; }
+  .site-header[data-menu-open="true"] { border-color: transparent; }
+  .site-header[data-menu-open="true"] .brand, .site-header[data-menu-open="true"] .header-actions { z-index: 3; }
 }
-html[data-motion="reduced"] .site-header .navigation-surface,
-html[data-motion="reduced"] .site-header .navigation-item { transform: none !important; }
-html[data-motion="reduced"] .site-header .navigation-surface[aria-hidden="true"] { display: none; }
-@media (prefers-reduced-motion: reduce) {
-  .site-header .navigation-surface, .site-header .navigation-item { transform: none !important; }
-  .site-header .navigation-surface[aria-hidden="true"] { display: none; }
+@media (max-width: 40rem) { .site-header .navigation-surface { padding-inline: 24px; } }
+@media (max-height: 540px) and (max-width: 64rem) {
+  .site-header .navigation-surface { padding-top: 80px; }
+  .site-header .navigation-caption { padding-bottom: 12px; }
+  .site-header .nav-link { min-height: 48px; }
 }

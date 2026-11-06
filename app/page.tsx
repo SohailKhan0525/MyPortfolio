@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { gsap, useGSAP } from "./gsap";
 import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import LiveStats from "./LiveStats";
 import ProjectDisclosures from "./ProjectDisclosures";
@@ -12,7 +12,7 @@ import RobotCompanion from "./RobotCompanion";
 import UnderpageFooter from "./UnderpageFooter";
 import { scrollToPortfolioSection } from "./portfolio-scroll";
 import { usePortfolioMotion } from "./MotionPreferences";
-import { AnimatedHeading, AnimatedMetric, CopyLabel, MotionButton, MotionLink, MotionSection, Reveal, SectionHeading } from "./MotionElements";
+import { AnimatedHeading, AnimatedMetric, CopyLabel, MotionButton, MotionLink, MotionSection, Reveal, SectionHeading, SectionTitle } from "./MotionElements";
 import { ArrowDown, ArrowUpRight, Briefcase, Check, Code, GithubLogo, LinkedinLogo, PaperPlaneTilt, Sparkle } from "@phosphor-icons/react";
 
 type Contribution = { date: string; count: number; level: 0 | 1 | 2 | 3 | 4 };
@@ -123,6 +123,12 @@ function Terminal() {
   const [ready, setReady] = useState(false);
   const [bootLines, setBootLines] = useState(0);
   const historyRef = useRef<HTMLDivElement>(null);
+  const terminalRef = useRef<HTMLDivElement>(null);
+  useGSAP(() => {
+    if (reduced || !terminalRef.current) return;
+    const lines = terminalRef.current.querySelectorAll('.terminal-line, .terminal-boot > div');
+    if (lines.length) gsap.fromTo(Array.from(lines).slice(-4), { y: 6, opacity: .55 }, { y: 0, opacity: 1, stagger: .035, duration: .3, clearProps: 'transform,opacity' });
+  }, { scope: terminalRef, dependencies: [history, bootLines, reduced], revertOnUpdate: true });
 
   useEffect(() => {
     const timers = [
@@ -202,11 +208,11 @@ function Terminal() {
   };
 
   return (
-    <div className="hero-terminal-real" dir="ltr">
+    <div ref={terminalRef} className="hero-terminal-real" dir="ltr">
       <div className="terminal-top"><div className="terminal-top-left"><span className="terminal-tab">portfolio.py</span><span className="terminal-title">zsh: portfolio</span></div><span className="terminal-status"><i /> {ready ? "ready" : "booting"}</span></div>
       <div className="terminal-screen">
-        <div className="terminal-boot" aria-live="polite"><AnimatePresence initial={false}>{bootLines >= 1 && <motion.div key="boot-command" initial={reduced ? false : { opacity: 0.6, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.25 }}><b>portfolio@zaheer</b>:~$ ./start.sh</motion.div>}{bootLines >= 2 && <motion.div key="boot-status" initial={reduced ? false : { opacity: 0.6, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.25 }}><span>{ready ? "profile loaded. terminal ready." : "loading profile…"}</span></motion.div>}</AnimatePresence></div>
-        <div ref={historyRef} className="terminal-history" aria-live="polite" aria-label="Terminal output"><AnimatePresence initial={false} mode="popLayout">{history.slice(-14).map((line, i) => <motion.div key={`${line}-${i}`} initial={reduced ? false : { opacity: 0.6, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} transition={{ duration: reduced ? 0 : 0.15 }} className={`terminal-line ${line.startsWith("$ ") ? "terminal-command" : "terminal-output-line"}`}>{line}</motion.div>)}</AnimatePresence></div>
+        <div className="terminal-boot" aria-live="polite">{bootLines >= 1 && <div><b>portfolio@zaheer</b>:~$ ./start.sh</div>}{bootLines >= 2 && <div><span>{ready ? "profile loaded. terminal ready." : "loading profile…"}</span></div>}</div>
+        <div ref={historyRef} className="terminal-history" aria-live="polite" aria-label="Terminal output">{history.slice(-14).map((line, i) => <div key={`${line}-${i}`} className={`terminal-line ${line.startsWith("$ ") ? "terminal-command" : "terminal-output-line"}`}>{line}</div>)}</div>
         <form className="terminal-form" dir="ltr" onSubmit={submit}><span className="terminal-prompt" aria-hidden="true">$</span><input className="terminal-input" type="text" dir="ltr" value={input} onChange={e => setInput(e.target.value)} onKeyDown={key} disabled={!ready} placeholder={ready ? "type a command…" : "booting…"} aria-label="Terminal command" autoComplete="off" autoCorrect="off" autoCapitalize="none" spellCheck={false} /><MotionButton type="submit" className="terminal-submit" aria-label="Run command" disabled={!ready || !input.trim()}><ArrowUpRight size={18} aria-hidden="true" /></MotionButton></form>
         <div className="terminal-help"><span>↑↓ history / Tab complete / Enter run</span><div className="terminal-quick" aria-label="Quick terminal commands">{["help", "projects", "ai", "skills", "about"].map(cmd => <MotionButton key={cmd} type="button" className="terminal-chip" disabled={!ready} aria-label={`Run ${cmd} command`} onClick={() => runCommand(cmd)}>{cmd}</MotionButton>)}</div></div>
       </div>
@@ -232,13 +238,14 @@ export default function Home() {
       <div className="portfolio-foreground">
       <PortfolioHeader />
       <a className="skip-link" href="#top">Skip to content</a><main id="top" tabIndex={-1}>
-        <MotionSection id="intro" className="hero hero-with-companion section-pad"><div className="hero-copy"><AnimatedHeading>I build Python apps and machine learning projects.</AnimatedHeading><Reveal delay={0.16}><p className="hero-description">I’m a CSIT undergraduate learning through datasets, models, and working apps.</p></Reveal><Reveal delay={0.24}><div className="hero-actions"><MotionLink className="button button-primary" data-sound href="#work">See the work <ArrowDown size={17} /></MotionLink><MotionButton className="text-button" data-sound type="button" onClick={copyEmail}><CopyLabel copied={copied}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={16} /> : <PaperPlaneTilt size={16} />}</CopyLabel></MotionButton></div></Reveal><Reveal delay={0.32}><div className="proof-row"><span>7 projects</span><span>Python + ML focus</span><span>Open to internships</span></div></Reveal><DataInstrument /></div><Reveal className="hero-art" delay={0.16} variant="panel"><Terminal /><p className="hero-note">Try <b>help</b>, <b>projects</b>, <b>skills</b>, or <b>about</b>.</p></Reveal></MotionSection>
+        <div className="folio-line section-pad"><span>Mohd Zaheer Uddin / Portfolio</span><span>Python, models &amp; working things</span><span>2026</span></div>
+        <MotionSection id="intro" className="hero hero-with-companion section-pad"><div className="hero-copy"><span className="hero-kicker"><i /> CSIT undergraduate · Open to internships</span><AnimatedHeading>I build Python apps and machine learning projects.</AnimatedHeading><Reveal delay={0.16}><p className="hero-description">I’m a CSIT undergraduate learning through datasets, models, and working apps.</p></Reveal><Reveal delay={0.24}><div className="hero-actions"><MotionLink className="button button-primary" data-sound href="#work">See the work <ArrowDown size={17} /></MotionLink><MotionButton className="text-button" data-sound type="button" onClick={copyEmail}><CopyLabel copied={copied}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={16} /> : <PaperPlaneTilt size={16} />}</CopyLabel></MotionButton></div></Reveal><Reveal delay={0.32}><div className="proof-row"><span>7 projects</span><span>Python + ML focus</span><span>Open to internships</span></div></Reveal></div><Reveal className="hero-art" delay={0.16} variant="panel"><div className="terminal-caption"><span>01 / The working desk</span><ArrowDown size={18} aria-hidden="true" /></div><Terminal /><p className="hero-note">Try <b>help</b>, <b>projects</b>, <b>skills</b>, or <b>about</b>.</p></Reveal><div className="hero-process"><span className="process-caption">From a question<br />to something that works.</span><DataInstrument /></div></MotionSection>
         <MotionSection id="work" className="section-pad section-block"><SectionHeading title="Selected projects">Select a project to see the app and its source code.</SectionHeading><ProjectExplorer projects={projects} /></MotionSection>
         <MotionSection id="ai-era" className="section-pad section-block ai-era"><SectionHeading title="Building with AI">I use AI coding agents while learning the fundamentals. I write the specs, choose the architecture, and review the code. These are the products I’m working on.</SectionHeading><ProjectDisclosures items={aiEra} /></MotionSection>
         <MotionSection id="about" className="section-pad section-block"><SectionHeading title="About me" /><div className="about-grid"><Reveal className="about-copy" sequence><p>I am a CSIT undergraduate focused on Python, machine learning, data analysis, and practical web development.</p><div className="about-facts"><span><Briefcase size={17} /> Open to internships</span><span><Code size={17} /> Python + ML</span><span><Sparkle size={17} /> Learning by building</span></div></Reveal><Contributions /></div></MotionSection>
         <MotionSection id="journey" className="section-pad section-block"><SectionHeading title="What I’m learning">From Python fundamentals to models, apps, and deployment.</SectionHeading><LearningJourney /></MotionSection>
         <MotionSection id="skills" className="section-pad section-block"><SectionHeading title="Tools I use">The languages and libraries behind these projects.</SectionHeading><div className="skills-grid">{skills.map(([name, desc], i) => <Reveal key={name} delay={i * 0.045} variant="slide"><article className="skill-card surface"><span className="skill-index">0{i + 1}</span><strong>{name}</strong><span>{desc}</span></article></Reveal>)}</div></MotionSection>
-        <MotionSection id="contact" className="section-pad section-block"><div className="surface contact-card"><Reveal variant="panel"><h2>Get in touch</h2><p>I’m open to internships and collaborations. Email me or connect on LinkedIn.</p></Reveal><Reveal className="contact-actions" sequence><MotionLink className="contact-email" href={`mailto:${email}`}>{email}</MotionLink><MotionButton className="button button-primary" data-sound type="button" onClick={copyEmail}><CopyLabel copied={copied}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={17} /> : <PaperPlaneTilt size={17} />}</CopyLabel></MotionButton><MotionLink className="button button-secondary" data-sound href={linkedin} target="_blank" rel="noreferrer"><LinkedinLogo size={17} /> LinkedIn</MotionLink><MotionLink className="button button-secondary" data-sound href="https://github.com/SohailKhan0525" target="_blank" rel="noreferrer"><GithubLogo size={17} /> GitHub</MotionLink></Reveal></div></MotionSection>
+        <MotionSection id="contact" className="section-pad section-block"><div className="surface contact-card"><Reveal variant="panel"><SectionTitle>Let’s build something.</SectionTitle><span className="contact-section-label">Get in touch</span><p>I’m open to internships and collaborations. Email me or connect on LinkedIn.</p></Reveal><Reveal className="contact-actions" sequence><MotionLink className="contact-email" href={`mailto:${email}`}>{email}</MotionLink><MotionButton className="button button-primary" data-sound type="button" onClick={copyEmail}><CopyLabel copied={copied}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={17} /> : <PaperPlaneTilt size={17} />}</CopyLabel></MotionButton><MotionLink className="button button-secondary" data-sound href={linkedin} target="_blank" rel="noreferrer"><LinkedinLogo size={17} /> LinkedIn</MotionLink><MotionLink className="button button-secondary" data-sound href="https://github.com/SohailKhan0525" target="_blank" rel="noreferrer"><GithubLogo size={17} /> GitHub</MotionLink></Reveal></div></MotionSection>
       </main>
 
       <LiveStats />

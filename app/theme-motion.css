@@ -1,15 +1,15 @@
-/* Hallmark · 2026-10-28 · existing system; Magic UI theme transition.
- * Critique: touch needs the same clearly visible theme feedback as a pointer. */
-html[data-magicui-theme-fallback="active"] body,
-html[data-magicui-theme-fallback="active"] .portfolio-foreground,
-html[data-magicui-theme-fallback="active"] .underpage-footer,
-html[data-magicui-theme-fallback="active"] .site-header,
-html[data-magicui-theme-fallback="active"] .surface,
-html[data-magicui-theme-fallback="active"] .terminal-screen,
-html[data-magicui-theme-fallback="active"] .terminal-top,
-html[data-magicui-theme-fallback="active"] .terminal-bottom,
-html[data-magicui-theme-fallback="active"] .magicui-theme-toggler {
-  transition-property: background-color, color, border-color;
-  transition-duration: 350ms;
-  transition-timing-function: ease;
+/* GSAP interpolates the page palette and the two icon layers. */
+.magicui-theme-toggler {
+  display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px;
+  padding: 0; border: 1px solid var(--line); border-radius: 50%;
+  background: var(--surface); color: var(--text); cursor: pointer;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
 }
+.magicui-theme-toggler:hover { border-color: var(--signal); color: var(--signal); }
+.magicui-theme-toggler:focus-visible { outline: 2px solid var(--signal); outline-offset: 4px; }
+.magicui-theme-toggler:disabled { cursor: default; }
+.magicui-theme-icon { position: relative; display: block; width: 24px; height: 24px; }
+.magicui-theme-icon > span { position: absolute; inset: 0; display: grid; place-items: center; }
+.magicui-theme-icon svg { display: block; width: 22px; height: 22px; }
+.magicui-theme-toggler[data-reduced-motion="true"] { transform: none !important; }
+@media (prefers-reduced-motion: reduce) { .magicui-theme-toggler { transform: none !important; } }

@@ -1,39 +1,64 @@
-/* Hallmark · 2026-10-28 · native sticky project reading, original content.
- * Critique: pin each record's heading without overlapping the next record or
- * reserving empty card space. The article's natural end releases its own heading. */
-:root { --portfolio-sticky-top: 96px; }
-.ai-project-stack {
-  position: relative;
-  isolation: isolate;
-  display: block;
-  border-top: 0;
-}
+/* Native sticky chapters; GSAP choreographs their inner surfaces, not document scrolling. */
+:root { --portfolio-sticky-top: 100px; }
+.ai-project-stack { position: relative; isolation: isolate; display: block; border-top: 0; }
 .ai-project-stack > .ai-card,
-.ai-project-stack > .ai-card:hover {
-  position: relative;
-  overflow: visible;
-  background: var(--bg);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  margin-bottom: 24px;
-  transform: none;
-}
+.ai-project-stack > .ai-card:hover { position: relative; overflow: visible; background: transparent; border: 0; border-radius: 0; margin: 0 0 clamp(26px, 4vw, 64px); padding: 0; transform: none; box-shadow: none; }
 .ai-project-stack > .ai-card:last-child { margin-bottom: 0; }
-.ai-project-stack .ai-record-heading {
-  z-index: 2;
-  background: var(--bg);
-  scroll-margin-top: calc(var(--ai-pin-top) + 16px);
+.ai-project-stack .ai-card-shell { border: 1px solid var(--line-strong, var(--line)); background: var(--bg); }
+.ai-project-stack > .ai-card:nth-child(2) .ai-card-shell { background: var(--surface); }
+.ai-project-stack .ai-record-heading { margin: 0; z-index: 2; background: inherit; scroll-margin-top: calc(var(--ai-pin-top) + 16px); }
+.ai-project-stack .ai-card-head { display: grid; grid-template-columns: 70px minmax(0, 1fr) auto 36px; align-items: center; gap: 22px; width: 100%; padding: clamp(24px, 3vw, 38px); background: transparent; border: 0; border-radius: 0; color: var(--text); text-align: left; cursor: pointer; scroll-margin-top: calc(var(--ai-pin-top) + 16px); }
+.ai-project-stack .ai-card-index { display: flex; flex-direction: column; gap: 5px; align-self: start; padding-top: 5px; color: var(--signal); opacity: 1; font: 400 21px/1.2 var(--font-code); }
+.ai-project-stack .ai-card-index > span { color: var(--muted); font-size: 9px; }
+.ai-project-stack .ai-card-title { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.ai-project-stack .ai-card-title small { margin: 0; font: 400 11px/1.4 var(--font-code); color: var(--muted); }
+.ai-project-stack .ai-card-title strong { font: 500 clamp(32px, 4vw, 58px)/1.03 var(--font-body); letter-spacing: -.045em; overflow-wrap: anywhere; }
+.ai-project-stack .ai-status { max-width: 190px; padding: 0; border: 0; border-radius: 0; background: transparent; font: 400 11px/1.5 var(--font-code); color: var(--muted); white-space: normal; text-align: right; }
+.ai-project-stack .ai-caret { display: grid; place-items: center; width: 36px; height: 36px; margin: 0; border: 1px solid var(--line); border-radius: 50%; color: var(--text); }
+.ai-project-stack .ai-card-body-inner { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); gap: 26px 48px; max-width: none; padding: 0 clamp(24px, 3vw, 38px) 30px; padding-left: calc(clamp(24px, 3vw, 38px) + 92px); }
+.ai-project-stack .ai-project-description { margin: 0; max-width: 50ch; font: 400 clamp(16px, 1.5vw, 20px)/1.6 var(--font-body); color: var(--text); }
+.ai-project-stack .ai-why { display: block; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; }
+.ai-project-stack .ai-why-label { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--line); color: var(--signal); font: 400 11px/1.5 var(--font-code); }
+.ai-project-stack .ai-why p { margin: 0; max-width: none; color: var(--muted); font: 400 14px/1.75 var(--font-body); }
+.ai-project-stack .ai-project-diagram { grid-column: 1 / -1; max-width: 620px; width: 100%; padding-top: 2px; }
+.ai-project-stack .ai-project-diagram svg { display: block; width: 100%; height: auto; max-height: 130px; }
+.ai-project-stack .ai-card-body-inner .stack-row { grid-column: 1 / -1; margin: 0; padding-top: 16px; border-top: 1px solid var(--line); gap: 7px 20px; }
+.ai-project-stack .stack-row span { margin: 0; padding: 0; border: 0; border-radius: 0; color: var(--muted); font: 400 10px/1.6 var(--font-code); }
+.ai-project-stack[data-sticky-mode="cards"] > .ai-card { position: sticky; top: calc(var(--ai-pin-top) + var(--ai-card-order) * 12px); }
+.ai-project-stack[data-sticky-mode="headings"] .ai-record-heading { position: sticky; top: var(--ai-pin-top); background: var(--bg); }
+.ai-project-stack[data-sticky-mode="headings"] .ai-card:nth-child(2) .ai-record-heading { background: var(--surface); }
+.ai-project-stack .ai-card-head:focus-visible { outline: 2px solid var(--signal); outline-offset: -5px; }
+@media (hover: hover) and (pointer: fine) {
+  .ai-project-stack .ai-card-head:hover .ai-caret { background: var(--signal-soft); border-color: var(--signal); }
 }
-.ai-project-stack .ai-card-head { scroll-margin-top: calc(var(--ai-pin-top) + 16px); }
-.ai-project-stack[data-sticky-mode="headings"] .ai-record-heading {
-  position: sticky;
-  top: var(--ai-pin-top);
+@media (max-width: 60rem) {
+  .ai-project-stack .ai-card-head { grid-template-columns: 48px minmax(0, 1fr) auto 34px; gap: 16px; padding: 26px; }
+  .ai-project-stack .ai-card-body-inner { gap: 24px; padding: 0 26px 28px 90px; }
+  .ai-project-stack .ai-status { max-width: 130px; font-size: 10px; }
+  .ai-project-stack .ai-card-title strong { font-size: clamp(30px, 4vw, 44px); }
+  .ai-project-stack .ai-project-description { font-size: 17px; }
 }
 @media (max-width: 40rem) {
-  :root { --portfolio-sticky-top: 84px; }
-  .ai-project-stack > .ai-card { margin-bottom: 16px; }
+  :root { --portfolio-sticky-top: 82px; }
+  .ai-project-stack > .ai-card { margin-bottom: 24px; }
+  .ai-project-stack .ai-card-head { display: grid; grid-template-columns: 28px minmax(0, 1fr) 32px; gap: 10px; padding: 22px 18px; }
+  .ai-project-stack .ai-card-index { grid-column: 1; grid-row: 1; font-size: 15px; padding-top: 2px; }
+  .ai-project-stack .ai-card-index > span { font-size: 7px; }
+  .ai-project-stack .ai-card-title { grid-column: 2; grid-row: 1; gap: 9px; }
+  .ai-project-stack .ai-card-title strong { font-size: clamp(28px, 7vw, 36px); }
+  .ai-project-stack .ai-card-title small { font-size: 10px; }
+  .ai-project-stack .ai-status { grid-column: 2; grid-row: 2; max-width: none; margin: 3px 0 0; font-size: 10px; text-align: left; }
+  .ai-project-stack .ai-caret { grid-column: 3; grid-row: 1; width: 30px; height: 30px; }
+  .ai-project-stack .ai-card-body-inner { grid-template-columns: minmax(0, 1fr); padding: 0 18px 24px; gap: 20px; }
+  .ai-project-stack .ai-project-description { font-size: 15px; line-height: 1.65; }
+  .ai-project-stack .ai-why-label { margin-bottom: 9px; padding-bottom: 8px; }
+  .ai-project-stack .ai-why p { font-size: 13px; line-height: 1.65; }
+  .ai-project-stack .ai-project-diagram { padding: 0; }
+  .ai-project-stack .ai-project-diagram svg { max-height: 90px; }
+  .ai-project-stack .ai-card-body-inner .stack-row { gap: 6px 14px; padding-top: 14px; }
+  .ai-project-stack .stack-row span { font-size: 9px; }
 }
-@media print {
-  .ai-project-stack[data-sticky-mode] > .ai-card,
-  .ai-project-stack[data-sticky-mode] .ai-record-heading { position: static; }
+@media (prefers-reduced-motion: reduce), print {
+  .ai-project-stack[data-sticky-mode] > .ai-card, .ai-project-stack[data-sticky-mode] .ai-record-heading { position: static; }
+  .ai-project-stack .ai-card-shell { transform: none !important; }
 }

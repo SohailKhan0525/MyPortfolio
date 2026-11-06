@@ -3,8 +3,8 @@ export type Theme = "light" | "dark";
 export const DEFAULT_THEME: Theme = "light";
 export const THEME_STORAGE_KEY = "portfolio-theme";
 export const THEME_COLORS: Record<Theme, string> = {
-  light: "#f8f7f4",
-  dark: "#080808",
+  light: "#f2f1e9",
+  dark: "#111a15",
 };
 
 export function resolveThemePreference(saved: string | null): Theme {

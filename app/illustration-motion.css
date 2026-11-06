@@ -15,7 +15,6 @@
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  transition: color 160ms ease;
 }
 .illustration-playback:hover { color: var(--signal); }
 .illustration-playback:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }

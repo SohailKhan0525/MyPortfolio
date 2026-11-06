@@ -1,9 +1,10 @@
 "use client";
 
-import { useIllustrationPlayback } from "./useIllustrationPlayback";
+import { useIllustrationTimeline } from "./useIllustrationPlayback";
 import "./illustration-motion.css";
 
-import { motion, useInView } from "motion/react";
+import { gsap } from "./gsap";
+import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
 import { useRef, type ReactNode } from "react";
 
 const ink = "var(--text)";
@@ -30,23 +31,19 @@ function Registration({ x, y }: { x: number; y: number }) {
   return <path d={`M${x - 4} ${y}h8 M${x} ${y - 4}v8`} stroke={line} />;
 }
 
-const ease = [0.22, 1, 0.36, 1] as const;
+gsap.registerPlugin(DrawSVGPlugin);
 
-function Accent({ d, draw, delay = 0.7 }: { d: string; draw: boolean; delay?: number }) {
-  return <motion.path d={d} fill="none" stroke={signal} strokeWidth="2" initial={draw ? { pathLength: 0 } : false}
-    animate={{ pathLength: draw ? [0, 1] : 1 }} transition={{ type: "tween", duration: draw ? 1.8 : 0, delay: draw ? delay : 0, ease }} />;
+function Accent({ d, delay = 0.7 }: { d: string; draw: boolean; delay?: number }) {
+  return <path d={d} data-draw-path data-delay={delay} fill="none" stroke={signal} strokeWidth="2" />;
 }
 
-/** Each short study settles into its complete drawing between visible replays. */
-function Arrive({ draw, delay = 0, children }: { draw: boolean; delay?: number; children: ReactNode }) {
-  return <motion.g initial={draw ? { opacity: 0.15, y: 12 } : false} animate={{ opacity: draw ? [0.15, 1] : 1, y: draw ? [12, 0] : 0 }}
-    transition={{ type: "tween", duration: draw ? 0.9 : 0, delay: draw ? delay : 0, ease }}>{children}</motion.g>;
+function Arrive({ delay = 0, children }: { draw: boolean; delay?: number; children: ReactNode }) {
+  return <g data-draw-arrive data-delay={delay}>{children}</g>;
 }
 
-function Pulse({ x, y, draw, delay = 0, radius = 30 }: { x: number; y: number; draw: boolean; delay?: number; radius?: number }) {
-  return <motion.circle cx={x} cy={y} fill="none" stroke={signal} strokeWidth="1.5" initial={draw ? { r: 5, opacity: 0 } : false}
-    animate={{ r: draw ? [5, radius] : radius, opacity: draw ? [0, 0.85, 0] : 0 }}
-    transition={{ type: "tween", duration: draw ? 1.45 : 0, delay: draw ? delay : 0, ease: "easeOut" }} />;
+function Pulse({ x, y, delay = 0, radius = 30 }: { x: number; y: number; draw: boolean; delay?: number; radius?: number }) {
+  return <circle cx={x} cy={y} r={radius} data-draw-pulse data-delay={delay} data-radius={radius}
+    fill="none" stroke={signal} strokeWidth="1.5" opacity="0" />;
 }
 
 function House({ draw }: { draw: boolean }) {
@@ -95,12 +92,10 @@ function Earthquake({ draw }: { draw: boolean }) {
 
 function Heart({ draw }: { draw: boolean }) {
   return <>
-    <motion.g initial={draw ? { scale: 1 } : false} style={{ transformBox: "view-box", originX: "168px", originY: "120px" }}
-      animate={{ scale: draw ? [1, 1.07, 1, 1.04, 1] : 1 }}
-      transition={{ type: "tween", duration: draw ? 1.7 : 0, ease: "easeInOut" }}>
+    <g data-draw-heart>
       <path d="M168 186C138 170 92 145 91 105c-1-30 20-51 47-48 14 1 24 9 30 20 7-11 18-19 33-20 27-2 46 20 45 48-2 38-45 65-78 81Z" fill={wash} strokeWidth="1.6" />
       <path d="M111 107c-1-19 12-31 27-30 M168 95v70" stroke={secondary} />
-    </motion.g>
+    </g>
     <path d="M63 32h210 M63 202h210 M76 23v18 M260 23v18" stroke={line} />
     <Label x={168} y={28} anchor="middle">HEALTH / FEATURES</Label>
     <path d="M300 68h44 M300 110h44 M300 152h44 M344 68v84 M344 110h41 M457 110h57" stroke={line} />
@@ -170,10 +165,10 @@ function Bank({ draw }: { draw: boolean }) {
     <path d="M77 62 209 86v118L77 180Z M77 62l42-29 132 24v118l-42 29 M209 86l42-29" />
     <path d="m94 83 97 18v81l-97-18Z" stroke={secondary} />
     <ellipse cx="143" cy="132" rx="24" ry="30" transform="rotate(-11 143 132)" fill={wash} />
-    <motion.g initial={draw ? { rotate: -75 } : false} style={{ transformBox: "view-box", originX: "143px", originY: "132px" }} animate={{ rotate: draw ? [-75, 0] : 0 }} transition={{ type: "tween", duration: draw ? 1.6 : 0, ease }}>
+    <g data-draw-vault>
       <ellipse cx="143" cy="132" rx="7" ry="9" transform="rotate(-11 143 132)" stroke={signal} />
       <path d="m143 123-3-14 M149 130l13-4 M148 139l8 14 M137 136l-13 6" stroke={secondary} />
-    </motion.g>
+    </g>
     <path d="M104 92v9 M104 150v9 M220 103l19-13v51l-19 13Z" stroke={secondary} />
     <path d="M324 59c31-13 59-11 91 5 33-16 63-18 94-5v126c-34-12-65-9-94 6-28-14-58-17-91-6Z" fill="var(--surface)" />
     <path d="M415 64v127 M337 78c24-6 43-4 65 5 M337 99c24-6 43-4 65 5 M337 120c24-6 43-4 65 5 M337 141c24-6 43-4 65 5 M428 83c23-9 44-11 68-5 M428 104c23-9 44-11 68-5 M428 125c23-9 44-11 68-5 M428 146c23-9 44-11 68-5" stroke={line} />
@@ -203,33 +198,52 @@ function Files({ draw }: { draw: boolean }) {
 
 const scenes = [House, Earthquake, Heart, Student, Outcomes, Bank, Files];
 
-/** Original vector studies of the project subjects, not screenshots or model results. */
+/** Original diagrams, never presented as model measurements. All drawing is
+ * sequenced in one GSAP timeline rather than remounting the SVG each cycle. */
+function createStudyTimeline(node: SVGSVGElement) {
+  const timeline = gsap.timeline({ paused: true, repeat: -1, repeatDelay: 4.5, defaults: { ease: "power2.out" } });
+  node.querySelectorAll<SVGElement>("[data-draw-arrive]").forEach(element => {
+    timeline.fromTo(element, { opacity: 0.25, y: 10 }, { opacity: 1, y: 0, duration: 0.8, immediateRender: false }, Number(element.dataset.delay));
+  });
+  node.querySelectorAll<SVGElement>("[data-draw-path]").forEach(element => {
+    timeline.fromTo(element, { drawSVG: "0%" }, { drawSVG: "100%", duration: 1.6, immediateRender: false }, Number(element.dataset.delay));
+  });
+  node.querySelectorAll<SVGElement>("[data-draw-pulse]").forEach(element => {
+    const at = Number(element.dataset.delay);
+    timeline.fromTo(element, { attr: { r: 5 }, opacity: 0 }, { attr: { r: Number(element.dataset.radius) }, duration: 1.4, immediateRender: false }, at)
+      .to(element, { opacity: 0.7, duration: 0.3 }, at)
+      .to(element, { opacity: 0, duration: 0.95 }, at + 0.4);
+  });
+  const heart = node.querySelector("[data-draw-heart]");
+  if (heart) timeline.to(heart, { scale: 1.065, svgOrigin: "168 120", duration: 0.23, yoyo: true, repeat: 1 }, 0.4)
+    .to(heart, { scale: 1.035, duration: 0.23, yoyo: true, repeat: 1 }, 0.95);
+  const vault = node.querySelector("[data-draw-vault]");
+  if (vault) timeline.fromTo(vault, { rotation: -75, svgOrigin: "143 132" }, { rotation: 0, duration: 1.6, immediateRender: false }, 0.2);
+  return timeline;
+}
+
 export default function ProjectIllustration({ index }: { index: number }) {
   const drawing = useRef<SVGSVGElement>(null);
-  const inView = useInView(drawing, { amount: 0.2, margin: "0px 0px -8% 0px" });
   const safeIndex = Number.isInteger(index) && index >= 0 && index < scenes.length ? index : 0;
-  const playback = useIllustrationPlayback(inView, 6800, safeIndex);
+  const playback = useIllustrationTimeline(drawing, createStudyTimeline, safeIndex);
   const Scene = scenes[safeIndex];
   return (
     <>
     <svg ref={drawing} className="project-drawing" viewBox="0 0 600 220" role="img" aria-label={descriptions[safeIndex]} style={{ display: "block", width: "100%", height: "auto", overflow: "visible" }} fill="none" stroke={ink} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-      <Registration x={18} y={18} />
-      <Registration x={582} y={18} />
-      <Registration x={18} y={202} />
-      <Registration x={582} y={202} />
-      <Scene key={`${safeIndex}-${playback.run}`} draw={playback.playing} />
+      <Registration x={18} y={18} /><Registration x={582} y={18} />
+      <Registration x={18} y={202} /><Registration x={582} y={202} />
+      <Scene key={safeIndex} draw={playback.playing} />
     </svg>
     {playback.ready && playback.reduced ? <span className="illustration-static">Reduced motion</span> : (
-      <motion.button type="button" className="illustration-playback" onClick={playback.toggle}
+      <button type="button" className="illustration-playback" onClick={playback.toggle}
         disabled={!playback.ready}
         aria-label={playback.paused ? "Resume project illustration animation" : "Pause project illustration animation"}
-        title={playback.paused ? "Resume the animated study" : "Pause animation and show the completed drawing"}
-        whileTap={{ scale: 0.96 }} transition={{ type: "spring", stiffness: 420, damping: 28 }}>
+        title={playback.paused ? "Resume the animated study" : "Pause animation and show the completed drawing"}>
         <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
           {playback.paused ? <path d="m5 3 7 5-7 5Z" fill="currentColor" /> : <path d="M5 3v10M11 3v10" stroke="currentColor" strokeWidth="2" />}
         </svg>
         {playback.paused ? "Resume drawing" : "Pause drawing"}
-      </motion.button>
+      </button>
     )}
     </>
   );

@@ -1,148 +1,131 @@
 "use client";
-
-import { AnimatePresence, animate as animateValue, motion, stagger, useAnimate, useInView, useMotionValue, useTransform, type HTMLMotionProps } from "motion/react";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useRef, type ReactNode, type ComponentPropsWithoutRef, type RefObject } from "react";
+import { SplitText } from "gsap/SplitText";
+import { gsap, useGSAP } from "./gsap";
 import { usePortfolioMotion } from "./MotionPreferences";
+gsap.registerPlugin(SplitText);
+export const easeOut = "power3.out";
 
-export const easeOut = [0.22, 1, 0.36, 1] as const;
-
-/** Each block enters once, when its own mobile/desktop position becomes visible.
- * Content stays readable on return; scrolling never resets it to a dim state. */
 export function Reveal({ children, delay = 0, className = "", sequence = false, variant = "lift" }: {
   children: ReactNode; delay?: number; className?: string; sequence?: boolean; variant?: "lift" | "panel" | "slide";
 }) {
-  const [scope, animate] = useAnimate<HTMLDivElement>();
-  const inView = useInView(scope, { once: true, amount: "some", margin: "0px 0px -32px 0px" });
-  const { reduced, ready } = usePortfolioMotion();
-
-  useEffect(() => {
-    const node = scope.current;
-    if (!node || !ready) return;
-    // Observe the stationary wrapper and move only its children. Moving the
-    // observed node itself can retrigger IntersectionObserver at a scroll edge.
-    const targets = Array.from(node.children);
-    if (reduced) {
-      const controls = animate(targets, { opacity: 1, x: 0, y: 0, scale: 1 }, { duration: 0 });
-      return () => controls.stop();
-    }
-    if (!inView) return;
-    const startDelay = Math.min(0.18, Math.max(0, delay));
-    const controls = animate(targets, {
-      opacity: [0.5, 1],
-      x: variant === "slide" ? [22, 0] : 0,
-      y: variant === "slide" ? 0 : [variant === "panel" ? 32 : 24, 0],
-      scale: variant === "panel" ? [0.975, 1] : 1,
-    }, {
-      duration: variant === "panel" ? 0.8 : 0.65,
-      delay: sequence ? stagger(0.07, { startDelay }) : startDelay, ease: easeOut,
-    });
-    return () => controls.stop();
-  }, [inView, reduced, ready, sequence, delay, variant, animate, scope]);
-
+  const scope = useRef<HTMLDivElement>(null);
+  const { ready, reduced } = usePortfolioMotion();
+  useGSAP(() => {
+    if (!ready || reduced || !scope.current) return;
+    gsap.fromTo(Array.from(scope.current.children),
+      { opacity: .5, x: variant === "slide" ? 20 : 0, y: variant === "slide" ? 0 : 32 },
+      { opacity: 1, x: 0, y: 0, duration: .85, ease: easeOut,
+        delay: Math.min(delay, .18), stagger: sequence ? .08 : 0, immediateRender: false,
+        scrollTrigger: { trigger: scope.current, start: "top 94%", once: true }, clearProps: "transform,opacity" });
+  }, { scope, dependencies: [ready, reduced, delay, sequence, variant], revertOnUpdate: true });
   return <div ref={scope} className={`motion-reveal ${className}`}>
     {sequence ? children : <div className="motion-reveal-content">{children}</div>}
   </div>;
 }
 
-/** Decorative rules draw on entry, without measuring every section on scroll. */
-export function MotionSection({ children, ...props }: Omit<HTMLMotionProps<"section">, "children"> & { children: ReactNode }) {
-  const target = useRef<HTMLElement>(null);
-  const { reduced } = usePortfolioMotion();
-  const inView = useInView(target, { once: true, amount: "some", margin: "0px 0px -8% 0px" });
-  return <motion.section {...props} ref={target}>
-    {props.className?.includes("section-block") && <span className="section-rule" aria-hidden="true"><motion.span initial={false}
-      animate={{ scaleX: !reduced && inView ? [0, 1] : 1 }}
-      transition={{ type: "tween", duration: reduced ? 0 : 0.85, ease: easeOut }} /></span>}
+export function MotionSection({ children, ...props }: ComponentPropsWithoutRef<"section">) {
+  const scope = useRef<HTMLElement>(null);
+  const { ready, reduced } = usePortfolioMotion();
+  useGSAP(() => {
+    if (!ready || reduced || !scope.current?.querySelector(".section-rule > span")) return;
+    gsap.fromTo(".section-rule > span", { scaleX: 0 }, { scaleX: 1, duration: 1.15, ease: "power2.inOut",
+      immediateRender: false, scrollTrigger: { trigger: scope.current, start: "top 90%", once: true } });
+  }, { scope, dependencies: [ready, reduced], revertOnUpdate: true });
+  return <section {...props} ref={scope}>
+    {props.className?.includes("section-block") && <span className="section-rule" aria-hidden="true"><span /></span>}
     {children}
-  </motion.section>;
+  </section>;
 }
 
+function useHeadline(scope: RefObject<HTMLHeadingElement | null>, hero: boolean) {
+  const { ready, reduced } = usePortfolioMotion();
+  useGSAP(() => {
+    if (!ready || reduced || !scope.current) return;
+    SplitText.create(scope.current, {
+      type: "lines", mask: "lines", autoSplit: true, linesClass: "editorial-line",
+      onSplit(self) {
+        return gsap.fromTo(self.lines,
+          { yPercent: hero ? 18 : 102, opacity: hero ? .8 : .4, rotation: hero ? 0 : 1 },
+          { yPercent: 0, opacity: 1, rotation: 0, duration: hero ? 1.15 : .95,
+            stagger: .1, ease: "power4.out", immediateRender: false,
+            scrollTrigger: { trigger: scope.current, start: "top 94%", once: true } });
+      },
+    });
+  }, { scope, dependencies: [ready, reduced, hero], revertOnUpdate: true });
+}
 export function AnimatedHeading({ children }: { children: string }) {
-  const [scope, animate] = useAnimate<HTMLHeadingElement>();
-  const inView = useInView(scope, { once: true, amount: 0.2 });
-  const { reduced, ready } = usePortfolioMotion();
-  useEffect(() => {
-    if (!scope.current || !ready || !inView) return;
-    const controls = animate(".hero-word", { y: reduced ? 0 : [26, 0], opacity: reduced ? 1 : [0.7, 1] }, {
-      duration: reduced ? 0 : 0.8, delay: reduced ? 0 : stagger(0.045), ease: easeOut,
-    });
-    return () => controls.stop();
-  }, [inView, reduced, ready, animate, scope]);
-  return <h1 ref={scope} aria-label={children}>{children.split(" ").map((word, i, words) =>
-    <span key={`${word}-${i}`} aria-hidden="true"><span className="hero-word">{word}</span>{i < words.length - 1 ? " " : ""}</span>
-  )}</h1>;
+  const ref = useRef<HTMLHeadingElement>(null); useHeadline(ref, true);
+  return <h1 ref={ref}>{children}</h1>;
 }
-
-/** A masked word rise gives section changes a distinct rhythm. The server HTML
- * is already readable; only headings that enter the viewport are animated. */
 export function SectionTitle({ children }: { children: string }) {
-  const [scope, animate] = useAnimate<HTMLHeadingElement>();
-  const inView = useInView(scope, { once: true, amount: 0.4, margin: "0px 0px -24px 0px" });
-  const { reduced, ready } = usePortfolioMotion();
-  const played = useRef(false);
-  useEffect(() => {
-    if (!scope.current || !ready) return;
-    if (reduced) {
-      const controls = animate(".section-title-word", { y: "0%", opacity: 1 }, { duration: 0 });
-      return () => controls.stop();
-    }
-    if (!inView || played.current) return;
-    played.current = true;
-    const controls = animate(".section-title-word", { y: ["105%", "0%"], opacity: [0.65, 1] }, {
-      duration: 0.72, delay: stagger(0.045), ease: easeOut,
-    });
-    return () => controls.stop();
-  }, [animate, inView, ready, reduced, scope]);
-  return <h2 ref={scope} className="section-title" aria-label={children}>{children.split(" ").map((word, index, words) =>
-    <span key={`${word}-${index}`} aria-hidden="true"><span className="section-title-mask"><span className="section-title-word">{word}</span></span>{index < words.length - 1 ? " " : ""}</span>
-  )}</h2>;
+  const ref = useRef<HTMLHeadingElement>(null); useHeadline(ref, false);
+  return <h2 ref={ref} className="section-title">{children}</h2>;
 }
-
 export function SectionHeading({ title, children }: { title: string; children?: ReactNode }) {
   return <div className="section-heading"><SectionTitle>{title}</SectionTitle>
-    {children && <Reveal className="section-heading-copy" delay={0.08}><p>{children}</p></Reveal>}
+    {children && <Reveal className="section-heading-copy" delay={.08}><p>{children}</p></Reveal>}
   </div>;
 }
 
-export function MotionLink(props: HTMLMotionProps<"a">) {
-  const { reduced } = usePortfolioMotion();
-  return <motion.a {...props} className={`motion-control ${props.className ?? ""}`}
-    whileHover={reduced ? undefined : { y: -2 }} whileTap={reduced ? undefined : { scale: 0.97 }}
-    whileFocus={reduced ? undefined : { y: -2 }}
-    transition={{ type: "spring", stiffness: 460, damping: 30 }} />;
+function useControl<T extends HTMLElement>(ref: RefObject<T | null>) {
+  const { ready, reduced } = usePortfolioMotion();
+  useGSAP(() => {
+    const node = ref.current;
+    if (!node || !ready || reduced) return;
+    const options = { duration: .25, ease: "power2.out" };
+    const yTo = gsap.quickTo(node, "y", options);
+    const scaleXTo = gsap.quickTo(node, "scaleX", options);
+    const scaleYTo = gsap.quickTo(node, "scaleY", options);
+    const icon = node.querySelector("svg");
+    const iconX = icon ? gsap.quickTo(icon, "x", options) : null;
+    const iconY = icon ? gsap.quickTo(icon, "y", options) : null;
+    const animate = (y: number, scale: number) => {
+      yTo(y); scaleXTo(scale); scaleYTo(scale);
+      iconX?.(y < 0 ? 2 : 0); iconY?.(y < 0 ? -2 : 0);
+    };
+    const enter = () => { if (window.matchMedia("(hover: hover)").matches) animate(-2, 1); };
+    const leave = () => animate(0, 1);
+    const down = () => animate(0, .97);
+    const focus = () => animate(-2, 1);
+    node.addEventListener("pointerenter", enter); node.addEventListener("pointerleave", leave);
+    node.addEventListener("pointerdown", down); node.addEventListener("pointerup", leave);
+    node.addEventListener("pointercancel", leave); node.addEventListener("focus", focus); node.addEventListener("blur", leave);
+    return () => {
+      node.removeEventListener("pointerenter", enter); node.removeEventListener("pointerleave", leave);
+      node.removeEventListener("pointerdown", down); node.removeEventListener("pointerup", leave);
+      node.removeEventListener("pointercancel", leave); node.removeEventListener("focus", focus); node.removeEventListener("blur", leave);
+    };
+  }, { scope: ref, dependencies: [ready, reduced], revertOnUpdate: true });
 }
-
-export function MotionButton(props: HTMLMotionProps<"button">) {
-  const { reduced } = usePortfolioMotion();
-  return <motion.button {...props} type={props.type ?? "button"} className={`motion-control ${props.className ?? ""}`}
-    whileHover={reduced ? undefined : { y: -2 }} whileTap={reduced ? undefined : { scale: 0.96 }}
-    whileFocus={reduced ? undefined : { y: -2 }}
-    transition={{ type: "spring", stiffness: 460, damping: 30 }} />;
+export function MotionLink(props: ComponentPropsWithoutRef<"a">) {
+  const ref = useRef<HTMLAnchorElement>(null); useControl(ref);
+  return <a {...props} ref={ref} className={`motion-control ${props.className ?? ""}`} />;
 }
-
+export function MotionButton(props: ComponentPropsWithoutRef<"button">) {
+  const ref = useRef<HTMLButtonElement>(null); useControl(ref);
+  return <button {...props} ref={ref} type={props.type ?? "button"} className={`motion-control ${props.className ?? ""}`} />;
+}
 export function CopyLabel({ copied, children }: { copied: boolean; children: ReactNode }) {
+  const ref = useRef<HTMLSpanElement>(null);
   const { reduced } = usePortfolioMotion();
-  return <span className="copy-label"><AnimatePresence mode="wait" initial={false}>
-    <motion.span key={String(copied)} initial={reduced ? false : { y: 5, opacity: 0.6 }}
-      animate={{ y: 0, opacity: 1 }} exit={{ y: reduced ? 0 : -5, opacity: 0 }}
-      transition={{ type: "tween", duration: reduced ? 0 : 0.14, ease: easeOut }}>{children}</motion.span>
-  </AnimatePresence></span>;
+  useGSAP(() => {
+    if (!reduced) gsap.fromTo(ref.current, { y: 4, opacity: .6 }, { y: 0, opacity: 1, duration: .22, clearProps: "transform,opacity" });
+  }, { scope: ref, dependencies: [copied, reduced], revertOnUpdate: true });
+  return <span className="copy-label"><span ref={ref}>{children}</span></span>;
 }
-
-/** Animate only real values; the accessible text always reports the final number. */
 export function AnimatedMetric({ value }: { value: number }) {
-  const target = useRef<HTMLSpanElement>(null);
-  const inView = useInView(target, { once: true });
-  const { reduced } = usePortfolioMotion();
-  const number = useMotionValue(value);
-  const display = useTransform(number, n => Math.round(n).toLocaleString("en-IN"));
-  const played = useRef(false);
-  useEffect(() => {
-    if (reduced) { number.set(value); return; }
-    if (!inView) return;
-    if (!played.current) { number.set(0); played.current = true; }
-    const controls = animateValue(number, value, { duration: 0.75, ease: easeOut });
-    return () => controls.stop();
-  }, [inView, reduced, value, number]);
-  return <span ref={target}><span className="metric-accessible">{value.toLocaleString("en-IN")}</span><motion.span aria-hidden="true">{display}</motion.span></span>;
+  const ref = useRef<HTMLSpanElement>(null);
+  const { ready, reduced } = usePortfolioMotion();
+  useGSAP(() => {
+    if (!ready || reduced || !ref.current) return;
+    const node = ref.current.querySelector<HTMLElement>("[aria-hidden]")!;
+    const count = { value: 0 };
+    gsap.to(count, { value, duration: 1.2, ease: "power2.out",
+      scrollTrigger: { trigger: ref.current, start: "top 95%", once: true },
+      onUpdate: () => { node.textContent = Math.round(count.value).toLocaleString("en-IN"); },
+      onComplete: () => { node.textContent = value.toLocaleString("en-IN"); } });
+    return () => { node.textContent = value.toLocaleString("en-IN"); };
+  }, { scope: ref, dependencies: [ready, reduced, value], revertOnUpdate: true });
+  return <span ref={ref}><span className="metric-accessible">{value.toLocaleString("en-IN")}</span><span aria-hidden="true">{value.toLocaleString("en-IN")}</span></span>;
 }

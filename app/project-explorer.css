@@ -1,103 +1,102 @@
-/* The project index stays close to its detail on small screens. Native scrolling
-   and explicit selection leave reading position and keyboard focus in place. */
+/* A working index beside an oversized, illustrated project study. */
 .project-explorer { min-width: 0; }
-.project-explorer .project-explorer-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
-.project-explorer .project-explorer-filters { display: flex; flex-wrap: wrap; gap: 6px; }
-.project-explorer .project-explorer-filter { position: relative; isolation: isolate; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 14px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--muted); font: 500 13px/1.4 var(--font-body); cursor: pointer; transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease; touch-action: manipulation; }
-.project-explorer .project-explorer-filter > span { font: 400 11px/1.4 var(--font-code); }
-.project-explorer .project-explorer-filter[aria-pressed="true"] { color: var(--signal); }
-.project-explorer .project-explorer-filter-indicator { position: absolute; z-index: -1; inset: -1px; border: 1px solid color-mix(in srgb, var(--signal) 22%, transparent); border-radius: 6px; background: var(--signal-soft); pointer-events: none; }
-.project-explorer .project-explorer-count { margin: 0; color: var(--muted); font: 400 12px/1.5 var(--font-code); white-space: nowrap; }
-.project-explorer .project-explorer-layout { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); align-items: start; gap: 36px; }
+.project-explorer .project-explorer-toolbar { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 18px; margin-bottom: 32px; }
+.project-explorer .project-explorer-toolbar-rule { position: absolute; bottom: 0; left: 0; width: 100%; height: 1px; background: var(--line-strong, var(--line)); transform-origin: left center; }
+.project-explorer .project-explorer-filters { display: flex; flex-wrap: wrap; gap: 4px; }
+.project-explorer .project-explorer-filter { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 44px; padding: 10px 13px; border: 0; border-radius: 0; background: transparent; color: var(--muted); font: 500 13px/1.4 var(--font-body); cursor: pointer; touch-action: manipulation; }
+.project-explorer .project-explorer-filter > span { font: 400 10px/1.4 var(--font-code); opacity: 0.7; align-self: flex-start; }
+.project-explorer .project-explorer-filter[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+.project-explorer .project-explorer-count { margin: 0; color: var(--muted); font: 400 11px/1.5 var(--font-code); white-space: nowrap; }
+.project-explorer .project-explorer-layout { display: grid; grid-template-columns: minmax(0, .7fr) minmax(0, 1.3fr); align-items: start; gap: clamp(24px, 4vw, 64px); }
 .project-explorer .project-explorer-index { min-width: 0; }
-.project-explorer .project-explorer-hint { display: none; }
+.project-explorer .project-explorer-hint { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 18px; color: var(--muted); font: 400 11px/1.5 var(--font-code); }
 .project-explorer .project-explorer-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
 .project-explorer .project-explorer-list > li { min-width: 0; border-bottom: 1px solid var(--line); }
-.project-explorer .project-explorer-option { position: relative; isolation: isolate; display: grid; grid-template-columns: 25px minmax(0, 1fr) 20px; align-items: center; gap: 14px; width: 100%; min-height: 85px; padding: 17px 14px; border: 0; border-radius: 0; background: transparent; color: var(--text); text-align: left; cursor: pointer; transition: background-color 160ms ease, color 160ms ease; touch-action: manipulation; }
-.project-explorer .project-explorer-option[aria-pressed="true"] { color: var(--signal); }
-.project-explorer .project-explorer-selection { position: absolute; z-index: -1; inset: 0; background: var(--signal-soft); border-left: 3px solid var(--signal); pointer-events: none; }
-.project-explorer .project-explorer-row-arrival { height: 100%; }
+.project-explorer .project-explorer-list > li[hidden] { display: none; }
+.project-explorer .project-explorer-option { position: relative; display: grid; grid-template-columns: 24px minmax(0, 1fr) 20px; align-items: center; gap: 10px; width: 100%; min-height: 83px; padding: 17px 10px; border: 0; border-radius: 0; background: transparent; color: var(--text); text-align: left; cursor: pointer; touch-action: manipulation; }
+.project-explorer .project-explorer-option[aria-pressed="true"] { background: var(--signal-soft); box-shadow: inset 3px 0 0 var(--signal); }
 .project-explorer .project-explorer-number { color: var(--muted); font: 400 11px/1.5 var(--font-code); }
 .project-explorer .project-explorer-name { display: grid; min-width: 0; gap: 5px; }
-.project-explorer .project-explorer-name strong { font: 500 15px/1.4 var(--font-body); overflow-wrap: anywhere; }
-.project-explorer .project-explorer-name small { color: var(--muted); font: 400 12px/1.5 var(--font-body); }
-.project-explorer .project-explorer-arrow { color: var(--muted); opacity: 0.5; transition: transform 160ms ease, color 160ms ease, opacity 160ms ease; }
+.project-explorer .project-explorer-name strong { font: 500 clamp(14px, 1.1vw, 16px)/1.35 var(--font-body); overflow-wrap: anywhere; }
+.project-explorer .project-explorer-name small { color: var(--muted); font: 400 11px/1.5 var(--font-body); }
+.project-explorer .project-explorer-arrow { color: var(--muted); opacity: .4; }
 .project-explorer .project-explorer-option[aria-pressed="true"] .project-explorer-arrow { color: var(--signal); opacity: 1; }
-.project-explorer .project-explorer-detail { min-width: 0; padding: clamp(22px, 3vw, 36px); border: 1px solid var(--line); border-radius: 10px; background: var(--surface); scroll-margin-top: 110px; }
+.project-explorer .project-explorer-pagination { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 18px; font: 400 11px/1.5 var(--font-code); color: var(--muted); }
+.project-explorer .project-explorer-pagination > div { display: flex; gap: 7px; }
+.project-explorer .project-explorer-pagination button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: transparent; color: var(--text); cursor: pointer; }
+.project-explorer .project-explorer-pagination button:disabled { opacity: .3; cursor: default; }
+.project-explorer .project-explorer-detail { position: relative; min-width: 0; padding: clamp(22px, 3vw, 40px); border: 1px solid var(--line); border-radius: 2px; background: var(--surface); scroll-margin-top: 110px; }
+.project-explorer .project-explorer-study-header { position: relative; z-index: 1; display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding-bottom: 20px; border-bottom: 1px solid var(--line); font: 400 10px/1.5 var(--font-code); color: var(--muted); }
+.project-explorer .project-explorer-large-number { position: relative; overflow: hidden; height: clamp(90px, 12vw, 154px); margin-top: 26px; color: var(--signal); font: 400 clamp(105px, 14vw, 180px)/.87 var(--font-body); letter-spacing: -.085em; }
+.project-explorer .project-explorer-large-number > span { display: block; }
 .project-explorer .project-explorer-content { min-width: 0; }
-.project-explorer .project-explorer-summary { min-height: 232px; }
-.project-explorer .project-explorer-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 19px; color: var(--muted); font: 400 12px/1.5 var(--font-code); }
+.project-explorer .project-explorer-summary { min-height: 210px; margin-top: 28px; }
+.project-explorer .project-explorer-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; color: var(--muted); font: 400 11px/1.5 var(--font-code); }
 .project-explorer .project-explorer-meta > span:last-child { flex: none; }
-.project-explorer .project-explorer-detail h3 { margin: 0; max-width: 22ch; color: var(--text); font: 500 clamp(24px, 2.5vw, 32px)/1.14 var(--font-body); letter-spacing: -0.035em; text-wrap: balance; }
-.project-explorer .project-explorer-description { margin: 16px 0 0; max-width: 47ch; color: var(--muted); font: 400 15px/1.7 var(--font-body); }
-.project-explorer .project-explorer-stack { display: flex; flex-wrap: wrap; gap: 6px 14px; list-style: none; margin: 21px 0 0; padding: 0; color: var(--text); font: 400 11px/1.7 var(--font-code); }
-.project-explorer .project-explorer-illustration { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0 10px; min-width: 0; margin: 26px 0 24px; padding: 15px 0 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.project-explorer .project-explorer-detail h3 { margin: 0; max-width: 20ch; color: var(--text); font: 500 clamp(30px, 3vw, 46px)/1.04 var(--font-body); letter-spacing: -.045em; text-wrap: balance; }
+.project-explorer .project-explorer-description { margin: 18px 0 0; max-width: 48ch; color: var(--muted); font: 400 15px/1.7 var(--font-body); }
+.project-explorer .project-explorer-stack { display: flex; flex-wrap: wrap; gap: 6px 16px; list-style: none; margin: 22px 0 0; padding: 0; color: var(--text); font: 400 10px/1.7 var(--font-code); }
+.project-explorer .project-explorer-stack > li { display: inline-flex; align-items: center; gap: 6px; }
+.project-explorer .project-explorer-stack > li::before { content: ""; width: 3px; height: 3px; background: var(--signal); }
+.project-explorer .project-explorer-illustration { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0 10px; min-width: 0; margin: 28px 0 24px; padding: 18px 0 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .project-explorer .project-explorer-illustration > svg { display: block; grid-column: 1 / -1; width: 100%; height: auto; overflow: visible; }
-.project-explorer .project-explorer-illustration > figcaption { grid-column: 1; grid-row: 2; min-width: 0; margin: 0; padding: 12px 0; color: var(--muted); font: 400 12px/1.5 var(--font-body); }
+.project-explorer .project-explorer-illustration > figcaption { grid-column: 1; grid-row: 2; min-width: 0; margin: 0; padding: 12px 0; color: var(--muted); font: 400 10px/1.5 var(--font-code); }
 .project-explorer .project-explorer-illustration .illustration-playback,
 .project-explorer .project-explorer-illustration .illustration-static { grid-column: 2; grid-row: 2; justify-self: end; min-height: 44px; margin: 0; }
 .project-explorer .project-explorer-illustration .illustration-static { display: flex; align-items: center; }
-.project-explorer .project-explorer-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
-.project-explorer .project-explorer-link { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 46px; padding: 12px 17px; border: 1px solid transparent; border-radius: 5px; font: 500 13px/1.4 var(--font-body); text-decoration: none; transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease; touch-action: manipulation; }
-.project-explorer .project-explorer-link-primary { color: var(--bg); background: var(--text); border-color: var(--text); }
+.project-explorer .project-explorer-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.project-explorer .project-explorer-link { display: inline-flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 48px; padding: 13px 18px; border: 1px solid transparent; border-radius: 0; font: 500 13px/1.4 var(--font-body); text-decoration: none; touch-action: manipulation; }
+.project-explorer .project-explorer-link-primary { color: var(--bg); background: var(--text); border-color: var(--text); flex: 1; }
 .project-explorer .project-explorer-link-source { color: var(--text); background: transparent; border-color: var(--line); }
-.project-explorer button:focus-visible,
-.project-explorer a:focus-visible { outline: 2px solid var(--signal); outline-offset: 4px; }
+.project-explorer button:focus-visible, .project-explorer a:focus-visible { outline: 2px solid var(--signal); outline-offset: 4px; }
 .project-explorer .project-explorer-announcement { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .project-explorer .project-explorer-empty { padding: 32px 0; color: var(--muted); }
 @media (hover: hover) and (pointer: fine) {
-  .project-explorer .project-explorer-filter:hover { color: var(--text); }
-  .project-explorer .project-explorer-filter:not([aria-pressed="true"]):hover { background: var(--surface); }
-  .project-explorer .project-explorer-option:hover { background: var(--signal-soft); }
-  .project-explorer .project-explorer-option:hover .project-explorer-arrow { transform: translateX(3px); opacity: 1; }
+  .project-explorer .project-explorer-filter:not([aria-pressed="true"]):hover,
+  .project-explorer .project-explorer-option:hover { color: var(--text); background: var(--signal-soft); }
+  .project-explorer .project-explorer-option:hover .project-explorer-arrow { opacity: 1; }
   .project-explorer .project-explorer-link-primary:hover { background: var(--signal); border-color: var(--signal); }
-  .project-explorer .project-explorer-link-source:hover { background: var(--signal-soft); border-color: var(--signal); color: var(--signal); }
+  .project-explorer .project-explorer-link-source:hover,
+  .project-explorer .project-explorer-pagination button:not(:disabled):hover { background: var(--signal-soft); border-color: var(--signal); }
 }
-/* Keep the selected study in view only when a tall desktop viewport can fit it. */
-@media (min-width: 60.0625rem) and (min-height: 56rem) {
-  .project-explorer .project-explorer-detail { position: sticky; top: 104px; }
+@media (min-width: 60.0625rem) and (min-height: 52rem) {
+  .project-explorer .project-explorer-index { position: sticky; top: 108px; }
 }
 @media (max-width: 60rem) {
-  .project-explorer .project-explorer-toolbar { margin-bottom: 18px; }
-  .project-explorer .project-explorer-layout { grid-template-columns: minmax(0, 1fr); gap: 20px; }
-  .project-explorer .project-explorer-hint { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; color: var(--muted); font: 400 12px/1.5 var(--font-body); }
-  .project-explorer .project-explorer-list { display: flex; gap: 10px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scroll-padding-inline: 4px; scrollbar-width: thin; scrollbar-color: var(--line) transparent; border: 0; padding: 4px 4px 12px; margin-inline: -4px; }
-  .project-explorer .project-explorer-list > li { flex: 0 0 230px; scroll-snap-align: start; border: 0; }
-  .project-explorer .project-explorer-option { grid-template-columns: 20px minmax(0, 1fr); grid-template-rows: 1fr; align-items: start; height: 100%; min-height: 112px; padding: 16px 13px; gap: 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
-  .project-explorer .project-explorer-option[aria-pressed="true"] { background: transparent; border-color: color-mix(in srgb, var(--signal) 55%, var(--line)); }
-  .project-explorer .project-explorer-selection { border: 0; border-bottom: 3px solid var(--signal); border-radius: 5px; }
+  .project-explorer .project-explorer-toolbar { margin-bottom: 22px; }
+  .project-explorer .project-explorer-layout { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .project-explorer .project-explorer-hint { margin-bottom: 10px; }
+  .project-explorer .project-explorer-list { display: flex; gap: 0; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scroll-padding-inline: 4px; scrollbar-width: thin; scrollbar-color: var(--line) transparent; border: 1px solid var(--line); padding: 0 0 6px; }
+  .project-explorer .project-explorer-list > li { flex: 0 0 224px; scroll-snap-align: start; border: 0; border-right: 1px solid var(--line); }
+  .project-explorer .project-explorer-option { grid-template-columns: 20px minmax(0, 1fr); align-items: start; height: 100%; min-height: 96px; padding: 15px 13px; gap: 10px; }
+  .project-explorer .project-explorer-option[aria-pressed="true"] { box-shadow: inset 0 -3px 0 var(--signal); }
   .project-explorer .project-explorer-number { padding-top: 3px; }
-  .project-explorer .project-explorer-name strong { font-size: 14px; }
   .project-explorer .project-explorer-arrow { display: none; }
-  .project-explorer .project-explorer-detail { padding: 26px; }
-  .project-explorer .project-explorer-summary { min-height: 224px; }
+  .project-explorer .project-explorer-pagination { margin-top: 9px; }
+  .project-explorer .project-explorer-detail { padding: 28px; }
+  .project-explorer .project-explorer-large-number { height: 110px; font-size: 128px; }
+  .project-explorer .project-explorer-summary { min-height: 0; margin-top: 22px; }
   .project-explorer .project-explorer-illustration > svg { max-width: 650px; justify-self: center; }
 }
 @media (max-width: 40rem) {
-  .project-explorer .project-explorer-toolbar { align-items: flex-start; gap: 0; }
-  .project-explorer .project-explorer-filters { gap: 4px; }
-  .project-explorer .project-explorer-filter { gap: 6px; padding-inline: 10px; font-size: 12px; }
+  .project-explorer .project-explorer-toolbar { align-items: flex-start; gap: 0; padding-bottom: 12px; }
+  .project-explorer .project-explorer-filters { gap: 2px; }
+  .project-explorer .project-explorer-filter { gap: 5px; padding-inline: 9px; font-size: 11px; }
   .project-explorer .project-explorer-count { display: none; }
-  .project-explorer .project-explorer-list > li { flex-basis: min(230px, 80%); }
-  .project-explorer .project-explorer-detail { padding: 21px 18px; }
-  .project-explorer .project-explorer-meta { font-size: 11px; margin-bottom: 15px; }
-  .project-explorer .project-explorer-summary { min-height: 268px; }
+  .project-explorer .project-explorer-list > li { flex-basis: min(224px, 80%); }
+  .project-explorer .project-explorer-detail { padding: 22px 18px; }
+  .project-explorer .project-explorer-study-header { font-size: 9px; padding-bottom: 16px; }
+  .project-explorer .project-explorer-large-number { height: 90px; font-size: 105px; margin-top: 20px; }
+  .project-explorer .project-explorer-detail h3 { font-size: clamp(29px, 8vw, 38px); }
   .project-explorer .project-explorer-description { font-size: 14px; }
-  .project-explorer .project-explorer-stack { gap: 5px 12px; }
-  .project-explorer .project-explorer-illustration { grid-template-columns: minmax(0, 1fr); margin-top: 22px; }
+  .project-explorer .project-explorer-meta { font-size: 10px; }
   .project-explorer .project-explorer-illustration > figcaption { grid-column: 1; grid-row: 2; padding-block: 8px 0; }
   .project-explorer .project-explorer-illustration .illustration-playback,
   .project-explorer .project-explorer-illustration .illustration-static { grid-column: 1; grid-row: 3; justify-self: start; }
-  .project-explorer .project-explorer-link { padding-inline: 13px; }
+  .project-explorer .project-explorer-link { padding-inline: 13px; gap: 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .project-explorer button, .project-explorer a, .project-explorer .project-explorer-arrow { transition: none; }
-  .project-explorer .project-explorer-option:hover .project-explorer-arrow { transform: none; }
+  .project-explorer .project-explorer-index { position: static; }
+  .project-explorer .project-explorer-list { scroll-snap-type: none; }
 }
-
-/* Live reduction also settles a layout spring that was already in flight. */
-.project-explorer[data-reduced="true"] .project-explorer-row-arrival,
-.project-explorer[data-reduced="true"] .project-explorer-summary > *,
-.project-explorer[data-reduced="true"] .project-explorer-illustration,
-.project-explorer[data-reduced="true"] .project-explorer-filter-indicator,
-.project-explorer[data-reduced="true"] .project-explorer-selection { opacity: 1 !important; transform: none !important; }
+.project-explorer[data-reduced="true"] .project-explorer-index { position: static; }

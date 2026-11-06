@@ -1,0 +1,88 @@
+/* Exercise the shipping theme control with real GSAP and DOM custom properties. */
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const { createRequire, Module } = require('node:module');
+const base = path.resolve(__dirname, '..');
+const req = createRequire(path.join(base, 'package.json'));
+const dependency = name => require(process.env.PORTFOLIO_TEST_DEPS ? path.join(process.env.PORTFOLIO_TEST_DEPS, name) : name);
+const { JSDOM } = dependency('jsdom');
+const ts = dependency('typescript');
+const keys = ['--bg', '--surface', '--surface-2', '--surface-3', '--text', '--muted', '--text2', '--line', '--line-strong', '--signal', '--signal-soft', '--accent', '--header-bg'];
+const declarations = (color) => keys.map(key => `${key}:${color};`).join('');
+const dom = new JSDOM(`<html data-theme="light"><head><meta name="theme-color" content="#f8f7f4"><style>html[data-theme="light"]{${declarations('#f2f1e9')}}html[data-theme="dark"]{${declarations('#111a15')}}</style></head><body><div id="root"></div></body></html>`, { url: 'https://portfolio.test', pretendToBeVisual: true });
+for (const name of ['window', 'document', 'HTMLElement', 'SVGElement', 'Element', 'Node', 'NodeList', 'EventTarget', 'CustomEvent', 'KeyboardEvent', 'AbortController', 'AbortSignal', 'localStorage']) global[name] = dom.window[name];
+Object.defineProperty(global, 'navigator', { value: dom.window.navigator, configurable: true });
+global.getComputedStyle = dom.window.getComputedStyle.bind(dom.window);
+global.requestAnimationFrame = dom.window.requestAnimationFrame.bind(dom.window);
+global.cancelAnimationFrame = dom.window.cancelAnimationFrame.bind(dom.window);
+global.IS_REACT_ACT_ENVIRONMENT = true;
+window.scrollTo = () => {};
+const listeners = new Set();
+window.matchMedia = () => ({ matches: false, addEventListener(_, cb) { listeners.add(cb); }, removeEventListener(_, cb) { listeners.delete(cb); }, addListener() {}, removeListener() {} });
+require.extensions['.css'] = () => {};
+const compile = (module, filename) => module._compile(ts.transpileModule(fs.readFileSync(filename, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2020, esModuleInterop: true } }).outputText, filename);
+require.extensions['.tsx'] = compile; require.extensions['.ts'] = compile;
+const React = req('react');
+const { act } = React;
+const originalLoad = Module._load;
+Module._load = function(request, parent, isMain) {
+  if (request === '@phosphor-icons/react') return { Sun: () => React.createElement('svg'), Moon: () => React.createElement('svg') };
+  return originalLoad.call(this, request, parent, isMain);
+};
+const { createRoot } = req('react-dom/client');
+const { AnimatedThemeToggler } = req(path.join(base, 'registry/magicui/animated-theme-toggler.tsx'));
+const { gsap, ScrollTrigger } = req(path.join(base, 'app/gsap.ts'));
+let root = createRoot(document.getElementById('root'));
+let reduced = false;
+const render = () => root.render(React.createElement(React.StrictMode, null, React.createElement(AnimatedThemeToggler, { reduceMotion: reduced, duration: 300 })));
+const button = () => document.querySelector('button');
+const click = () => act(async () => button().click());
+const settle = ms => act(async () => new Promise(resolve => setTimeout(resolve, ms)));
+(async () => {
+  try {
+    await act(async () => render());
+    assert.equal(document.documentElement.dataset.theme, 'light');
+    assert.equal(button().getAttribute('aria-label'), 'Switch to dark mode');
+    assert.equal(listeners.size, 1, 'StrictMode owns one preference listener');
+    await click();
+    assert.equal(document.documentElement.dataset.theme, 'dark', 'Theme state commits immediately, without waiting for choreography');
+    assert.equal(localStorage.getItem('portfolio-theme'), 'dark');
+    assert.equal(button().getAttribute('aria-pressed'), 'true');
+    await settle(90);
+    const intermediate = document.documentElement.style.getPropertyValue('--bg');
+    assert(intermediate && intermediate !== '#111a15' && intermediate !== '#f2f1e9', 'GSAP produces an intermediate palette');
+    await click();
+    await settle(400);
+    assert.equal(document.documentElement.dataset.theme, 'light', 'Rapid retarget ends at the last choice');
+    assert.equal(localStorage.getItem('portfolio-theme'), 'light');
+    assert(keys.every(key => !document.documentElement.style.getPropertyValue(key)), 'Completed palette clears all temporary inline overrides');
+
+    await act(async () => button().dispatchEvent(new window.MouseEvent('pointerdown', { bubbles: true })));
+    await settle(70);
+    await act(async () => button().dispatchEvent(new window.MouseEvent('pointerup', { bubbles: true })));
+    await click();
+    await settle(350);
+    assert.equal(Number(gsap.getProperty(button(), 'scaleX')), 1, 'Theme changes do not strand the press transform');
+    await click();
+    await settle(50);
+    reduced = true;
+    await act(async () => render());
+    assert(keys.every(key => !document.documentElement.style.getPropertyValue(key)), 'Enabling reduced motion clears a transition in progress');
+    assert.equal(document.documentElement.dataset.theme, 'light');
+    await click();
+    assert.equal(document.documentElement.dataset.theme, 'dark');
+    assert(keys.every(key => !document.documentElement.style.getPropertyValue(key)), 'Reduced motion toggles synchronously without a palette tween');
+    await act(async () => root.unmount());
+    assert.equal(listeners.size, 0, 'Unmount removes the media listener');
+    root = createRoot(document.getElementById('root'));
+    await act(async () => render());
+    assert.equal(button().getAttribute('aria-label'), 'Switch to light mode', 'A stored dark preference survives remount');
+    await act(async () => root.unmount());
+    assert(keys.every(key => !document.documentElement.style.getPropertyValue(key)), 'Unmount leaves no custom-property animation residue');
+    console.log('PASS: real GSAP palette interpolation, immediate theme state, rapid toggle retargeting, icon/press settling, live reduced motion, persistence and StrictMode cleanup.');
+  } finally {
+    await act(async () => root.unmount());
+    ScrollTrigger.killAll(); ScrollTrigger.disable(); gsap.globalTimeline.clear(); gsap.ticker.sleep(); Module._load = originalLoad; dom.window.close();
+  }
+})().then(() => process.exit(0)).catch(error => { console.error(error); process.exit(1); });

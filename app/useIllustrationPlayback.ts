@@ -1,37 +1,63 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import { gsap, useGSAP } from "./gsap";
 import { usePortfolioMotion } from "./MotionPreferences";
-import { useScrollActivity } from "./useScrollActivity";
 
-/** Replay a short study only while someone can see it. Pausing settles the art. */
-export function useIllustrationPlayback(inView: boolean, cycleMs = 6400, subjectKey = 0) {
+/** Observe the stationary drawing, not its animated children. No frame updates
+ * cross React's boundary, and hidden/offscreen diagrams consume no animation work. */
+export function useIllustrationPlayback(target: RefObject<Element | null>) {
   const { ready, reduced } = usePortfolioMotion();
-  const scrolling = useScrollActivity();
+  const [inView, setInView] = useState(false);
   const [pageVisible, setPageVisible] = useState(false);
   const [paused, setPaused] = useState(false);
-  const [run, setRun] = useState(0);
 
   useEffect(() => {
     const update = () => setPageVisible(document.visibilityState !== "hidden");
     update();
     document.addEventListener("visibilitychange", update);
-    return () => document.removeEventListener("visibilitychange", update);
-  }, []);
+    const node = target.current;
+    const observer = node && typeof IntersectionObserver !== "undefined"
+      ? new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0.12 })
+      : null;
+    if (node) observer?.observe(node);
+    if (!observer) setInView(true);
+    return () => {
+      observer?.disconnect();
+      document.removeEventListener("visibilitychange", update);
+    };
+  }, [target]);
 
-  // Keep native scrolling free of SVG geometry updates and scene remounts.
-  // The complete diagram remains visible, then animates once scrolling settles.
-  const active = ready && !reduced && inView && pageVisible && !paused && !scrolling;
+  const toggle = useCallback(() => setPaused(current => !current), []);
+  return { ready, reduced, paused, playing: ready && !reduced && inView && pageVisible && !paused, toggle };
+}
+
+/** One reversible GSAP context owns each scene, including repeat delays.
+ * A deliberate pause settles the diagram; leaving the viewport only suspends it. */
+export function useIllustrationTimeline<T extends Element>(
+  target: RefObject<T | null>,
+  create: (node: T) => gsap.core.Timeline,
+  subjectKey = 0,
+) {
+  const playback = useIllustrationPlayback(target);
+  const timeline = useRef<gsap.core.Timeline | null>(null);
+  const { ready, reduced, playing, paused } = playback;
+
+  useGSAP(() => {
+    if (!ready || reduced || !target.current) return;
+    timeline.current = create(target.current);
+    return () => { timeline.current = null; };
+  }, { scope: target, dependencies: [ready, reduced, subjectKey, create], revertOnUpdate: true });
+
   useEffect(() => {
-    if (!active) return;
-    setRun(current => current + 1);
-    const timer = window.setInterval(() => setRun(current => current + 1), cycleMs);
-    return () => window.clearInterval(timer);
-  }, [active, cycleMs, subjectKey]);
+    const current = timeline.current;
+    if (!current) return;
+    if (paused) current.pause().progress(1);
+    else if (playing) {
+      if (current.time() >= current.duration()) current.restart();
+      else current.play();
+    } else current.pause();
+  }, [playing, paused, ready, reduced, subjectKey]);
 
-  return {
-    ready, reduced, paused, run,
-    playing: active && run > 0,
-    toggle: () => setPaused(current => !current),
-  };
+  return playback;
 }

@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "layerSize": 384,
+  "pivots": {
+    "body": [
+      50,
+      82.35
+    ],
+    "head": [
+      50,
+      45.61
+    ],
+    "leftArm": [
+      29.69,
+      52.69
+    ],
+    "rightArm": [
+      70.31,
+      52.69
+    ]
+  },
+  "turn": {
+    "columns": 6,
+    "rows": 4,
+    "frames": 24,
+    "size": 320
+  },
+  "files": [
+    "base.webp",
+    "body.webp",
+    "left-arm.webp",
+    "right-arm.webp",
+    "head-smile.webp",
+    "head-neutral.webp",
+    "head-cry.webp",
+    "head-angry.webp",
+    "head-sleepy.webp",
+    "head-dizzy.webp",
+    "head-confused.webp",
+    "head-blink-half.webp",
+    "head-blink-closed.webp",
+    "head-look-left.webp",
+    "head-look-right.webp",
+    "turn-atlas.webp"
+  ]
+}

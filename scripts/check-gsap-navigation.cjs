@@ -1,0 +1,132 @@
+/* Shipping header + real React/GSAP. Browser geometry and CSS are verified separately. */
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const { createRequire, Module } = require('node:module');
+const base = path.resolve(__dirname, '..');
+const req = createRequire(path.join(base, 'package.json'));
+const dependency = name => require(process.env.PORTFOLIO_TEST_DEPS ? path.join(process.env.PORTFOLIO_TEST_DEPS, name) : name);
+const { JSDOM } = dependency('jsdom');
+const ts = dependency('typescript');
+const dom = new JSDOM('<html><body><div id="root"></div><main><section id="work"></section><section id="about"></section></main><footer class="underpage-footer"></footer></body></html>', { url: 'https://portfolio.test', pretendToBeVisual: true });
+for (const name of ['window', 'document', 'HTMLElement', 'SVGElement', 'Element', 'Node', 'NodeList', 'EventTarget', 'CustomEvent', 'KeyboardEvent', 'AbortController', 'AbortSignal']) global[name] = dom.window[name];
+Object.defineProperty(global, 'navigator', { value: dom.window.navigator, configurable: true });
+global.getComputedStyle = dom.window.getComputedStyle.bind(dom.window);
+global.requestAnimationFrame = dom.window.requestAnimationFrame.bind(dom.window);
+global.cancelAnimationFrame = dom.window.cancelAnimationFrame.bind(dom.window);
+global.IS_REACT_ACT_ENVIRONMENT = true;
+window.scrollTo = () => {};
+let reduced = false;
+let compact = true;
+const mediaListeners = new Set();
+window.matchMedia = query => ({ get matches() { return query === '(max-width: 64rem)' ? compact : false; }, addEventListener(_, listener) { if (query === '(max-width: 64rem)') mediaListeners.add(listener); }, removeEventListener(_, listener) { mediaListeners.delete(listener); }, addListener() {}, removeListener() {} });
+const observers = [];
+global.IntersectionObserver = window.IntersectionObserver = class {
+  constructor(callback) { this.callback = callback; this.disconnected = false; observers.push(this); }
+  observe() {} unobserve() {} disconnect() { this.disconnected = true; }
+};
+global.ResizeObserver = window.ResizeObserver = class { observe() {} disconnect() {} };
+require.extensions['.css'] = () => {};
+const compile = (module, filename) => module._compile(ts.transpileModule(fs.readFileSync(filename, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2020, esModuleInterop: true } }).outputText, filename);
+require.extensions['.tsx'] = compile;
+require.extensions['.ts'] = compile;
+const React = req('react');
+const { act } = React;
+const originalLoad = Module._load;
+Module._load = function(request, parent, isMain) {
+  if (request === 'next/link') return { __esModule: true, default: React.forwardRef(({ children, ...props }, ref) => React.createElement('a', { ...props, ref, onClick(event) { props.onClick?.(event); event.preventDefault(); } }, children)) };
+  if (request === './MotionPreferences') return { usePortfolioMotion: () => ({ reduced, ready: true }) };
+  if (request === './BrandMark') return { __esModule: true, default: () => React.createElement('span', null, 'Logo') };
+  if (request === './ThemeToggle') return { __esModule: true, default: () => React.createElement('button', { type: 'button', className: 'test-theme' }, 'Theme') };
+  return originalLoad.call(this, request, parent, isMain);
+};
+const Header = req(path.join(base, 'app/PortfolioHeader.tsx')).default;
+const { gsap, ScrollTrigger } = req(path.join(base, 'app/gsap.ts'));
+const { renderToStaticMarkup } = req('react-dom/server');
+const { createRoot } = req('react-dom/client');
+const root = createRoot(document.getElementById('root'));
+const render = () => root.render(React.createElement(React.StrictMode, null, React.createElement(Header)));
+const button = () => document.querySelector('.mobile-menu-button');
+const nav = () => document.getElementById('primary-navigation');
+const click = element => act(async () => element.click());
+const settle = ms => act(async () => new Promise(resolve => setTimeout(resolve, ms)));
+const resize = async value => { compact = value; await act(async () => { for (const listener of mediaListeners) listener({ matches: compact }); }); };
+const key = (target, value, shiftKey = false) => act(async () => target.dispatchEvent(new KeyboardEvent('keydown', { key: value, shiftKey, bubbles: true, cancelable: true })));
+const menuEvents = [];
+window.addEventListener('portfolio:menu-state', event => menuEvents.push(event.detail.open));
+
+(async () => {
+  try {
+    const html = renderToStaticMarkup(React.createElement(Header));
+    assert.equal((html.match(/class="nav-link"/g) || []).length, 7, 'SSR keeps every navigation destination');
+    await act(async () => render());
+    assert.equal(button().getAttribute('aria-expanded'), 'false');
+    assert.equal(nav().getAttribute('aria-hidden'), 'true');
+    assert(nav().hasAttribute('inert'), 'Closed mobile navigation cannot receive keyboard focus');
+    assert.equal(mediaListeners.size, 1, 'StrictMode has one breakpoint listener');
+
+    await click(button());
+    assert.equal(getComputedStyle(nav()).visibility, 'visible', 'Opening exposes the actual surface synchronously before keyboard focus');
+    assert.equal(document.activeElement, nav().querySelector('a'), 'First destination receives focus');
+    assert.equal(document.querySelector('main').inert, true, 'The modal curtain makes background content inert');
+    assert.equal(document.querySelector('footer').inert, true);
+    assert.equal(document.body.style.overflow, 'hidden');
+    assert.equal(document.querySelector('header').getAttribute('aria-modal'), 'true');
+    await settle(180);
+    assert.notEqual(nav().style.clipPath, 'inset(0 0 100% 0)', 'Actual GSAP curtain advances after opening');
+    assert.notEqual(nav().style.clipPath, 'inset(0 0 0% 0)', 'Curtain has a genuine intermediate state');
+    await settle(800);
+    assert.equal(nav().style.clipPath, 'inset(0 0 0% 0)');
+    button().focus();
+    await key(button(), 'Tab');
+    assert.equal(document.activeElement, document.querySelector('.brand'), 'Tab wraps through modal header controls');
+    await key(document.querySelector('.brand'), 'Tab', true);
+    assert.equal(document.activeElement, button(), 'Shift+Tab wraps to the close control');
+    await key(button(), 'Escape');
+    assert.equal(button().getAttribute('aria-expanded'), 'false');
+    assert.equal(document.activeElement, button(), 'Escape restores focus');
+    assert(nav().hasAttribute('inert'), 'Closing links are immediately inert');
+    assert.equal(Boolean(document.querySelector('main').inert), false);
+    assert.equal(document.body.style.overflow, '');
+    await settle(700);
+    assert.equal(nav().style.visibility, 'hidden');
+
+    await click(button());
+    await click(nav().querySelector('a[href="#work"]'));
+    assert.equal(button().getAttribute('aria-expanded'), 'false');
+    assert.equal(document.activeElement, button(), 'Destination activation never leaves focus in an inert curtain');
+    await click(button());
+    await resize(false);
+    assert.equal(nav().dataset.menuSurface, 'desktop');
+    assert.equal(nav().hasAttribute('inert'), false);
+    assert.equal(nav().style.clipPath, '');
+    assert.equal(document.body.style.overflow, '');
+    assert.equal(document.querySelectorAll('#primary-navigation').length, 1);
+    await act(async () => observers.findLast(observer => !observer.disconnected).callback([{ isIntersecting: true, target: document.getElementById('work') }]));
+    assert.equal(nav().querySelector('a[href="#work"]').getAttribute('aria-current'), 'location');
+    await resize(true);
+    await click(button());
+    reduced = true;
+    await act(async () => render());
+    assert.equal(nav().style.clipPath, 'inset(0 0 0% 0)', 'Reduced motion during entrance immediately settles open');
+    assert.equal(nav().style.visibility, 'visible');
+    await key(button(), 'Escape');
+    assert.equal(nav().style.visibility, 'hidden', 'Reduced motion has no delayed exit');
+    await click(button());
+    await act(async () => root.unmount());
+    assert.equal(Boolean(document.querySelector('main').inert), false, 'Unmount restores background interaction');
+    assert.equal(document.body.style.overflow, '', 'Unmount restores native scrolling');
+    assert.equal(menuEvents.at(-1), false, 'Scroll engine receives final unlock');
+    assert.equal(mediaListeners.size, 0);
+    assert(observers.every(observer => observer.disconnected));
+    console.log('PASS: GSAP curtain intermediate/final states, SSR links, modal focus loop, Escape, background inert/scroll lock, route activation, responsive reset, live reduced motion, active section and StrictMode cleanup.');
+  } finally {
+    await act(async () => root.unmount());
+    ScrollTrigger.killAll();
+    ScrollTrigger.disable();
+    gsap.globalTimeline.clear();
+    gsap.ticker.sleep();
+    Module._load = originalLoad;
+    dom.window.close();
+  }
+})().then(() => process.exit(0)).catch(error => { console.error(error); process.exit(1); });

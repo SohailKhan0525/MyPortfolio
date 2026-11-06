@@ -17,7 +17,7 @@ export function scrollToPortfolioSection(id: string): void {
     return;
   }
   target.scrollIntoView({
-    behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+    behavior: "auto",
     block: "start",
   });
 }

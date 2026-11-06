@@ -1,9 +1,9 @@
 "use client";
 
-import { motion } from "motion/react";
-import { AnimatedMetric, Reveal, easeOut } from "./MotionElements";
+import { gsap, useGSAP } from "./gsap";
+import { AnimatedMetric, Reveal } from "./MotionElements";
 import { usePortfolioMotion } from "./MotionPreferences";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type Stats = {
   configured: boolean;
@@ -18,7 +18,9 @@ type Stats = {
 const fmt = (n = 0) => n.toLocaleString("en-IN");
 
 export default function LiveStats() {
-  const { reduced } = usePortfolioMotion();
+  const { ready, reduced } = usePortfolioMotion();
+  const chart = useRef<HTMLDivElement>(null);
+  const chartEntered = useRef(false);
   const [stats, setStats] = useState<Stats | null>(null);
   const [updated, setUpdated] = useState<Date | null>(null);
   const [, tick] = useState(0);
@@ -66,6 +68,19 @@ export default function LiveStats() {
   const secs = updated ? Math.max(0, Math.round((Date.now() - updated.getTime()) / 1000)) : null;
   const bars = days.length ? days : Array.from({ length: 30 }, (_, i) => ({ date: String(i), views: 0 }));
 
+  useGSAP(() => {
+    if (!chart.current || !ready || reduced || !stats?.configured || stats.error || chartEntered.current) return;
+    gsap.fromTo(chart.current.querySelectorAll(".vs-bars i"),
+      { scaleY: 0.05, transformOrigin: "center bottom" },
+      {
+        scaleY: 1, duration: 0.7, stagger: 0.018, ease: "power3.out",
+        scrollTrigger: {
+          trigger: chart.current, start: "top 92%", once: true,
+          onEnter: () => { chartEntered.current = true; },
+        },
+      });
+  }, { scope: chart, dependencies: [ready, reduced, stats?.configured, stats?.error, days.length], revertOnUpdate: true });
+
   return (
     <section id="analytics" className="section-pad vs-section">
       <Reveal className="surface vs-card" sequence>
@@ -87,10 +102,10 @@ export default function LiveStats() {
               <div className="vs-stat"><span>This month</span><strong>{stats ? <AnimatedMetric value={stats.month ?? 0} /> : "–"}</strong><small>page views</small></div>
               <div className="vs-stat"><span>Unique visitors</span><strong>{stats ? <AnimatedMetric value={stats.unique ?? 0} /> : "–"}</strong><small>this month{stats ? ` · ${fmt(stats.uniqueToday)} today` : ""}</small></div>
             </div>
-            <div className="vs-chart" role="img" aria-label="Page views per day for the last 30 days">
+            <div ref={chart} className="vs-chart" role="img" aria-label="Page views per day for the last 30 days">
               <div className="vs-bars">
                 {bars.map((d, i) => (
-                  <motion.i initial={false} whileInView={reduced ? { scaleY: 1 } : { scaleY: [0.05, 1] }} viewport={{ once: true }} transition={{ type: "tween", duration: reduced ? 0 : 0.6, delay: reduced ? 0 : i * 0.012, ease: easeOut }} key={d.date} className={i === bars.length - 1 ? "is-today" : ""} title={`${d.date}: ${d.views} views`} style={{ height: `${Math.max(3, (d.views / max) * 100)}%` }} />
+                  <i key={d.date} className={i === bars.length - 1 ? "is-today" : ""} title={`${d.date}: ${d.views} views`} style={{ height: `${Math.max(3, (d.views / max) * 100)}%` }} />
                 ))}
               </div>
               <div className="vs-axis"><span>30 days ago</span><span>daily page views</span><span>today</span></div>

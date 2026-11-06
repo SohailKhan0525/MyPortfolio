@@ -17,6 +17,7 @@ import "./motion-system.css";
 import "./scroll-performance.css";
 import "./portfolio-refinement.css";
 import "./motion-choreography.css";
+import "./gsap-redesign.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mohdzaheeruddin0525.vercel.app"),
