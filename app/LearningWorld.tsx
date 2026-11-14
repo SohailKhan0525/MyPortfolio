@@ -180,7 +180,7 @@ export default function LearningWorld({ onVisitProject, onTryExperiment }: {
       <img className="field-world__painting" src="/world/learning-lab.webp"
         srcSet="/world/learning-lab-small.webp 768w, /world/learning-lab.webp 1536w"
         sizes="(max-width: 768px) calc(100vw - 32px), (max-width: 1360px) 61vw, 850px"
-        width={1536} height={1024} fetchPriority="high" decoding="async" draggable={false}
+        width={1536} height={1024} loading="lazy" decoding="async" draggable={false}
         alt="A miniature pine valley with a terracotta cottage, a seismic observatory and a heart-shaped sign above a clinic. Little railway tracks link the three projects." />
       <svg className="field-world__rails" viewBox="0 0 768 512" aria-hidden="true">
         {stations.map((stop, index) => <path key={stop.id} d={stop.track} fill="none" stroke="none" ref={node => { paths.current[index] = node; }} />)}

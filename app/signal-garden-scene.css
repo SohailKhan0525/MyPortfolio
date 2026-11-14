@@ -1,0 +1,34 @@
+.signal-garden-scene {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border: 1px solid #7b8267;
+  border-radius: 16px;
+  background: linear-gradient(155deg, #c6d4b5 5%, #f6ddaf 62%, #cbad83);
+  box-shadow: 0 2px 0 rgb(75 79 53 / 24%), 0 14px 36px -28px #233c2d;
+}
+.garden-conservatory, .garden-conservatory img, .garden-interactive-board {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.garden-conservatory { pointer-events: none; }
+.garden-conservatory img { object-fit: cover; user-select: none; }
+.garden-interactive-board {
+  overflow: hidden;
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.garden-interactive-board [data-garden-bed] { cursor: crosshair; }
+.signal-garden-scene:focus-within { outline: 3px solid var(--signal, #2c6042); outline-offset: 4px; }
+.garden-interactive-board:focus { outline: none; }
+.garden-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 640px) {
+  .signal-garden-scene { aspect-ratio: 1.28; border-radius: 12px; }
+}
