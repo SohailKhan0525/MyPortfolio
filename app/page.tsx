@@ -8,6 +8,7 @@ import DataInstrument from "./DataInstrument";
 import ProjectExplorer from "./ProjectExplorer";
 import LearningJourney from "./LearningJourney";
 import LearningWorld from "./LearningWorld";
+import InkObservatory from "./InkObservatory";
 import SignalGarden from "./SignalGarden";
 import ModelWorkbench from "./ModelWorkbench";
 import "./world-home.css";
@@ -269,14 +270,29 @@ export default function Home() {
       <div className="portfolio-foreground">
       <PortfolioHeader />
       <a className="skip-link" href="#top">Skip to content</a><main id="top" tabIndex={-1}>
-        <MotionSection id="intro" className="garden-opening section-pad">
+        <MotionSection id="intro" className="garden-opening observatory-opening section-pad" data-companion-clear>
           <div className="garden-masthead">
-            <AnimatedHeading>Zaheer’s signal garden.</AnimatedHeading>
+            <AnimatedHeading>The Ink Observatory.</AnimatedHeading>
             <div className="garden-byline">
-              <p>I’m a CSIT student working toward ML engineering. Plant an example and see what Minty grows around it.</p>
-              <MotionLink className="garden-project-link" href="#work">See my {projects.length} projects <ArrowDown size={15} aria-hidden="true" /></MotionLink>
+              <p>I’m Zaheer, a CSIT student working toward ML engineering. This little optical reader shows how a model sees your handwriting.</p>
+              <div className="observatory-shortcuts">
+                <MotionLink className="garden-project-link" href="#work">My {projects.length} projects <ArrowDown size={15} aria-hidden="true" /></MotionLink>
+                <MotionLink className="garden-project-link" href="#glasshouse">Visit Minty’s garden <ArrowDown size={15} aria-hidden="true" /></MotionLink>
+              </div>
             </div>
           </div>
+          <InkObservatory />
+        </MotionSection>
+        <MotionSection id="work" className="section-pad section-block">
+          <SectionHeading title="Selected projects">Select a project to see the app and its source code.</SectionHeading>
+          <ProjectExplorer projects={projects} launchRequest={projectLaunch} />
+          <details className="station-atlas" id="project-map">
+            <summary><span>Explore the project map</span><svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="m5 9 7 7 7-7" /></svg></summary>
+            <LearningWorld onVisitProject={openProject} onTryExperiment={openExperiment} />
+          </details>
+        </MotionSection>
+        <MotionSection id="glasshouse" className="section-pad section-block botanical-room" data-companion-clear>
+          <SectionHeading title="The signal garden">Plant a fern or a poppy. Minty uses the three nearest planted examples to guess what will grow in each bed.</SectionHeading>
           <SignalGarden onExploreClassifier={() => openProject("02")} />
         </MotionSection>
         <MotionSection id="workbench" className="section-pad section-block field-bench">
@@ -290,14 +306,6 @@ export default function Home() {
             </div>
             <ModelWorkbench launchRequest={experimentLaunch} />
           </div>
-        </MotionSection>
-        <MotionSection id="work" className="section-pad section-block">
-          <SectionHeading title="Selected projects">Select a project to see the app and its source code.</SectionHeading>
-          <ProjectExplorer projects={projects} launchRequest={projectLaunch} />
-          <details className="station-atlas" id="project-map">
-            <summary><span>Explore the project map</span><svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="m5 9 7 7 7-7" /></svg></summary>
-            <LearningWorld onVisitProject={openProject} onTryExperiment={openExperiment} />
-          </details>
         </MotionSection>
         <MotionSection id="ai-era" className="section-pad section-block ai-era"><SectionHeading title="Building with AI">I use AI coding agents while learning the fundamentals. I write the specs, choose the architecture, and review the code. These are the products I’m working on.</SectionHeading><ProjectDisclosures items={aiEra} /></MotionSection>
         <MotionSection id="about" className="section-pad section-block"><SectionHeading title="About me" /><div className="about-grid"><Reveal className="about-copy" sequence><p>I’m studying CSIT and working toward a career in machine learning engineering. My projects let me practice the whole process, from cleaning data in Python to building a web app someone can try.</p><div className="about-facts"><span><Briefcase size={17} /> Open to internships</span><span><Code size={17} /> Python + ML</span><span><Sparkle size={17} /> Learning by building</span></div></Reveal><Contributions /></div></MotionSection>

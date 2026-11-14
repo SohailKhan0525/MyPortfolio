@@ -16,7 +16,7 @@
   user-select: none;
 }
 .robot-companion * { pointer-events: none !important; }
-.robot-companion[data-menu-open="true"], .robot-companion[data-in-garden="true"] { visibility: hidden; }
+.robot-companion[data-menu-open="true"], .robot-companion[data-in-exhibit="true"] { visibility: hidden; }
 .minty-scene {
   position: absolute;
   inset: 0 auto auto calc(50% - var(--robot-size) / 2);

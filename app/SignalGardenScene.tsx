@@ -233,7 +233,7 @@ export default function SignalGardenScene({ size = GRID_SIZE, cells, selected, g
   return <div className="signal-garden-scene">
     <picture className="garden-conservatory" aria-hidden="true">
       <source media="(max-width: 640px)" srcSet="/garden/conservatory-small.webp" />
-      <img src="/garden/conservatory.webp" width="1536" height="1024" alt="" fetchPriority="high" decoding="async" draggable={false} />
+      <img src="/garden/conservatory.webp" width="1536" height="1024" alt="" loading="lazy" decoding="async" draggable={false} />
     </picture>
     <span id={`${id}-guide`} className="garden-sr-only">Use the arrow keys to move between beds. Press Enter or Space to plant. Each plant shows the prediction for its bed. Stakes mark planted examples. The star marks the mystery bed.</span>
     <svg className="garden-interactive-board" ref={surface} id="signal-garden-board" viewBox="0 0 768 512" preserveAspectRatio="xMidYMid slice"

@@ -34,6 +34,9 @@ html[data-theme="dark"] .field-home {
 }
 .garden-masthead .editorial-line { padding: .05em .04em .13em 0; margin: -.05em -.04em -.13em 0; }
 .garden-byline { max-width: 38ch; justify-self: end; }
+.observatory-shortcuts { display: flex; flex-wrap: wrap; gap: 0 18px; }
+.observatory-opening .garden-masthead h1 { max-width: none; }
+.field-home .botanical-room { scroll-margin-top: 4rem; }
 .garden-byline p { margin: 0; font-size: clamp(14px, 1.12vw, 16px); line-height: 1.45; color: var(--text2); }
 .garden-project-link { display: inline-flex; gap: 6px; align-items: center; min-height: 38px; font-size: 13px; font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
 .garden-project-link:focus-visible, .station-atlas summary:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }

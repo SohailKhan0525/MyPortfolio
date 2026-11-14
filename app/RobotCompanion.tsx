@@ -21,24 +21,29 @@ export default function RobotCompanion() {
   const [host, setHost] = useState<HTMLElement | null>(null);
   const [pageVisible, setPageVisible] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [inGarden, setInGarden] = useState(false);
+  const [inExhibit, setInExhibit] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const stage = useRef<HTMLElement>(null);
   const master = useRef<gsap.core.Timeline | null>(null);
   const ambient = useRef<gsap.core.Timeline | null>(null);
   const turnReady = useRef(false);
-  const active = ready && loaded && !reduced && pageVisible && !menuOpen && !inGarden && !failed;
+  const active = ready && loaded && !reduced && pageVisible && !menuOpen && !inExhibit && !failed;
 
   useEffect(() => {
-    // Minty is already on the board. Fetch the corner sprite when it first has a place on screen.
-    const garden = document.getElementById("signal-garden");
-    const observer = garden && typeof IntersectionObserver !== "undefined"
-      ? new IntersectionObserver(([entry]) => {
-        setInGarden(entry.isIntersecting);
-        if (!entry.isIntersecting) setHost(document.body);
+    // Keep the drawing surface and garden free of the fixed sprite. Other sections share one mount.
+    const exhibits = document.querySelectorAll("[data-companion-clear]");
+    const visible = new Set<Element>();
+    const observer = exhibits.length && typeof IntersectionObserver !== "undefined"
+      ? new IntersectionObserver(entries => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) visible.add(entry.target);
+          else visible.delete(entry.target);
+        }
+        setInExhibit(visible.size > 0);
+        if (!visible.size) setHost(document.body);
       }) : null;
-    if (garden && observer) observer.observe(garden);
+    if (observer) exhibits.forEach(exhibit => observer.observe(exhibit));
     else setHost(document.body);
     const visibility = () => setPageVisible(!document.hidden);
     const menu = (event: Event) => setMenuOpen(Boolean((event as CustomEvent<{ open: boolean }>).detail?.open));
@@ -201,7 +206,7 @@ export default function RobotCompanion() {
   if (!host) return null;
   return createPortal(<figure ref={stage} className="robot-companion" role="img"
     aria-label="Minty, a little mint-colored robot. It waves, looks around and occasionally takes a playful tumble."
-    data-active={active} data-reduced={reduced} data-loaded={loaded} data-failed={failed} data-menu-open={menuOpen} data-in-garden={inGarden}
+    data-active={active} data-reduced={reduced} data-loaded={loaded} data-failed={failed} data-menu-open={menuOpen} data-in-exhibit={inExhibit}
     aria-busy={!loaded && !failed}>
     {failed ? <img className="robot-poster" src="/models/minty-robot-still.webp" width="1280" height="640" alt="" /> :
       <div className="minty-scene" aria-hidden="true">

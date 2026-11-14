@@ -6,7 +6,9 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "./gsap";
 import { usePortfolioMotion } from "./MotionPreferences";
 import ProjectIllustration from "./ProjectIllustration";
+import StudyObject from "./StudyObject";
 import "./project-explorer.css";
+import "./study-objects.css";
 
 gsap.registerPlugin(Flip);
 
@@ -36,6 +38,8 @@ export default function ProjectExplorer({ projects, launchRequest }: ExplorerPro
   const [appliedLaunch, setAppliedLaunch] = useState<number | null>(null);
   const visible = projects.filter(project => matchesProjectFilter(project, selection.filter));
   const selected = visible.find(project => project[0] === selection.id) ?? visible[0];
+  const selectedId = selected?.[0];
+  const lastPrint = useRef(selectedId);
   const index = selected ? projects.indexOf(selected) : -1;
   const visibleIndex = selected ? visible.indexOf(selected) : -1;
 
@@ -67,6 +71,17 @@ export default function ProjectExplorer({ projects, launchRequest }: ExplorerPro
   }, [selected?.[0], selection.filter, appliedLaunch]);
 
   useGSAP(() => {
+    const changed = selectedId !== lastPrint.current;
+    lastPrint.current = selectedId;
+    if (!changed || !ready || reduced) return;
+    const print = railRef.current?.querySelector<HTMLElement>('button[aria-pressed="true"] .study-object-mount');
+    if (!print) return;
+    gsap.fromTo(print, { rotation: -3, y: -3 }, {
+      rotation: 0, y: 0, duration: 0.42, ease: "back.out(1.25)", clearProps: "transform",
+    });
+  }, { scope, dependencies: [selectedId, ready, reduced], revertOnUpdate: true });
+
+  useGSAP(() => {
     if (!ready || reduced || !scope.current) return;
     gsap.fromTo(".project-explorer-detail", { y: 32 }, {
       y: 0, duration: 0.9, ease: "power3.out", clearProps: "transform",
@@ -96,13 +111,9 @@ export default function ProjectExplorer({ projects, launchRequest }: ExplorerPro
     });
     timeline.fromTo(".project-explorer-summary > *", { y: 22, opacity: 0.3 }, {
       y: 0, opacity: 1, duration: 0.6, stagger: 0.055, clearProps: "transform,opacity",
-    }, 0)
-      .fromTo(".project-explorer-large-number > span", { yPercent: selection.direction * 105 }, {
-        yPercent: 0, duration: 0.7, clearProps: "transform",
-      }, 0)
-      .fromTo(".project-explorer-illustration", { x: selection.direction * 28, opacity: 0.3 }, {
-        x: 0, opacity: 1, duration: 0.7, clearProps: "transform,opacity",
-      }, 0.05);
+    }, 0).fromTo(".project-explorer-illustration", { x: selection.direction * 28, opacity: 0.3 }, {
+      x: 0, opacity: 1, duration: 0.7, clearProps: "transform,opacity",
+    }, 0.05);
   }, { scope, dependencies: [selected?.[0], selection.filter, selection.direction, ready, reduced], revertOnUpdate: true });
 
   function chooseFilter(filter: Filter) {
@@ -149,7 +160,7 @@ export default function ProjectExplorer({ projects, launchRequest }: ExplorerPro
             <button type="button" className="project-explorer-option" data-sound
               data-project-choice={project[0]} aria-pressed={selected[0] === project[0]}
               aria-controls="project-detail" onClick={() => chooseProject(project)}>
-              <span className="project-explorer-number" aria-hidden="true">{project[0]}</span>
+              <span className="study-object-mount" aria-hidden="true"><StudyObject id={project[0]} /></span>
               <span className="project-explorer-name"><strong>{project[1]}</strong><small>{project[2]}</small></span>
               <ArrowUpRight className="project-explorer-arrow" size={18} aria-hidden="true" />
             </button>
@@ -166,7 +177,6 @@ export default function ProjectExplorer({ projects, launchRequest }: ExplorerPro
 
       <article id="project-detail" className="project-explorer-detail" aria-labelledby="selected-project-title" tabIndex={-1}>
         <div className="project-explorer-study-header"><span>Project study</span><span>Python / applied learning</span></div>
-        <div className="project-explorer-large-number" aria-hidden="true"><span>{selected[0]}</span></div>
         <div className="project-explorer-content" data-direction={selection.direction}>
           <div className="project-explorer-summary">
             <div className="project-explorer-meta"><span>{selected[2]}</span><span>{selected[0]} — {String(projects.length).padStart(2, "0")}</span></div>
