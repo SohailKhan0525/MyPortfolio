@@ -1,7 +1,7 @@
 "use client";
 
-import { useId, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
-import { gsap, useGSAP } from "./gsap";
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
+import { gsap } from "./gsap";
 import { usePortfolioMotion } from "./MotionPreferences";
 import "./learning-world.css";
 
@@ -85,7 +85,6 @@ export default function LearningWorld({ onVisitProject, onTryExperiment }: {
   const { reduced } = usePortfolioMotion();
   const [selected, setSelected] = useState(0);
   const infoId = useId();
-  const scene = useRef<HTMLDivElement>(null);
   const rover = useRef<SVGGElement>(null);
   const paths = useRef<(SVGPathElement | null)[]>([]);
   const pins = useRef<(HTMLButtonElement | null)[]>([]);
@@ -95,7 +94,7 @@ export default function LearningWorld({ onVisitProject, onTryExperiment }: {
   const station = stations[selected];
   const experiment = station.experiment;
 
-  useGSAP(() => {
+  useEffect(() => {
     const vehicle = rover.current;
     if (!vehicle) return;
     function park() {
@@ -130,11 +129,18 @@ export default function LearningWorld({ onVisitProject, onTryExperiment }: {
     }
     if (!timeline.duration()) park();
     const icon = card.current?.querySelector("[data-station-stamp]");
-    if (icon) gsap.fromTo(icon, { scale: .88, rotation: -11 }, { scale: 1, rotation: 0, duration: .34, ease: "back.out(1.6)", clearProps: "transform" });
+    const stamp = icon && gsap.fromTo(icon, { scale: .88, rotation: -11 }, {
+      scale: 1, rotation: 0, duration: .34, ease: "back.out(1.6)", clearProps: "transform",
+    });
     const finishIfHidden = () => { if (document.hidden) timeline.progress(1); };
     document.addEventListener("visibilitychange", finishIfHidden);
-    return () => document.removeEventListener("visibilitychange", finishIfHidden);
-  }, { scope: scene, dependencies: [selected, reduced], revertOnUpdate: true });
+    return () => {
+      // Killing preserves the live track position when another destination interrupts a trip.
+      timeline.kill();
+      stamp?.revert();
+      document.removeEventListener("visibilitychange", finishIfHidden);
+    };
+  }, [selected, reduced, station]);
 
   function visit(index: number) {
     setSelected(index);
@@ -170,7 +176,7 @@ export default function LearningWorld({ onVisitProject, onTryExperiment }: {
   }
 
   return <section className="field-world" id="field-map" aria-label="Explore the machine learning field lab" tabIndex={-1}>
-    <div className="field-world__stage" ref={scene} onClick={visitFromPainting}>
+    <div className="field-world__stage" onClick={visitFromPainting}>
       <img className="field-world__painting" src="/world/learning-lab.webp"
         srcSet="/world/learning-lab-small.webp 768w, /world/learning-lab.webp 1536w"
         sizes="(max-width: 768px) calc(100vw - 32px), (max-width: 1360px) 61vw, 850px"

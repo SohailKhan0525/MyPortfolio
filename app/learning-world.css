@@ -100,7 +100,7 @@
 }
 .field-world__detail {
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) auto;
+  grid-template-columns: 36px minmax(0, 1fr);
   gap: 12px 14px;
   align-items: center;
   background: var(--surface);
@@ -134,7 +134,16 @@
   margin: 0;
   text-wrap: pretty;
 }
-.field-world__actions { display: flex; flex-direction: column; align-items: stretch; justify-self: start; gap: 2px; }
+.field-world__actions {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-self: start;
+  gap: 4px 10px;
+  /* Leave the fixed companion’s corner free while the map scrolls past. */
+  max-width: calc(100% - 180px);
+}
 .field-world__actions button { min-height: 44px; cursor: pointer; font: 600 12px/1.2 var(--font-body, sans-serif); }
 .field-world__visit { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 7px 14px; border-radius: 8px; background: var(--text); color: var(--bg); }
 .field-world__visit:hover, .field-world__visit:focus-visible { background: var(--signal); }
@@ -143,7 +152,7 @@
 @container (max-width: 550px) {
   .field-world__detail { grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 15px 16px; }
   .field-world__stamp { display: none; }
-  .field-world__actions { flex-direction: row; align-items: center; flex-wrap: wrap; gap: 4px 10px; }
+  .field-world__actions { grid-column: 1; max-width: 100%; }
   .field-world__hint { bottom: 8px; left: 8px; padding: 4px 6px; font-size: 9px; }
   .field-world__sign { gap: 4px; min-height: 24px; padding: 3px 6px; font-size: 11px; }
   .field-world__sign svg { width: 13px; height: 13px; }
