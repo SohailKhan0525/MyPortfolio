@@ -7,11 +7,6 @@ import ProjectDisclosures from "./ProjectDisclosures";
 import DataInstrument from "./DataInstrument";
 import ProjectExplorer from "./ProjectExplorer";
 import LearningJourney from "./LearningJourney";
-import LearningWorld from "./LearningWorld";
-import InkObservatory from "./InkObservatory";
-import SignalGarden from "./SignalGarden";
-import ModelWorkbench from "./ModelWorkbench";
-import "./world-home.css";
 import PortfolioHeader from "./PortfolioHeader";
 import RobotCompanion from "./RobotCompanion";
 import UnderpageFooter from "./UnderpageFooter";
@@ -23,9 +18,9 @@ import { ArrowDown, ArrowUpRight, Briefcase, Check, Code, GithubLogo, LinkedinLo
 type Contribution = { date: string; count: number; level: 0 | 1 | 2 | 3 | 4 };
 
 const projects = [
-  ["01", "House Price Prediction", "Regression", "I converted floor areas to a common unit and compared tree models to estimate house prices in lakhs.", ["Python", "pandas", "NumPy", "scikit learn"], "https://housepriceprediction-rqo8ykwgldxbpemwl6kvok.streamlit.app/", "https://github.com/SohailKhan0525/HousePricePrediction"],
-  ["02", "Global Earthquake Prediction", "Classification", "I used recorded earthquake data to classify whether a tsunami followed each event.", ["Python", "pandas", "NumPy", "scikit learn"], "https://github.com/SohailKhan0525/Global-Earthquake-Prediction", "https://github.com/SohailKhan0525/Global-Earthquake-Prediction"],
-  ["03", "Heart Disease Prediction", "Logistic regression", "For this student project, I encoded and scaled the inputs for a logistic regression classifier, then put it in a Streamlit app.", ["Python", "scikit learn", "Streamlit"], "https://heartdiseaseml-4zrcurmudxpfxbwygcuyytm.streamlit.app/", "https://github.com/SohailKhan0525/HeartDiseaseML"],
+  ["01", "House Price Prediction", "Regression", "Predicting house prices with Python and a practical ML workflow.", ["Python", "pandas", "NumPy", "scikit learn"], "https://housepriceprediction-rqo8ykwgldxbpemwl6kvok.streamlit.app/", "https://github.com/SohailKhan0525/HousePricePrediction"],
+  ["02", "Global Earthquake Prediction", "Classification", "An applied classification project exploring earthquake prediction.", ["Python", "pandas", "NumPy", "scikit learn"], "https://github.com/SohailKhan0525/Global-Earthquake-Prediction", "https://github.com/SohailKhan0525/Global-Earthquake-Prediction"],
+  ["03", "Heart Disease Prediction", "Logistic regression", "A Streamlit app turning a classification model into an interactive experience.", ["Python", "scikit learn", "Streamlit"], "https://heartdiseaseml-4zrcurmudxpfxbwygcuyytm.streamlit.app/", "https://github.com/SohailKhan0525/HeartDiseaseML"],
   ["04", "Student Management", "Python app", "A practical student management application with a hosted interface.", ["Python", "Streamlit"], "https://studentmanagementproject-ulj54ytmcyj55upzakbzhn.streamlit.app/", "https://github.com/SohailKhan0525/StudentManagementProject"],
   ["05", "Student Pass / Fail Predictor", "Classification", "A small interactive application for predicting student outcomes.", ["Python", "scikit learn", "Streamlit"], "https://studentfailpasspredictor-hjymwbpsp4bksec9ycb2xz.streamlit.app/", "https://github.com/SohailKhan0525/StudentFailPassPredictor"],
   ["06", "Bank Management", "Python app", "A practical project focused on application logic and Python fundamentals.", ["Python", "Streamlit"], "https://bankmanagementproject-brt9pt282uavy8ddzzy7ql.streamlit.app/", "https://github.com/SohailKhan0525/BankManagementProject"],
@@ -226,35 +221,8 @@ function Terminal() {
   );
 }
 
-function visitStationDestination(id: string) {
-  const destination = document.getElementById(id);
-  if (!destination) return;
-  destination.focus({ preventScroll: true });
-  scrollToPortfolioSection(id);
-}
-
 export default function Home() {
   const [copied, setCopied] = useState(false);
-  const [projectLaunch, setProjectLaunch] = useState<{ id: string; serial: number } | null>(null);
-  const [experimentLaunch, setExperimentLaunch] = useState<{ mode: "house" | "quake"; serial: number } | null>(null);
-
-  function openProject(id: string) {
-    setProjectLaunch(previous => ({ id, serial: (previous?.serial ?? 0) + 1 }));
-  }
-  function openExperiment(mode: "house" | "quake") {
-    setExperimentLaunch(previous => ({ mode, serial: (previous?.serial ?? 0) + 1 }));
-  }
-
-  // Move focus only for an explicit visit, after the selected
-  // destination has committed. A station preview never moves the page.
-  useEffect(() => {
-    if (projectLaunch) visitStationDestination("project-detail");
-  }, [projectLaunch]);
-
-  useEffect(() => {
-    if (experimentLaunch) visitStationDestination("model-workbench");
-  }, [experimentLaunch]);
-
   const email = "sohailkhannnn.0525@gmail.com";
   const linkedin = "https://www.linkedin.com/in/mohd-zaheer-uddin-166b3b356/";
 
@@ -265,50 +233,16 @@ export default function Home() {
   };
 
   return (
-    <div className="site-shell field-home">
+    <div className="site-shell">
       <RobotCompanion />
       <div className="portfolio-foreground">
       <PortfolioHeader />
       <a className="skip-link" href="#top">Skip to content</a><main id="top" tabIndex={-1}>
-        <MotionSection id="intro" className="garden-opening observatory-opening section-pad" data-companion-clear>
-          <div className="garden-masthead">
-            <AnimatedHeading>The Ink Observatory.</AnimatedHeading>
-            <div className="garden-byline">
-              <p>I’m Zaheer, a CSIT student working toward ML engineering. This little optical reader shows how a model sees your handwriting.</p>
-              <div className="observatory-shortcuts">
-                <MotionLink className="garden-project-link" href="#work">My {projects.length} projects <ArrowDown size={15} aria-hidden="true" /></MotionLink>
-                <MotionLink className="garden-project-link" href="#glasshouse">Visit Minty’s garden <ArrowDown size={15} aria-hidden="true" /></MotionLink>
-              </div>
-            </div>
-          </div>
-          <InkObservatory />
-        </MotionSection>
-        <MotionSection id="work" className="section-pad section-block">
-          <SectionHeading title="Selected projects">Select a project to see the app and its source code.</SectionHeading>
-          <ProjectExplorer projects={projects} launchRequest={projectLaunch} />
-          <details className="station-atlas" id="project-map">
-            <summary><span>Explore the project map</span><svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="m5 9 7 7 7-7" /></svg></summary>
-            <LearningWorld onVisitProject={openProject} onTryExperiment={openExperiment} />
-          </details>
-        </MotionSection>
-        <MotionSection id="glasshouse" className="section-pad section-block botanical-room" data-companion-clear>
-          <SectionHeading title="The signal garden">Plant a fern or a poppy. Minty uses the three nearest planted examples to guess what will grow in each bed.</SectionHeading>
-          <SignalGarden onExploreClassifier={() => openProject("02")} />
-        </MotionSection>
-        <MotionSection id="workbench" className="section-pad section-block field-bench">
-          <div className="field-bench-heading">
-            <SectionTitle>My workbench.</SectionTitle>
-            <DataInstrument />
-          </div>
-          <div className="field-bench-tools">
-            <div className="field-shell">
-              <Terminal />
-            </div>
-            <ModelWorkbench launchRequest={experimentLaunch} />
-          </div>
-        </MotionSection>
+        <div className="folio-line section-pad"><span>Mohd Zaheer Uddin / Portfolio</span><span>Python, models &amp; working things</span><span>2026</span></div>
+        <MotionSection id="intro" className="hero hero-with-companion section-pad"><div className="hero-copy"><span className="hero-kicker"><i /> CSIT undergraduate · Open to internships</span><AnimatedHeading>I build Python apps and machine learning projects.</AnimatedHeading><Reveal delay={0.16}><p className="hero-description">I’m a CSIT undergraduate learning through datasets, models, and working apps.</p></Reveal><Reveal delay={0.24}><div className="hero-actions"><MotionLink className="button button-primary" data-sound href="#work">See the work <ArrowDown size={17} /></MotionLink><MotionButton className="text-button" data-sound type="button" onClick={copyEmail}><CopyLabel copied={copied}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={16} /> : <PaperPlaneTilt size={16} />}</CopyLabel></MotionButton></div></Reveal><Reveal delay={0.32}><div className="proof-row"><span>7 projects</span><span>Python + ML focus</span><span>Open to internships</span></div></Reveal></div><Reveal className="hero-art" delay={0.16} variant="panel"><div className="terminal-caption"><span>01 / The working desk</span><ArrowDown size={18} aria-hidden="true" /></div><Terminal /><p className="hero-note">Try <b>help</b>, <b>projects</b>, <b>skills</b>, or <b>about</b>.</p></Reveal><div className="hero-process"><span className="process-caption">From a question<br />to something that works.</span><DataInstrument /></div></MotionSection>
+        <MotionSection id="work" className="section-pad section-block"><SectionHeading title="Selected projects">Select a project to see the app and its source code.</SectionHeading><ProjectExplorer projects={projects} /></MotionSection>
         <MotionSection id="ai-era" className="section-pad section-block ai-era"><SectionHeading title="Building with AI">I use AI coding agents while learning the fundamentals. I write the specs, choose the architecture, and review the code. These are the products I’m working on.</SectionHeading><ProjectDisclosures items={aiEra} /></MotionSection>
-        <MotionSection id="about" className="section-pad section-block"><SectionHeading title="About me" /><div className="about-grid"><Reveal className="about-copy" sequence><p>I’m studying CSIT and working toward a career in machine learning engineering. My projects let me practice the whole process, from cleaning data in Python to building a web app someone can try.</p><div className="about-facts"><span><Briefcase size={17} /> Open to internships</span><span><Code size={17} /> Python + ML</span><span><Sparkle size={17} /> Learning by building</span></div></Reveal><Contributions /></div></MotionSection>
+        <MotionSection id="about" className="section-pad section-block"><SectionHeading title="About me" /><div className="about-grid"><Reveal className="about-copy" sequence><p>I am a CSIT undergraduate focused on Python, machine learning, data analysis, and practical web development.</p><div className="about-facts"><span><Briefcase size={17} /> Open to internships</span><span><Code size={17} /> Python + ML</span><span><Sparkle size={17} /> Learning by building</span></div></Reveal><Contributions /></div></MotionSection>
         <MotionSection id="journey" className="section-pad section-block"><SectionHeading title="What I’m learning">From Python fundamentals to models, apps, and deployment.</SectionHeading><LearningJourney /></MotionSection>
         <MotionSection id="skills" className="section-pad section-block"><SectionHeading title="Tools I use">The languages and libraries behind these projects.</SectionHeading><div className="skills-grid">{skills.map(([name, desc], i) => <Reveal key={name} delay={i * 0.045} variant="slide"><article className="skill-card surface"><span className="skill-index">0{i + 1}</span><strong>{name}</strong><span>{desc}</span></article></Reveal>)}</div></MotionSection>
         <MotionSection id="contact" className="section-pad section-block"><div className="surface contact-card"><Reveal variant="panel"><SectionTitle>Let’s build something.</SectionTitle><span className="contact-section-label">Get in touch</span><p>I’m open to internships and collaborations. Email me or connect on LinkedIn.</p></Reveal><Reveal className="contact-actions" sequence><MotionLink className="contact-email" href={`mailto:${email}`}>{email}</MotionLink><MotionButton className="button button-primary" data-sound type="button" onClick={copyEmail}><CopyLabel copied={copied}>{copied ? "Email copied" : "Copy email"} {copied ? <Check size={17} /> : <PaperPlaneTilt size={17} />}</CopyLabel></MotionButton><MotionLink className="button button-secondary" data-sound href={linkedin} target="_blank" rel="noreferrer"><LinkedinLogo size={17} /> LinkedIn</MotionLink><MotionLink className="button button-secondary" data-sound href="https://github.com/SohailKhan0525" target="_blank" rel="noreferrer"><GithubLogo size={17} /> GitHub</MotionLink></Reveal></div></MotionSection>

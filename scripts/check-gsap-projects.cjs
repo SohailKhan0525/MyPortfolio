@@ -87,9 +87,8 @@ function visit(node) {
 visit(source);
 const workRoot = createRoot(document.getElementById('work-root'));
 const aiRoot = createRoot(document.getElementById('ai-root'));
-let launchRequest = null;
 const render = () => {
-  workRoot.render(React.createElement(React.StrictMode, null, React.createElement(ProjectExplorer, { projects: data.projects, launchRequest })));
+  workRoot.render(React.createElement(React.StrictMode, null, React.createElement(ProjectExplorer, { projects: data.projects })));
   aiRoot.render(React.createElement(React.StrictMode, null, React.createElement(ProjectDisclosures, { items: data.aiEra })));
 };
 const click = element => act(async () => { assert(element); element.click(); });
@@ -136,34 +135,6 @@ const resize = async (width, height) => { window.innerWidth = width; window.inne
     assert.equal(title().textContent, 'House Price Prediction');
     assert.equal(document.querySelector('[aria-label="Previous project"]').disabled, true);
     assert.equal(pageScrolls, 0, 'Project interactions never scroll the whole page');
-
-    const rail = document.getElementById('project-options');
-    Object.defineProperties(rail, {
-      clientWidth: { configurable: true, value: 350 },
-      scrollWidth: { configurable: true, value: 1568 },
-    });
-    const heartButton = choice('Heart Disease Prediction');
-    rail.getBoundingClientRect = () => ({ left: 0, right: 350 });
-    heartButton.getBoundingClientRect = () => ({ left: 448 - rail.scrollLeft, right: 672 - rail.scrollLeft });
-    launchRequest = { id: '03', serial: 1 };
-    await act(async () => render());
-    assert.equal(title().textContent, 'Heart Disease Prediction');
-    assert.equal(filter('Machine learning').getAttribute('aria-pressed'), 'true', 'A compatible filter survives a visit from the world');
-    assert.equal(rail.scrollLeft, 448, 'The chosen station reveals its offscreen project option in the narrow rail');
-    assert.equal(document.querySelector('.project-explorer-link-primary').getAttribute('href'), data.projects[2][5]);
-    await click(filter('Python apps'));
-    await act(async () => render());
-    assert.equal(title().textContent, 'Student Management', 'A consumed request does not override browsing');
-    launchRequest = { id: '03', serial: 2 };
-    await act(async () => render());
-    assert.equal(title().textContent, 'Heart Disease Prediction', 'Revisiting the same station selects it again');
-    assert.equal(filter('All work').getAttribute('aria-pressed'), 'true', 'An incompatible filter clears');
-    assert.equal(document.getElementById('project-detail').tabIndex, -1, 'The destination can receive focus without another tab stop');
-    assert.equal(pageScrolls, 0, 'Rail positioning leaves the document scroll to the page navigation');
-    delete heartButton.getBoundingClientRect;
-    delete rail.getBoundingClientRect;
-    delete rail.clientWidth;
-    delete rail.scrollWidth;
 
     const triggers = [...document.querySelectorAll('.ai-card-head')];
     await click(triggers[0]);
@@ -218,7 +189,7 @@ const resize = async (width, height) => { window.innerWidth = width; window.inne
     await act(async () => { workRoot.unmount(); aiRoot.unmount(); });
     assert.equal(observers.size, 0, 'StrictMode and unmount release all intrinsic-size observers');
     assert.equal(ScrollTrigger.getAll().length, 0, 'Component scopes release all ScrollTriggers');
-    console.log('PASS: all 7 studies/URLs, repeat world visits, filter and rail handoff, 3 AI chapters/copy, filtering, Prev/Next, focus, accordion semantics, desktop/mobile/short viewport fit modes, genuine GSAP intermediate state, rapid selection, live reduced motion and StrictMode cleanup.');
+    console.log('PASS: all 7 studies/URLs, 3 AI chapters/copy, filtering, Prev/Next, focus, accordion semantics, desktop/mobile/short viewport fit modes, genuine GSAP intermediate state, rapid selection, live reduced motion and StrictMode cleanup.');
   } finally {
     await act(async () => { workRoot.unmount(); aiRoot.unmount(); });
     ScrollTrigger.killAll(); ScrollTrigger.disable(); gsap.globalTimeline.clear(); gsap.ticker.sleep();

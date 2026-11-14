@@ -2,13 +2,11 @@
 
 import { ArrowLeft, ArrowRight, ArrowUpRight, GithubLogo } from "@phosphor-icons/react";
 import { Flip } from "gsap/Flip";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "./gsap";
 import { usePortfolioMotion } from "./MotionPreferences";
 import ProjectIllustration from "./ProjectIllustration";
-import StudyObject from "./StudyObject";
 import "./project-explorer.css";
-import "./study-objects.css";
 
 gsap.registerPlugin(Flip);
 
@@ -24,62 +22,15 @@ export function matchesProjectFilter(project: Project, filter: Filter) {
   return filter === "all" || (filter === "python" ? application : !application);
 }
 
-type ExplorerProps = {
-  projects: readonly Project[];
-  launchRequest?: { id: string; serial: number } | null;
-};
-
-export default function ProjectExplorer({ projects, launchRequest }: ExplorerProps) {
+export default function ProjectExplorer({ projects }: { projects: readonly Project[] }) {
   const scope = useRef<HTMLDivElement>(null);
-  const railRef = useRef<HTMLUListElement>(null);
   const flipState = useRef<ReturnType<typeof Flip.getState> | null>(null);
   const { reduced, ready } = usePortfolioMotion();
   const [selection, setSelection] = useState({ filter: "all" as Filter, id: projects[0]?.[0], direction: 1 });
-  const [appliedLaunch, setAppliedLaunch] = useState<number | null>(null);
   const visible = projects.filter(project => matchesProjectFilter(project, selection.filter));
   const selected = visible.find(project => project[0] === selection.id) ?? visible[0];
-  const selectedId = selected?.[0];
-  const lastPrint = useRef(selectedId);
   const index = selected ? projects.indexOf(selected) : -1;
   const visibleIndex = selected ? visible.indexOf(selected) : -1;
-
-  // Apply each visit before committing. The scroll destination and its links
-  // then describe the requested study even when a previous filter excluded it.
-  if (launchRequest && launchRequest.serial !== appliedLaunch) {
-    setAppliedLaunch(launchRequest.serial);
-    const nextIndex = projects.findIndex(project => project[0] === launchRequest.id);
-    const next = projects[nextIndex];
-    if (next && next[0] !== selected?.[0]) {
-      setSelection({
-        id: next[0],
-        filter: matchesProjectFilter(next, selection.filter) ? selection.filter : "all",
-        direction: nextIndex < index ? -1 : 1,
-      });
-    }
-  }
-
-  useLayoutEffect(() => {
-    const rail = railRef.current;
-    if (!rail || rail.scrollWidth <= rail.clientWidth) return;
-    const button = rail.querySelector<HTMLButtonElement>('button[aria-pressed="true"]');
-    if (!button) return;
-    const bounds = rail.getBoundingClientRect();
-    const buttonBounds = button.getBoundingClientRect();
-    if (buttonBounds.left < bounds.left || buttonBounds.right > bounds.right) {
-      rail.scrollLeft += buttonBounds.left - bounds.left;
-    }
-  }, [selected?.[0], selection.filter, appliedLaunch]);
-
-  useGSAP(() => {
-    const changed = selectedId !== lastPrint.current;
-    lastPrint.current = selectedId;
-    if (!changed || !ready || reduced) return;
-    const print = railRef.current?.querySelector<HTMLElement>('button[aria-pressed="true"] .study-object-mount');
-    if (!print) return;
-    gsap.fromTo(print, { rotation: -3, y: -3 }, {
-      rotation: 0, y: 0, duration: 0.42, ease: "back.out(1.25)", clearProps: "transform",
-    });
-  }, { scope, dependencies: [selectedId, ready, reduced], revertOnUpdate: true });
 
   useGSAP(() => {
     if (!ready || reduced || !scope.current) return;
@@ -111,9 +62,13 @@ export default function ProjectExplorer({ projects, launchRequest }: ExplorerPro
     });
     timeline.fromTo(".project-explorer-summary > *", { y: 22, opacity: 0.3 }, {
       y: 0, opacity: 1, duration: 0.6, stagger: 0.055, clearProps: "transform,opacity",
-    }, 0).fromTo(".project-explorer-illustration", { x: selection.direction * 28, opacity: 0.3 }, {
-      x: 0, opacity: 1, duration: 0.7, clearProps: "transform,opacity",
-    }, 0.05);
+    }, 0)
+      .fromTo(".project-explorer-large-number > span", { yPercent: selection.direction * 105 }, {
+        yPercent: 0, duration: 0.7, clearProps: "transform",
+      }, 0)
+      .fromTo(".project-explorer-illustration", { x: selection.direction * 28, opacity: 0.3 }, {
+        x: 0, opacity: 1, duration: 0.7, clearProps: "transform,opacity",
+      }, 0.05);
   }, { scope, dependencies: [selected?.[0], selection.filter, selection.direction, ready, reduced], revertOnUpdate: true });
 
   function chooseFilter(filter: Filter) {
@@ -135,7 +90,15 @@ export default function ProjectExplorer({ projects, launchRequest }: ExplorerPro
 
   function stepProject(direction: number) {
     const next = visible[visibleIndex + direction];
-    if (next) chooseProject(next);
+    if (!next) return;
+    chooseProject(next);
+    // Reveal the active choice within its own native horizontal rail only.
+    const button = scope.current?.querySelector<HTMLButtonElement>(`[data-project-choice="${next[0]}"]`);
+    const rail = scope.current?.querySelector<HTMLElement>(".project-explorer-list");
+    if (button && rail && rail.scrollWidth > rail.clientWidth) {
+      const left = button.getBoundingClientRect().left - rail.getBoundingClientRect().left + rail.scrollLeft;
+      rail.scrollLeft = left;
+    }
   }
 
   return <div ref={scope} className="project-explorer" data-reduced={reduced}>
@@ -154,13 +117,13 @@ export default function ProjectExplorer({ projects, launchRequest }: ExplorerPro
     {selected ? <div className="project-explorer-layout">
       <div className="project-explorer-index">
         <p className="project-explorer-hint">Browse the studies <ArrowRight size={16} aria-hidden="true" /></p>
-        <ul ref={railRef} className="project-explorer-list" id="project-options" aria-label="Select a project">
+        <ul className="project-explorer-list" id="project-options" aria-label="Select a project">
           {projects.map(project => <li key={project[0]} className="project-explorer-choice"
             data-flip-id={`project-${project[0]}`} hidden={!matchesProjectFilter(project, selection.filter)}>
             <button type="button" className="project-explorer-option" data-sound
               data-project-choice={project[0]} aria-pressed={selected[0] === project[0]}
               aria-controls="project-detail" onClick={() => chooseProject(project)}>
-              <span className="study-object-mount" aria-hidden="true"><StudyObject id={project[0]} /></span>
+              <span className="project-explorer-number" aria-hidden="true">{project[0]}</span>
               <span className="project-explorer-name"><strong>{project[1]}</strong><small>{project[2]}</small></span>
               <ArrowUpRight className="project-explorer-arrow" size={18} aria-hidden="true" />
             </button>
@@ -175,8 +138,9 @@ export default function ProjectExplorer({ projects, launchRequest }: ExplorerPro
         </div>
       </div>
 
-      <article id="project-detail" className="project-explorer-detail" aria-labelledby="selected-project-title" tabIndex={-1}>
+      <article id="project-detail" className="project-explorer-detail" aria-labelledby="selected-project-title">
         <div className="project-explorer-study-header"><span>Project study</span><span>Python / applied learning</span></div>
+        <div className="project-explorer-large-number" aria-hidden="true"><span>{selected[0]}</span></div>
         <div className="project-explorer-content" data-direction={selection.direction}>
           <div className="project-explorer-summary">
             <div className="project-explorer-meta"><span>{selected[2]}</span><span>{selected[0]} — {String(projects.length).padStart(2, "0")}</span></div>

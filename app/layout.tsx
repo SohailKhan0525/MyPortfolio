@@ -21,12 +21,11 @@ import "./gsap-redesign.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mohdzaheeruddin0525.vercel.app"),
-  title: "The Ink Observatory | Mohd Zaheer Uddin",
-  description: "Draw a digit and see how a model reads it. Explore Zaheer’s handwritten digit recognizer, playable signal garden and seven Python and machine learning projects.",
+  title: "Mohd Zaheer Uddin | ML & Data Science",
+  description: "Portfolio of Mohd Zaheer Uddin, a CSIT undergraduate building practical machine learning and data science projects with Python.",
   openGraph: {
-    title: "The Ink Observatory | Mohd Zaheer Uddin",
-    description: "Draw on the glass of Zaheer’s handwriting reader and see the examples behind its guess. Explore his machine learning studies and playable garden.",
-    images: [{ url: "/ink/observatory.webp", width: 1536, height: 1024, alt: "A brass and green enamel optical reader in Zaheer’s Ink Observatory." }],
+    title: "Mohd Zaheer Uddin | ML & Data Science",
+    description: "Projects, learning journey, skills, resume, and contact details for Mohd Zaheer Uddin.",
     type: "website",
   },
   icons: { icon: "/favicon.svg" },
