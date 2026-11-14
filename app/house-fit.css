@@ -1,0 +1,25 @@
+.house-fit {
+  --sale: #a6492d;
+  max-width: 100%; min-width: 0; margin-block: 18px 0; padding-block: 20px 0;
+  border-top: 1px solid var(--line-strong); color: var(--text);
+}
+html[data-theme="dark"] .house-fit { --sale: #ffab80; }
+.house-fit h3 { margin: 0; font: 550 clamp(21px, 2.1vw, 28px)/1.16 var(--font-body, sans-serif); letter-spacing: -.04em; }
+.house-fit p.house-fit-instructions { margin: 8px 0 10px; max-width: 46ch; color: var(--text2); font-size: 14px; line-height: 1.5; }
+.house-fit .house-fit-plot { display: block; width: 100%; height: auto; max-height: 195px; margin: 4px 0; overflow: visible; }
+.house-fit-plot text { font: 10px var(--font-code, monospace); fill: var(--text2); }
+.house-fit-grid { stroke: var(--line); }
+.house-fit-line { stroke: var(--signal); stroke-width: 2.5; }
+.house-fit-gap { stroke: var(--sale); stroke-dasharray: 2 2; }
+.house-fit-sale { fill: var(--sale); stroke: var(--bg); stroke-width: 1.5; }
+.house-fit-rate { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-top: 12px; font-size: 13px; }
+.house-fit-rate span { font: 600 15px var(--font-code, monospace); }
+.house-fit input[type="range"] { display: block; width: 100%; min-width: 0; height: 40px; margin: 0; padding: 0; accent-color: var(--signal); cursor: pointer; }
+.house-fit input:disabled { cursor: default; }
+.house-fit-result { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-block: 10px; }
+.house-fit .house-fit-result p { display: grid; gap: 3px; margin: 0; }
+.house-fit-result strong { font: 530 22px/1.15 var(--font-body, sans-serif); letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.house-fit-result p > span, .house-fit-result small { font-size: 12px; line-height: 1.45; color: var(--text2); }
+.house-fit-result button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--text); font: 500 13px var(--font-body, sans-serif); border-radius: 7px; cursor: pointer; }
+.house-fit-result button:hover { border-color: var(--signal); }
+.house-fit :is(input,button):focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }

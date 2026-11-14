@@ -21,11 +21,12 @@ import "./gsap-redesign.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mohdzaheeruddin0525.vercel.app"),
-  title: "Mohd Zaheer Uddin | ML & Data Science",
-  description: "Portfolio of Mohd Zaheer Uddin, a CSIT undergraduate building practical machine learning and data science projects with Python.",
+  title: "Zaheer’s Field Lab | Mohd Zaheer Uddin",
+  description: "Explore the Python and machine learning projects of Mohd Zaheer Uddin, a CSIT student working toward ML engineering. Visit the field stations and try a model yourself.",
   openGraph: {
-    title: "Mohd Zaheer Uddin | ML & Data Science",
-    description: "Projects, learning journey, skills, resume, and contact details for Mohd Zaheer Uddin.",
+    title: "Zaheer’s Field Lab | Mohd Zaheer Uddin",
+    description: "A student’s machine learning portfolio. Explore the field stations, fit a line to house prices, and see how a classifier makes decisions.",
+    images: [{ url: "/world/learning-lab.webp", width: 1536, height: 1024, alt: "A miniature valley with a cottage, a quake station, and a heart lab connected by rail." }],
     type: "website",
   },
   icons: { icon: "/favicon.svg" },

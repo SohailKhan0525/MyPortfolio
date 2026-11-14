@@ -1,0 +1,271 @@
+/* The lab uses the portfolio’s existing paper, ink and forest palette. */
+.field-home {
+  --field-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --field-terracotta: #975237;
+}
+
+html[data-theme="dark"] .field-home {
+  --field-terracotta: #ffc49d;
+}
+
+.site-shell.field-home .site-header {
+  min-height: 72px;
+  padding-block: 12px;
+}
+
+.field-home .field-landing {
+  display: grid;
+  grid-template-columns: minmax(0, .72fr) minmax(0, 1.48fr);
+  align-items: center;
+  gap: clamp(1.5rem, 3.2vw, 3.25rem);
+  padding-block: clamp(1.75rem, 4.2vw, 4.25rem) clamp(2.5rem, 4.6vw, 4.75rem);
+}
+
+.field-intro {
+  min-width: 0;
+  padding-block: .5rem;
+}
+
+.field-availability {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  margin: 0 0 clamp(1.5rem, 2.8vw, 2.5rem);
+  color: var(--text2);
+  font: 500 .75rem/1.4 var(--font-body);
+}
+
+.field-availability > span {
+  width: .58rem;
+  height: .58rem;
+  border-radius: 50%;
+  background: var(--signal);
+  box-shadow: 0 0 0 3px var(--signal-soft);
+}
+
+.field-home .field-intro h1 {
+  max-width: 8ch;
+  margin: 0;
+  color: var(--text);
+  font-family: var(--field-display);
+  font-size: clamp(4.1rem, 6.55vw, 6.55rem);
+  font-weight: 500;
+  line-height: .96;
+  letter-spacing: -.065em;
+  overflow-wrap: normal;
+}
+
+.field-intro .editorial-line {
+  padding: .04em .035em .12em 0;
+  margin: -.04em -.035em -.12em 0;
+}
+
+.field-introduction {
+  max-width: 32ch;
+  margin: clamp(1.15rem, 2.2vw, 2rem) 0 0;
+  color: var(--text2);
+  font: 400 clamp(1rem, 1.24vw, 1.16rem)/1.58 var(--font-body);
+  text-wrap: pretty;
+}
+
+.field-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .38rem 1.2rem;
+  margin-top: clamp(1.1rem, 2vw, 1.85rem);
+}
+
+.field-project-link,
+.field-email-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+  min-height: 44px;
+  font: 500 .8rem/1.4 var(--font-body);
+  cursor: pointer;
+}
+
+.field-project-link {
+  border: 1px solid transparent;
+  padding: .65rem 1rem;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+  text-decoration: none;
+}
+
+.field-project-link:hover,
+.field-project-link:focus-visible {
+  background: var(--signal);
+  color: var(--bg);
+}
+
+.field-email-link {
+  padding: .35rem .125rem;
+  border: 0;
+  background: transparent;
+  color: var(--text2);
+  text-underline-offset: .32rem;
+}
+
+.field-email-link:hover,
+.field-email-link:focus-visible {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+.field-home .field-bench.section-block {
+  padding-block: clamp(2.25rem, 4.6vw, 4.75rem);
+}
+
+.field-bench-heading,
+.field-bench-tools {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+}
+
+.field-bench-heading {
+  align-items: center;
+  margin-bottom: clamp(1.5rem, 3vw, 2.75rem);
+}
+
+.field-home .section-heading .section-title,
+.field-home .field-bench-heading > .section-title,
+.field-home #contact .section-title {
+  font-family: var(--field-display);
+  font-weight: 500;
+  letter-spacing: -.055em;
+  line-height: 1.04;
+}
+
+.field-bench-heading > .section-title {
+  max-width: 11ch;
+  margin: 0;
+  font-size: clamp(2.7rem, 4.65vw, 4.4rem);
+}
+
+.field-bench-heading .data-instrument {
+  width: 100%;
+  max-width: 32rem;
+  justify-self: end;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.field-bench-tools {
+  align-items: start;
+}
+
+.field-shell {
+  min-width: 0;
+}
+
+.field-home .field-shell .hero-terminal-real {
+  border-radius: .75rem;
+  box-shadow: none;
+}
+
+.field-home .field-shell .terminal-top {
+  border-radius: .7rem .7rem 0 0;
+}
+
+.field-home .field-shell .terminal-bottom {
+  border-radius: 0 0 .7rem .7rem;
+}
+
+.field-home .field-shell .terminal-screen {
+  max-height: none;
+}
+
+.field-home .field-shell .terminal-input,
+.field-home .field-shell .terminal-form {
+  max-width: 100%;
+}
+
+.field-home #contact .contact-section-label {
+  padding: 0;
+  background: transparent;
+  color: var(--field-terracotta);
+}
+
+@media (min-width: 90rem) {
+  .field-home .field-landing { grid-template-columns: minmax(0, .69fr) minmax(0, 1.51fr); }
+}
+
+@media (max-width: 56rem) {
+  .field-home .field-landing {
+    grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr);
+    gap: 1.5rem;
+  }
+  .field-links { column-gap: .8rem; }
+}
+
+@media (max-width: 48rem) {
+  .field-home .field-landing {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+    padding-block: 1.75rem 2.5rem;
+  }
+  .field-intro { padding: 0; }
+  .field-availability { margin-bottom: .75rem; }
+  .field-home .field-intro h1 {
+    max-width: none;
+    font-size: clamp(2.5rem, 8vw, 4.25rem);
+    line-height: 1.02;
+  }
+  .field-introduction {
+    max-width: 49ch;
+    margin-top: .75rem;
+    font-size: 1rem;
+  }
+  .field-links { margin-top: .6rem; }
+  .field-bench-heading, .field-bench-tools {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.35rem;
+  }
+  .field-bench-heading > .section-title { max-width: none; }
+  .field-bench-heading .data-instrument { justify-self: start; }
+  .field-bench-tools { gap: 2rem; }
+}
+
+@media (max-width: 40rem) {
+  .site-shell.field-home .site-header {
+    min-height: 60px;
+    padding-block: 7px;
+  }
+  .site-shell.field-home .field-landing {
+    width: calc(100% - 32px) !important;
+    padding-top: 1.15rem;
+    gap: 1rem;
+  }
+  .field-intro { padding-inline: .25rem; }
+  /* The previous mobile hero applied its heading size to every h1. */
+  .field-home .field-intro h1 {
+    font-size: clamp(2.5rem, 9vw, 3.65rem) !important;
+    line-height: 1.02 !important;
+  }
+  .field-home .field-shell .terminal-chip { min-height: 44px !important; }
+  .field-home .field-shell .hero-terminal-real {
+    border-radius: .75rem !important;
+    box-shadow: none !important;
+  }
+  .field-introduction { max-width: 39ch; font-size: .95rem; line-height: 1.5; }
+  .field-project-link, .field-email-link { font-size: .775rem; }
+  body:has(.field-home) .robot-companion {
+    --robot-size: clamp(78px, 21vw, 110px);
+    width: calc(var(--robot-size) * 1.18);
+  }
+}
+
+@media (max-width: 26rem) {
+  .field-bench-heading { gap: .75rem; }
+}
+
+@media print {
+  .field-availability > span, .field-links { display: none; }
+  .field-home .field-landing { display: block; }
+}

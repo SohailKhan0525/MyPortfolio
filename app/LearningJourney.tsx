@@ -6,10 +6,10 @@ import { usePortfolioMotion } from "./MotionPreferences";
 import "./learning-journey.css";
 
 const milestones = [
-  ["01", "Python foundations", "Core syntax, OOP, files, data structures"],
-  ["02", "ML experiments", "Regression, classification, evaluation"],
-  ["03", "Interactive apps", "Turning models into usable tools"],
-  ["04", "Better engineering", "Responsive UI, deployment, accessibility"],
+  ["01", "Python foundations", "I started with classes, files, and the data structures behind my Python apps."],
+  ["02", "ML experiments", "For my housing project, I converted floor areas to square feet before comparing three regressors."],
+  ["03", "Interactive apps", "My Streamlit app takes a floor area and property details, then returns a price estimate in lakhs."],
+  ["04", "Better engineering", "I’m learning to check incoming data, test models on unseen examples, and build interfaces people can use."],
 ] as const;
 
 /** The rail follows reading progress; every milestone stays in the document flow. */

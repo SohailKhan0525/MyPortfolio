@@ -1,0 +1,94 @@
+.model-workbench {
+  min-width: 0;
+  scroll-margin-top: 110px;
+  color: var(--text);
+}
+.workbench-switch {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: stretch;
+  padding: 3px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+.workbench-switch button {
+  min-width: 0;
+  min-height: 44px;
+  padding: 6px clamp(8px, 1.2vw, 16px);
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text2);
+  font: 500 13px/1.25 var(--font-body, sans-serif);
+  cursor: pointer;
+}
+.workbench-switch button[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+.workbench-switch button:focus-visible, .quake-threshold input:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 3px;
+}
+.model-workbench > [hidden] { display: none; }
+.quake-threshold {
+  min-width: 0;
+  margin-top: 18px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line-strong);
+}
+.quake-threshold h3 {
+  margin: 0;
+  font: 550 clamp(21px, 2.1vw, 28px)/1.16 var(--font-body, sans-serif);
+  letter-spacing: -.04em;
+}
+.quake-threshold > p {
+  max-width: 49ch;
+  margin: 8px 0 14px;
+  color: var(--text2);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.quake-threshold-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+}
+.quake-threshold-label span { font: 600 15px var(--font-code, monospace); }
+.quake-threshold input {
+  display: block;
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--signal);
+  cursor: pointer;
+}
+.quake-threshold table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.3;
+  text-align: left;
+}
+.quake-threshold :is(td, th) {
+  padding: 5px 3px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+  font-weight: 400;
+}
+.quake-threshold thead th { color: var(--text2); font-size: 12px; }
+.quake-threshold td[data-flagged="true"] { color: var(--signal); font-weight: 650; }
+.quake-number { font-variant-numeric: tabular-nums; }
+.quake-results {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0 4px;
+}
+.quake-results dt { color: var(--text2); font-size: 12px; line-height: 1.45; }
+.quake-results dd {
+  margin: 4px 0 0;
+  font: 530 22px/1.15 var(--font-body, sans-serif);
+  font-variant-numeric: tabular-nums;
+}
